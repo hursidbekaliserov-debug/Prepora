@@ -633,10 +633,11 @@ export class StorageManager {
       'ADMIN-ACTIVATE-VIP'
     ];
 
-    // Tekshirish: Faqat rasmiy kodlar yoki admin bergan maxsus kalit
-    const isVerified = officialVerifiedKeys.some(
-      (code) => code === cleaned
-    );
+    // Tekshirish: Rasmiy kodlar yoki bot generatsiya qilgan tasdiqlangan kalit
+    const isVerified = 
+      cleaned.startsWith('PREPORA-PRO-') ||
+      cleaned.startsWith('PREPORA-VIP-') ||
+      officialVerifiedKeys.some((code) => code === cleaned);
 
     if (!isVerified) {
       return {
