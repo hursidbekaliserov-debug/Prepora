@@ -202,3 +202,4 @@ export default function AuthModal({ isOpen, onSuccess }: AuthModalProps) {
     </div>
   );
 }
+
