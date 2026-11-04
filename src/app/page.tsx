@@ -219,7 +219,7 @@ export default function LandingPage() {
                 className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base shadow-xl shadow-emerald-600/20 hover:scale-105 transition flex items-center justify-center gap-2"
               >
                 <Mic className="w-5 h-5" />
-                IELTS.GG Voice AI
+                Voice AI
               </Link>
 
               <Link
@@ -231,11 +231,10 @@ export default function LandingPage() {
               </Link>
 
               <Link
-                href="/sat/mock-exam"
-                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white hover:bg-slate-50 text-blue-950 border-2 border-slate-300 font-extrabold text-base transition flex items-center justify-center gap-2 shadow-xs"
+                href="/arena"
+                className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-blue-950 font-black text-base shadow-xl shadow-amber-400/20 hover:scale-105 transition flex items-center justify-center gap-2 animate-bounce"
               >
-                <Calculator className="w-5 h-5 text-blue-800" />
-                SAT Mock
+                <span>Arena (O'yinlar) 🎮</span>
               </Link>
             </div>
 
@@ -1069,7 +1068,7 @@ export default function LandingPage() {
                 </h3>
                 <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
                   Bepul hisobda har kuni 5 ta AI chat va 5 ta test ishlashingiz mumkin. 
-                  To'liq <strong>Bezlimit</strong> rejimga o'tib, IELTS.GG Voice AI bilan cheksiz ovozda gaplashing, 
+                  To'liq <strong>Bezlimit</strong> rejimga o'tib, Voice AI bilan cheksiz ovozda gaplashing, 
                   to'liq testlarni yeching va Cambridge Band 9.0 insho tahliliga ega bo'ling.
                 </p>
                 <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-bold text-amber-200">

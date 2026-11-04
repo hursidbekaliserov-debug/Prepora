@@ -385,7 +385,7 @@ export default function IeltsGgPage() {
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                  ielts.gg Jonli Ovoz Tizimi
+                  Voice AI Jonli Ovoz Tizimi
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">

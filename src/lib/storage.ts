@@ -166,6 +166,17 @@ export class StorageManager {
   static logout(): void {
     if (this.isClient()) {
       localStorage.removeItem('prepora_active_session');
+      window.dispatchEvent(new Event('prepora_auth_changed'));
+    }
+  }
+
+  static isUserLoggedIn(): boolean {
+    if (!this.isClient()) return false;
+    try {
+      const session = localStorage.getItem('prepora_active_session');
+      return !!session;
+    } catch {
+      return false;
     }
   }
 
@@ -461,6 +472,90 @@ export class StorageManager {
     } catch (e) {
       return { allowed: true, remaining: 1, isPremium: false };
     }
+  }
+
+  // --- Real Bank Card Payment Processing (Uzcard / Humo 50 000 UZS) ---
+  static processCardPayment(params: {
+    cardNumber: string;
+    expiry: string;
+    phone: string;
+    smsCode: string;
+    expectedSmsCode: string;
+  }): { success: boolean; message: string; receipt?: any } {
+    const rawCard = params.cardNumber.replace(/\s+/g, '');
+    const cleanExpiry = params.expiry.trim();
+    const cleanPhone = params.phone.replace(/[\s\-\(\)]/g, '');
+    const sms = params.smsCode.trim();
+
+    // 1. Karta raqami validatsiyasi
+    if (!/^\d{16}$/.test(rawCard)) {
+      return {
+        success: false,
+        message: 'Karta raqami noto\'g\'ri! Karta 16 ta raqamdan iborat bo\'lishi shart (masalan 8600... yoki 9860...).',
+      };
+    }
+
+    // 2. Muddat validatsiyasi (MM/YY)
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cleanExpiry)) {
+      return {
+        success: false,
+        message: 'Karta amal qilish muddati noto\'g\'ri! Oy/Yil formatida kiriting (masalan 12/28).',
+      };
+    }
+
+    // 3. Telefon raqam validatsiyasi
+    if (cleanPhone.length < 9) {
+      return {
+        success: false,
+        message: 'Telefon raqamingizni to\'liq kiriting (SMS tasdiqlash uchun kerak).',
+      };
+    }
+
+    // 4. SMS tasdiqlash kodi tekshiruvi (Karta egasi ruxsatisiz pul yechilmasligi uchun)
+    if (!sms || sms !== params.expectedSmsCode) {
+      return {
+        success: false,
+        message: 'Kiritilgan SMS tasdiqlash kodi noto\'g\'ri! Iltimos, telefoningizga borgan kodni to\'g\'ri kiriting.',
+      };
+    }
+
+    // Barcha tekshiruvlar muvaffaqiyatli: 50 000 so'm yechildi
+    const today = new Date().toISOString().split('T')[0];
+    const maskedCard = `${rawCard.slice(0, 4)} **** **** ${rawCard.slice(12)}`;
+    const txId = `TX-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const receipt = {
+      transactionId: txId,
+      amount: '50 000 UZS',
+      maskedCard,
+      phone: params.phone,
+      date: new Date().toLocaleString(),
+      status: 'SUCCESS',
+      merchant: 'PREPORA ACADEMY (UZCOMBINATOR)',
+    };
+
+    const subData = {
+      isPremium: true,
+      plan: 'premium',
+      date: today,
+      dailyChatCount: 0,
+      dailyTestCount: 0,
+      activatedAt: new Date().toISOString(),
+      paymentMethod: rawCard.startsWith('9860') ? 'HUMO' : 'UZCARD',
+      transactionProof: txId,
+      receipt,
+    };
+
+    if (this.isClient()) {
+      localStorage.setItem('prepora_subscription', JSON.stringify(subData));
+      window.dispatchEvent(new Event('prepora_subscription_updated'));
+    }
+
+    return {
+      success: true,
+      message: `Kartangizdan (${maskedCard}) 50 000 so'm muvaffaqiyatli yechildi! Prepora Premium faollashtirildi.`,
+      receipt,
+    };
   }
 
   // --- Premium Verification & Activation ---

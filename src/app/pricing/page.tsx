@@ -35,11 +35,11 @@ export default function PricingPage() {
   const faqs = [
     {
       q: "50 000 so'mlik Premium obunaga nimalar kiradi?",
-      a: "Prepora Premium bilan siz platformadagi barcha imkoniyatlardan mutlaqo bezlimit (cheksiz) foydalanasiz: IELTS.GG Voice AI bilan cheksiz ovozli suhbat, 24/7 AI repetitor, to'liq 98 savollik SAT va 4 ko'nikmali IELTS mock testlari hamda insholarni Cambridge mezonlari bo'yicha tekshirish."
+      a: "Prepora Premium bilan siz platformadagi barcha imkoniyatlardan mutlaqo bezlimit (cheksiz) foydalanasiz: Voice AI bilan cheksiz ovozli suhbat, 24/7 AI repetitor, to'liq 98 savollik SAT va 4 ko'nikmali IELTS mock testlari hamda insholarni Cambridge mezonlari bo'yicha tekshirish."
     },
     {
       q: "Bepul tarifda qanday cheklovlar bor?",
-      a: "Bepul (Standart) hisob egalari uchun har kuni 5 ta AI muloqot xabari (IELTS.GG yoki AI Repetitor) va 5 ta test ishlash imkoniyati beriladi. Har kecha soat 00:00 da bu limitlar qayta tiklanadi."
+      a: "Bepul (Standart) hisob egalari uchun har kuni 5 ta AI muloqot xabari (Voice AI yoki AI Repetitor) va 5 ta test ishlash imkoniyati beriladi. Har kecha soat 00:00 da bu limitlar qayta tiklanadi."
     },
     {
       q: "Qanday to'lov tizimlari orqali to'lash mumkin?",
@@ -142,7 +142,7 @@ export default function PricingPage() {
               <div className="pt-2 space-y-3 text-xs text-slate-700">
                 <div className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Kuniga 5 ta AI chat & IELTS.GG ovozli savol</span>
+                  <span>Kuniga 5 ta AI chat & Voice AI ovozli savol</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -209,7 +209,7 @@ export default function PricingPage() {
               <div className="pt-2 space-y-3 text-xs text-slate-800 font-medium">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span className="font-bold text-blue-950">Bezlimit IELTS.GG Voice AI ovozli suhbat</span>
+                  <span className="font-bold text-blue-950">Bezlimit Voice AI ovozli suhbat</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
