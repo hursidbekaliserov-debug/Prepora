@@ -30,8 +30,8 @@ interface PremiumModalProps {
 }
 
 export default function PremiumModal({ isOpen, onClose, reason = 'general' }: PremiumModalProps) {
-  // Qabul qiluvchi karta raqami (shaxsiy yoki biznes kartangizni qo'yishingiz mumkin)
-  const RECIPIENT_CARD = process.env.NEXT_PUBLIC_RECIPIENT_CARD || '8600 1404 9821 7345';
+  // Qabul qiluvchi karta raqami
+  const RECIPIENT_CARD = process.env.NEXT_PUBLIC_RECIPIENT_CARD || '9987 1000 3057 1273';
   const TELEGRAM_BOT_URL = 'https://t.me/prepora_support_bot';
 
   const [activeTab, setActiveTab] = useState<'pay_and_submit' | 'manual_code' | 'telegram_bot'>('pay_and_submit');
@@ -400,29 +400,26 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
             /* TAB 1: REKVIZITLAR VA TO'LOV CHEKINI YUBORISH */
             <div className="space-y-4">
               {/* Card visual */}
-              <div className="p-5 rounded-2xl bg-gradient-to-tr from-slate-900 via-blue-950 to-indigo-900 text-white shadow-md space-y-3 border border-blue-800/40">
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-tr from-slate-900 via-blue-950 to-indigo-900 text-white shadow-md space-y-2 border border-blue-800/40">
                 <div className="flex justify-between items-center text-xs text-slate-300">
                   <span className="font-semibold flex items-center gap-1">
                     <CreditCard className="w-4 h-4 text-amber-400" />
-                    Pul Qabul Qiluvchi Karta
+                    Karta Raqami
                   </span>
                   <span className="px-2 py-0.5 rounded-md bg-emerald-900 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
-                    Aktiv Hisob
+                    50 000 so'm
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-white/10 border border-white/15 flex items-center justify-between gap-3">
-                  <div>
-                    <span className="text-[10px] text-slate-300 uppercase font-mono block">Karta Raqami:</span>
-                    <span className="text-xl sm:text-2xl font-mono font-black text-amber-300 tracking-wider block">
-                      {RECIPIENT_CARD}
-                    </span>
-                  </div>
+                <div className="p-3 sm:p-3.5 rounded-xl bg-white/10 border border-white/15 flex items-center justify-between gap-2 overflow-hidden">
+                  <span className="text-base sm:text-xl font-mono font-black text-amber-300 tracking-wider whitespace-nowrap select-all">
+                    {RECIPIENT_CARD}
+                  </span>
 
                   <button
                     type="button"
                     onClick={handleCopyCard}
-                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-blue-950 text-xs font-black transition shrink-0 shadow-sm"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-blue-950 text-xs font-black transition shrink-0 shadow-sm"
                   >
                     {copied ? (
                       <>
@@ -436,11 +433,6 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                       </>
                     )}
                   </button>
-                </div>
-
-                <div className="flex justify-between items-center text-xs text-slate-300 pt-1 border-t border-white/10">
-                  <span>To'lov summasi: <strong className="text-white font-bold">50 000 so'm</strong></span>
-                  <span className="text-emerald-400 font-bold">Payme / Click / Humo</span>
                 </div>
               </div>
 
