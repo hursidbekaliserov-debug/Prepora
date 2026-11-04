@@ -42,14 +42,14 @@ const BLITZ_QUESTIONS: BlitzQuestion[] = [
 ];
 
 const SPIN_PRIZES = [
-  { label: '+150 XP Tajriba', color: 'bg-indigo-600', text: 'text-white' },
-  { label: '⚡ 1 Bepul AI Savoli', color: 'bg-emerald-500', text: 'text-white' },
-  { label: '💎 Super Talaba', color: 'bg-cyan-500', text: 'text-white' },
-  { label: '+300 XP Bonus', color: 'bg-amber-500', text: 'text-white' },
-  { label: '🏆 Oltin Sertifikat', color: 'bg-purple-600', text: 'text-white' },
-  { label: '🎯 Grammar Ninja', color: 'bg-rose-500', text: 'text-white' },
-  { label: '+100 XP Tajriba', color: 'bg-blue-600', text: 'text-white' },
-  { label: '🔥 Olovli Status', color: 'bg-orange-500', text: 'text-white' },
+  { label: '+150 XP', fullLabel: "+150 XP Tajriba Balli", icon: '⚡', color: '#4f46e5' },
+  { label: '1 AI Savol', fullLabel: "1 Bepul AI Savoli", icon: '🤖', color: '#059669' },
+  { label: 'Super VIP', fullLabel: "Super VIP Talaba Mavqei", icon: '💎', color: '#0891b2' },
+  { label: '+300 XP', fullLabel: "+300 XP Katta Bonus", icon: '✨', color: '#d97706' },
+  { label: 'Sertifikat', fullLabel: "Oltin Sertifikat Mavqei", icon: '🏆', color: '#7c3aed' },
+  { label: 'Grammar', fullLabel: "Grammar Ninja Unvoni", icon: '🎯', color: '#e11d48' },
+  { label: '+100 XP', fullLabel: "+100 XP Kunlik Tajriba", icon: '⭐', color: '#2563eb' },
+  { label: 'Olov Streak', fullLabel: "Olovli O'rganish Mavqei", icon: '🔥', color: '#ea580c' },
 ];
 
 export default function ArenaPage() {
@@ -96,17 +96,17 @@ export default function ArenaPage() {
     setIsSpinning(true);
     setWonPrize(null);
 
-    // Randomize degrees (at least 5 full turns + random slice)
+    // Randomize degrees (6 full turns + landing slice at top pointer)
     const prizeIndex = Math.floor(Math.random() * SPIN_PRIZES.length);
-    const extraTurns = 360 * 5;
+    const extraTurns = 360 * 6;
     const sliceDegree = 360 / SPIN_PRIZES.length;
-    const targetDegree = extraTurns + (prizeIndex * sliceDegree) + (sliceDegree / 2);
+    const targetDegree = extraTurns + ((SPIN_PRIZES.length - prizeIndex) % SPIN_PRIZES.length) * sliceDegree;
 
     setSpinDegree(targetDegree);
 
     setTimeout(() => {
       setIsSpinning(false);
-      const prize = SPIN_PRIZES[prizeIndex].label;
+      const prize = SPIN_PRIZES[prizeIndex].fullLabel;
       setWonPrize(prize);
       setHasSpunToday(true);
       const today = new Date().toISOString().split('T')[0];
@@ -226,35 +226,83 @@ export default function ArenaPage() {
             </div>
 
             {/* Visual Wheel Display */}
-            <div className="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto flex items-center justify-center">
+            <div className="relative w-72 h-72 sm:w-80 sm:h-80 mx-auto flex items-center justify-center">
               {/* Pointer at the top */}
-              <div className="absolute -top-3 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[24px] border-t-amber-500 filter drop-shadow-md" />
+              <div className="absolute -top-3.5 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-amber-500 filter drop-shadow-lg" />
 
-              {/* Rotating Circular Wheel */}
+              {/* Rotating Circular Wheel SVG */}
               <div 
-                className="w-full h-full rounded-full border-4 border-amber-400 shadow-2xl overflow-hidden relative transition-all ease-out"
+                className="w-full h-full relative transition-all ease-out"
                 style={{
                   transform: `rotate(${spinDegree}deg)`,
                   transitionDuration: isSpinning ? '4000ms' : '0ms',
                 }}
               >
-                {SPIN_PRIZES.map((prize, idx) => {
-                  const angle = (360 / SPIN_PRIZES.length) * idx;
-                  return (
-                    <div
-                      key={idx}
-                      className={`absolute w-1/2 h-full top-0 right-0 origin-left flex items-center justify-center font-black text-[10px] ${prize.color} ${prize.text} border-b border-white/20`}
-                      style={{
-                        transform: `rotate(${angle}deg)`,
-                        clipPath: 'polygon(0% 50%, 100% 0%, 100% 100%)',
-                      }}
-                    >
-                      <span className="transform rotate-90 translate-x-12 select-none">
-                        {prize.label}
-                      </span>
-                    </div>
-                  );
-                })}
+                <svg viewBox="0 0 300 300" className="w-full h-full drop-shadow-2xl select-none">
+                  {/* Outer Golden Rim */}
+                  <circle cx="150" cy="150" r="148" fill="#fbbf24" stroke="#d97706" strokeWidth="4" />
+
+                  {/* Slices */}
+                  {SPIN_PRIZES.map((prize, idx) => {
+                    const midAngle = idx * 45 - 90;
+                    const startAngle = (midAngle - 22.5) * (Math.PI / 180);
+                    const endAngle = (midAngle + 22.5) * (Math.PI / 180);
+
+                    const x1 = 150 + 142 * Math.cos(startAngle);
+                    const y1 = 150 + 142 * Math.sin(startAngle);
+                    const x2 = 150 + 142 * Math.cos(endAngle);
+                    const y2 = 150 + 142 * Math.sin(endAngle);
+
+                    const pathData = `M 150 150 L ${x1.toFixed(2)} ${y1.toFixed(2)} A 142 142 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
+
+                    return (
+                      <g key={idx}>
+                        <path
+                          d={pathData}
+                          fill={prize.color}
+                          stroke="#ffffff"
+                          strokeWidth="2"
+                          strokeOpacity="0.3"
+                        />
+                        <g transform={`rotate(${midAngle}, 150, 150)`}>
+                          {/* Label Text aligned along radius */}
+                          <text
+                            x="210"
+                            y="154"
+                            textAnchor="middle"
+                            fill="#ffffff"
+                            fontSize="11"
+                            fontWeight="900"
+                            letterSpacing="0.3px"
+                            className="select-none font-sans"
+                          >
+                            {prize.label}
+                          </text>
+                          {/* Icon near the rim */}
+                          <text
+                            x="266"
+                            y="154"
+                            textAnchor="middle"
+                            fontSize="13"
+                            className="select-none"
+                          >
+                            {prize.icon}
+                          </text>
+                        </g>
+                      </g>
+                    );
+                  })}
+
+                  {/* Decorative golden rim dots */}
+                  {Array.from({ length: 24 }).map((_, dotIdx) => {
+                    const dotAngle = (360 / 24) * dotIdx * (Math.PI / 180);
+                    const dx = 150 + 145 * Math.cos(dotAngle);
+                    const dy = 150 + 145 * Math.sin(dotAngle);
+                    return (
+                      <circle key={dotIdx} cx={dx} cy={dy} r="2" fill="#ffffff" opacity="0.9" />
+                    );
+                  })}
+                </svg>
               </div>
 
               {/* Center Wheel Hub */}
@@ -262,10 +310,10 @@ export default function ArenaPage() {
                 type="button"
                 onClick={handleSpinWheel}
                 disabled={isSpinning || hasSpunToday}
-                className="absolute z-10 w-16 h-16 rounded-full bg-blue-950 text-amber-400 font-black text-xs shadow-lg border-2 border-amber-400 flex flex-col items-center justify-center hover:scale-110 active:scale-95 transition disabled:opacity-80"
+                className="absolute z-10 w-18 h-18 rounded-full bg-gradient-to-tr from-blue-950 via-slate-900 to-indigo-950 text-amber-300 font-black text-xs shadow-2xl border-4 border-amber-400 flex flex-col items-center justify-center hover:scale-105 active:scale-95 transition disabled:opacity-75 cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 fill-amber-400" />
-                <span>{isSpinning ? '...' : 'SPIN'}</span>
+                <Sparkles className="w-4 h-4 mb-0.5 text-amber-400 fill-amber-400" />
+                <span className="text-[11px] tracking-wider font-black">{isSpinning ? '...' : 'SPIN'}</span>
               </button>
             </div>
 

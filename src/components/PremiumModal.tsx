@@ -30,9 +30,8 @@ interface PremiumModalProps {
 }
 
 export default function PremiumModal({ isOpen, onClose, reason = 'general' }: PremiumModalProps) {
-  // Qabul qiluvchi haqiqiy karta rekvizitlari
-  const RECIPIENT_CARD = '8600 1404 9821 7345';
-  const RECIPIENT_NAME = 'PREPORA ACADEMY (UZCARD / HUMO)';
+  // Qabul qiluvchi karta raqami (shaxsiy yoki biznes kartangizni qo'yishingiz mumkin)
+  const RECIPIENT_CARD = process.env.NEXT_PUBLIC_RECIPIENT_CARD || '8600 1404 9821 7345';
   const TELEGRAM_BOT_URL = 'https://t.me/prepora_support_bot';
 
   const [activeTab, setActiveTab] = useState<'pay_and_submit' | 'manual_code' | 'telegram_bot'>('pay_and_submit');
@@ -412,21 +411,18 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-white/10 border border-white/15 flex items-center justify-between gap-2">
+                <div className="p-3.5 rounded-xl bg-white/10 border border-white/15 flex items-center justify-between gap-3">
                   <div>
                     <span className="text-[10px] text-slate-300 uppercase font-mono block">Karta Raqami:</span>
-                    <span className="text-lg sm:text-xl font-mono font-black text-amber-300 tracking-wider">
+                    <span className="text-xl sm:text-2xl font-mono font-black text-amber-300 tracking-wider block">
                       {RECIPIENT_CARD}
-                    </span>
-                    <span className="text-[11px] text-slate-300 block font-medium mt-0.5">
-                      {RECIPIENT_NAME}
                     </span>
                   </div>
 
                   <button
                     type="button"
                     onClick={handleCopyCard}
-                    className="flex items-center gap-1 px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-blue-950 text-xs font-bold transition shrink-0 shadow-sm"
+                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-blue-950 text-xs font-black transition shrink-0 shadow-sm"
                   >
                     {copied ? (
                       <>
