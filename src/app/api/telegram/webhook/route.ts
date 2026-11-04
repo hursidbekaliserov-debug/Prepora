@@ -7,6 +7,7 @@ import {
   rejectReceiptRequest,
   sendTelegramMessage,
   editTelegramMessageText,
+  editTelegramMessageCaption,
   answerCallbackQuery,
   BOT_USERNAME,
 } from '@/lib/telegram';
@@ -41,16 +42,24 @@ export async function POST(req: NextRequest) {
 
 ✨ <i>Foydalanuvchining saytdagi hisobi avtomatik Pro (Premium) ga aylandi.</i>`;
 
-          // Edit this message
+          // Edit this message (caption if photo, or text)
           if (cq.message) {
-            await editTelegramMessageText(cq.message.chat.id, cq.message.message_id, updatedText);
+            if (cq.message.photo) {
+              await editTelegramMessageCaption(cq.message.chat.id, cq.message.message_id, updatedText);
+            } else {
+              await editTelegramMessageText(cq.message.chat.id, cq.message.message_id, updatedText);
+            }
           }
 
           // Edit for other admins if broadcasted
           if (res.request.telegramMessageIds) {
             for (const item of res.request.telegramMessageIds) {
               if (item.chatId !== cq.message?.chat.id) {
-                await editTelegramMessageText(item.chatId, item.messageId, updatedText);
+                if (item.isPhoto) {
+                  await editTelegramMessageCaption(item.chatId, item.messageId, updatedText);
+                } else {
+                  await editTelegramMessageText(item.chatId, item.messageId, updatedText);
+                }
               }
             }
           }
@@ -79,13 +88,21 @@ export async function POST(req: NextRequest) {
 ⚠️ <i>Foydalanuvchiga to'lov tasdiqlanmagani haqida ma'lumot berildi.</i>`;
 
           if (cq.message) {
-            await editTelegramMessageText(cq.message.chat.id, cq.message.message_id, updatedText);
+            if (cq.message.photo) {
+              await editTelegramMessageCaption(cq.message.chat.id, cq.message.message_id, updatedText);
+            } else {
+              await editTelegramMessageText(cq.message.chat.id, cq.message.message_id, updatedText);
+            }
           }
 
           if (res.request.telegramMessageIds) {
             for (const item of res.request.telegramMessageIds) {
               if (item.chatId !== cq.message?.chat.id) {
-                await editTelegramMessageText(item.chatId, item.messageId, updatedText);
+                if (item.isPhoto) {
+                  await editTelegramMessageCaption(item.chatId, item.messageId, updatedText);
+                } else {
+                  await editTelegramMessageText(item.chatId, item.messageId, updatedText);
+                }
               }
             }
           }
@@ -192,3 +209,4 @@ export async function GET() {
     admins: admins.map((a) => ({ chatId: a.chatId, username: a.username, firstName: a.firstName })),
   });
 }
+

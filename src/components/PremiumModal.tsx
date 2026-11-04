@@ -17,7 +17,9 @@ import {
   Clock,
   ExternalLink,
   RefreshCw,
-  Sparkles
+  Camera,
+  Trash2,
+  FileCheck
 } from 'lucide-react';
 import { StorageManager } from '@/lib/storage';
 
@@ -42,6 +44,10 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
   const [userPhone, setUserPhone] = useState('+998 ');
   const [transactionProof, setTransactionProof] = useState('');
   const [manualCode, setManualCode] = useState('');
+  const [photoBase64, setPhotoBase64] = useState<string | null>(null);
+  const [photoFileName, setPhotoFileName] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Status state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -112,6 +118,40 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Handle Screenshot File Selection
+  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setErrorMessage("Faqat rasm formatidagi fayl yuklang (PNG, JPG, JPEG)!");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMessage("Rasm hajmi juda katta (maksimal 10MB). Iltimos, kichikroq skrinshot yuklang.");
+      return;
+    }
+
+    setPhotoFileName(file.name);
+    setErrorMessage(null);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      setPhotoBase64(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveScreenshot = () => {
+    setPhotoBase64(null);
+    setPhotoFileName(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Submit receipt to Telegram Bot
   const handleSubmitReceipt = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,6 +163,12 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
 
     if (!cleanPhone || cleanPhone === '+998') {
       setErrorMessage('Iltimos, telefon raqamingizni kiriting!');
+      return;
+    }
+
+    // Screenshot is strictly mandatory
+    if (!photoBase64) {
+      setErrorMessage("To'lov cheki skrinshotini (rasmini) yuklash majburiy! Iltimos, Click yoki Payme orqali to'lov cheki skrinshotini yuklang.");
       return;
     }
 
@@ -148,6 +194,7 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
           userName: cleanName || 'O\'quvchi',
           userPhone: cleanPhone,
           transactionProof: cleanProof,
+          photoBase64,
         }),
       });
 
@@ -200,6 +247,8 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
     setErrorMessage(null);
     setTransactionProof('');
     setManualCode('');
+    setPhotoBase64(null);
+    setPhotoFileName(null);
     setRequestStatus('IDLE');
     setActiveRequestId(null);
     setIsSuccess(false);
@@ -298,7 +347,7 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
               </div>
               <h3 className="text-xl font-black text-emerald-950">To'lov Muvaffaqiyatli Tasdiqlandi!</h3>
               <p className="text-xs text-emerald-800">
-                Tabriklaymiz! Telegram admin to'lovingizni tasdiqladi. Prepora Pro obunasi hisobingizga muvaffaqiyatli yoqildi.
+                Tabriklaymiz! Telegram admin to'lov cheki skrinshotini tekshirib tasdiqladi. Prepora Pro obunasi hisobingizga muvaffaqiyatli yoqildi.
               </p>
               {successCode && (
                 <div className="p-2.5 bg-white rounded-xl border border-emerald-200 font-mono text-xs text-emerald-950 font-bold inline-block">
@@ -317,9 +366,9 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                 <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-900 text-[11px] font-mono font-bold border border-blue-300 inline-block mb-2">
                   So'rov ID: {activeRequestId}
                 </span>
-                <h3 className="text-lg font-black text-blue-950">Admin Tekshiruvi Kutilmoqda...</h3>
+                <h3 className="text-lg font-black text-blue-950">Admin Skrinshotni Tekshirmoqda...</h3>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed max-w-sm mx-auto">
-                  Chekingiz <strong>@prepora_support_bot</strong> orqali adminlarga yetkazildi. Admin kartaga 50 000 so'm tushganini tasdiqlashi bilan, ushbu oyna <strong>avtomatik Pro</strong> ga aylanadi!
+                  Chek skrinshotingiz <strong>@prepora_support_bot</strong> orqali barcha adminlarga yuborildi. Admin kartaga 50 000 so'm tushganini tasdiqlashi bilan, ushbu oyna <strong>avtomatik Pro</strong> ga aylanadi!
                 </p>
               </div>
 
@@ -406,9 +455,85 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                     <Send className="w-3.5 h-3.5 text-blue-600" />
                     To'lov Chekini Botga Yuborish
                   </span>
-                  <span className="text-[10px] text-slate-400 font-medium">
-                    Admin bot orqali tekshiradi
+                  <span className="text-[10px] text-rose-600 font-bold">
+                    * Skrinshot majburiy
                   </span>
+                </div>
+
+                {/* File Upload Area for Screenshot */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-blue-600" />
+                      <span>To'lov Cheki Skrinshoti:</span>
+                      <span className="text-[9px] bg-rose-50 text-rose-600 border border-rose-200 font-black px-1.5 py-0.5 rounded">
+                        MAJBURIY
+                      </span>
+                    </label>
+                    {photoBase64 && (
+                      <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5">
+                        <FileCheck className="w-3.5 h-3.5" />
+                        Yuklandi
+                      </span>
+                    )}
+                  </div>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleScreenshotChange}
+                    accept="image/*"
+                    className="hidden"
+                    id="receipt-screenshot-input"
+                  />
+
+                  {!photoBase64 ? (
+                    <label
+                      htmlFor="receipt-screenshot-input"
+                      className="cursor-pointer border-2 border-dashed border-blue-300 hover:border-blue-600 bg-blue-50/60 hover:bg-blue-50 transition rounded-2xl p-4 flex flex-col items-center justify-center text-center group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-blue-100 group-hover:bg-blue-200 text-blue-700 flex items-center justify-center mb-1.5 transition">
+                        <Camera className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-black text-blue-950 block">
+                        Chek Skrinshotini Yuklang (Majburiy)
+                      </span>
+                      <span className="text-[10px] text-slate-500 mt-0.5">
+                        Click yoki Payme to'lov kvitansiyasi rasmini tanlang (PNG, JPG)
+                      </span>
+                      <span className="mt-2.5 px-3 py-1 bg-white text-blue-700 border border-blue-200 rounded-lg text-[10px] font-bold shadow-xs flex items-center gap-1">
+                        <span>Faylni Tanlash</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </label>
+                  ) : (
+                    <div className="p-3 bg-white border-2 border-emerald-300 rounded-2xl flex items-center gap-3 shadow-xs">
+                      <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photoBase64}
+                          alt="Chek skrinshoti"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[11px] font-bold text-slate-800 block truncate">
+                          {photoFileName || 'To\'lov cheki skrinshoti'}
+                        </span>
+                        <span className="text-[10px] text-emerald-600 font-bold block mt-0.5">
+                          ✓ Skrinshot adminga yuborish uchun tayyor
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveScreenshot}
+                        className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 transition"
+                        title="Skrinshotni almashtirish"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -453,11 +578,11 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                       if (errorMessage) setErrorMessage(null);
                     }}
                     placeholder="Masalan: Payme tranzaksiya raqami yoki chek ID"
-                    className="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-300 text-xs font-mono font-bold focus:outline-hidden focus:border-blue-950"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-mono font-bold focus:outline-hidden focus:border-blue-950"
                     required
                   />
                   <span className="text-[10px] text-slate-400 block mt-1">
-                    Click yoki Payme da to'lov qilgach ko'ringan kvitansiya / tranzaksiya raqamini kiriting.
+                    Kvitansiyadagi tranzaksiya raqamini yozing.
                   </span>
                 </div>
 
@@ -469,12 +594,12 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                   {isSubmitting ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Admin Botga Yuborilmoqda...</span>
+                      <span>Chek & Skrinshot Adminga Yuborilmoqda...</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>Chekni Admin Botga Yuborish (50 000 so'm)</span>
+                      <span>Chek Skrinshotini Adminga Yuborish (50 000 so'm)</span>
                     </>
                   )}
                 </button>

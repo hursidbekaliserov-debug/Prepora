@@ -40,6 +40,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // To'lov cheki skrinshotini (rasmini) yuklash qat'iyan majburiy
+    if (!photoBase64 || typeof photoBase64 !== 'string' || (!photoBase64.startsWith('data:image') && !photoBase64.startsWith('http'))) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'To\'lov cheki skrinshotini (rasmini) yuklash majburiy! Iltimos, Payme yoki Click orqali qilingan to\'lov chekining aniq skrinshotini yuklang.',
+        },
+        { status: 400 }
+      );
+    }
+
     // Create the receipt request
     const request = createReceiptRequest({
       userName: cleanedName || 'O\'quvchi',
@@ -68,3 +79,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

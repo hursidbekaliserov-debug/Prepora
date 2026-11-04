@@ -18,7 +18,7 @@ export interface ReceiptRequest {
   createdAt: string;
   reviewedAt?: string;
   reviewedBy?: string;
-  telegramMessageIds?: { chatId: number | string; messageId: number }[];
+  telegramMessageIds?: { chatId: number | string; messageId: number; isPhoto?: boolean }[];
 }
 
 export interface TelegramAdmin {
@@ -235,12 +235,88 @@ export async function answerCallbackQuery(callbackQueryId: string, text?: string
   }
 }
 
+export async function sendTelegramPhoto(
+  chatId: number | string,
+  base64OrUrl: string,
+  caption: string,
+  extra: Record<string, any> = {}
+) {
+  try {
+    if (base64OrUrl.startsWith('http://') || base64OrUrl.startsWith('https://')) {
+      const res = await fetch(`${TELEGRAM_API_BASE}/sendPhoto`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          photo: base64OrUrl,
+          caption,
+          parse_mode: 'HTML',
+          ...extra,
+        }),
+      });
+      return await res.json();
+    }
+
+    // Convert Base64 data URI to Buffer and FormData
+    const base64Data = base64OrUrl.includes(',') ? base64OrUrl.split(',')[1] : base64OrUrl;
+    const mimeMatch = base64OrUrl.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*?,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    const formData = new FormData();
+    formData.append('chat_id', String(chatId));
+    formData.append('photo', new Blob([buffer], { type: mimeType }), 'receipt.jpg');
+    formData.append('caption', caption);
+    formData.append('parse_mode', 'HTML');
+    if (extra.reply_markup) {
+      formData.append(
+        'reply_markup',
+        typeof extra.reply_markup === 'string' ? extra.reply_markup : JSON.stringify(extra.reply_markup)
+      );
+    }
+
+    const res = await fetch(`${TELEGRAM_API_BASE}/sendPhoto`, {
+      method: 'POST',
+      body: formData,
+    });
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to send telegram photo:', err);
+    return null;
+  }
+}
+
+export async function editTelegramMessageCaption(
+  chatId: number | string,
+  messageId: number,
+  caption: string,
+  extra: Record<string, any> = {}
+) {
+  try {
+    const res = await fetch(`${TELEGRAM_API_BASE}/editMessageCaption`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        message_id: messageId,
+        caption,
+        parse_mode: 'HTML',
+        ...extra,
+      }),
+    });
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to edit telegram message caption:', err);
+    return null;
+  }
+}
+
 // Broadcast new receipt to all registered admins with Inline Action Buttons
 export async function broadcastReceiptToAdmins(request: ReceiptRequest) {
   const store = loadTelegramStore();
   const admins = store.admins;
 
-  const text = `🔔 <b>YANGI TO'LOV CHEKI KELDI!</b>
+  const captionText = `📸 <b>YANGI TO'LOV CHEKI SKRINSHOTI!</b>
 
 🆔 <b>So'rov ID:</b> <code>${request.id}</code>
 👤 <b>Foydalanuvchi:</b> ${escapeHtml(request.userName)}
@@ -248,10 +324,10 @@ export async function broadcastReceiptToAdmins(request: ReceiptRequest) {
 ${request.userAccountEmail ? `📧 <b>Email:</b> ${escapeHtml(request.userAccountEmail)}\n` : ''}💰 <b>Summa:</b> 50 000 so'm (Prepora Pro)
 📅 <b>Vaqt:</b> ${new Date(request.createdAt).toLocaleString('uz-UZ')}
 
-🧾 <b>Tranzaksiya / Chek izohi:</b>
+🧾 <b>Tranzaksiya / Izoh:</b>
 <code>${escapeHtml(request.transactionProof)}</code>
 
-⚠️ <i>Admin tekshiruvi: Iltimos, kartangizga 50 000 so'm tushganini tekshiring va quyidagi tugmalardan birini bosing:</i>`;
+⚠️ <i>Admin tekshiruvi: Skrinshotni va hisobingizga 50 000 so'm tushganini tekshirib, quyidagi tugmani bosing:</i>`;
 
   const inlineKeyboard = {
     inline_keyboard: [
@@ -268,17 +344,35 @@ ${request.userAccountEmail ? `📧 <b>Email:</b> ${escapeHtml(request.userAccoun
     ],
   };
 
-  const messageIds: { chatId: number | string; messageId: number }[] = [];
+  const messageIds: { chatId: number | string; messageId: number; isPhoto?: boolean }[] = [];
 
   for (const admin of admins) {
     try {
-      const result = await sendTelegramMessage(admin.chatId, text, {
-        reply_markup: inlineKeyboard,
-      });
+      let result = null;
+      let isPhoto = false;
+
+      // Agar chek skrinshoti (rasm) bo'lsa, Telegramga rasm sifatida yuboramiz
+      if (request.photoBase64) {
+        result = await sendTelegramPhoto(admin.chatId, request.photoBase64, captionText, {
+          reply_markup: inlineKeyboard,
+        });
+        if (result?.ok) {
+          isPhoto = true;
+        }
+      }
+
+      // Agar rasm yuborilmagan yoki xatolik bo'lsa, matnli xabar sifatida yuboramiz
+      if (!result?.ok) {
+        result = await sendTelegramMessage(admin.chatId, captionText, {
+          reply_markup: inlineKeyboard,
+        });
+      }
+
       if (result?.ok && result.result?.message_id) {
         messageIds.push({
           chatId: admin.chatId,
           messageId: result.result.message_id,
+          isPhoto,
         });
       }
     } catch (err) {
@@ -304,3 +398,4 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+

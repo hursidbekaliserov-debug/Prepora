@@ -70,6 +70,16 @@ async function editMessageText(chatId, messageId, text, extra = {}) {
   });
 }
 
+async function editMessageCaption(chatId, messageId, caption, extra = {}) {
+  return await tgRequest('editMessageCaption', {
+    chat_id: chatId,
+    message_id: messageId,
+    caption,
+    parse_mode: 'HTML',
+    ...extra,
+  });
+}
+
 async function answerCallbackQuery(callbackQueryId, text = '', showAlert = false) {
   return await tgRequest('answerCallbackQuery', {
     callback_query_id: callbackQueryId,
@@ -115,7 +125,19 @@ async function handleUpdate(update) {
 ✨ <i>Foydalanuvchining saytdagi hisobi avtomatik Pro ga aylandi!</i>`;
 
         if (cq.message) {
-          await editMessageText(cq.message.chat.id, cq.message.message_id, updatedText);
+          if (cq.message.photo) {
+            await editMessageCaption(cq.message.chat.id, cq.message.message_id, updatedText);
+          } else {
+            await editMessageText(cq.message.chat.id, cq.message.message_id, updatedText);
+          }
+        }
+
+        // Notify user if submitted via telegram directly
+        if (req.telegramUserChatId) {
+          await sendMessage(
+            req.telegramUserChatId,
+            `🎉 <b>To'lovingiz tasdiqlandi!</b>\n\nPrepora Pro faollashtirildi. Sizning aktivatsiya kodingiz:\n<code>${activationCode}</code>`
+          );
         }
 
         console.log(`[BOT] Approved request ${reqId} by ${adminName}`);
@@ -149,7 +171,18 @@ async function handleUpdate(update) {
 ⚠️ <i>Foydalanuvchiga to'lov cheki tasdiqlanmagani ma'lum qilindi.</i>`;
 
         if (cq.message) {
-          await editMessageText(cq.message.chat.id, cq.message.message_id, updatedText);
+          if (cq.message.photo) {
+            await editMessageCaption(cq.message.chat.id, cq.message.message_id, updatedText);
+          } else {
+            await editMessageText(cq.message.chat.id, cq.message.message_id, updatedText);
+          }
+        }
+
+        if (req.telegramUserChatId) {
+          await sendMessage(
+            req.telegramUserChatId,
+            `❌ To'lov chekingiz admin tomonidan rad etildi. Karta hisobiga 50 000 so'm tushmagan yoki chek noto'g'ri.`
+          );
         }
 
         console.log(`[BOT] Rejected request ${reqId} by ${adminName}`);
@@ -166,6 +199,71 @@ async function handleUpdate(update) {
     const chatId = msg.chat.id;
     const text = (msg.text || '').trim();
     const from = msg.from;
+
+    // 2.1 Agar foydalanuvchi to'lov cheki skrinshotini (rasm) botga yuborsa
+    if (msg.photo && msg.photo.length > 0) {
+      const store = loadStore();
+      const isAdmin = store.admins.some((a) => a.chatId === chatId);
+
+      if (!isAdmin) {
+        const bestPhoto = msg.photo[msg.photo.length - 1];
+        const fileId = bestPhoto.file_id;
+        const caption = msg.caption || 'To\'lov cheki skrinshoti';
+        const reqId = `REQ-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+        const userName = from?.first_name || 'Foydalanuvchi';
+        const userPhone = from?.username ? `@${from.username}` : `Telegram ID: ${chatId}`;
+
+        store.requests[reqId] = {
+          id: reqId,
+          userName,
+          userPhone,
+          transactionProof: caption,
+          amount: "50 000 so'm",
+          status: 'PENDING',
+          createdAt: new Date().toISOString(),
+          telegramUserChatId: chatId,
+          telegramMessageIds: [],
+        };
+        saveStore(store);
+
+        const adminCaption = `📸 <b>YANGI TO'LOV CHEKI SKRINSHOTI (TELEGRAMDAN)!</b>
+
+🆔 <b>So'rov ID:</b> <code>${reqId}</code>
+👤 <b>Foydalanuvchi:</b> ${userName}
+📞 <b>Bog'lanish:</b> ${userPhone}
+💰 <b>Summa:</b> 50 000 so'm (UZCARD/HUMO)
+📅 <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}
+
+🧾 <b>Izoh:</b> ${caption}
+
+⚠️ <i>Admin tekshiruvi: Skrinshotni tekshirib, hisobga pul tushgan bo'lsa tasdiqlang:</i>`;
+
+        const inlineKeyboard = {
+          inline_keyboard: [
+            [
+              { text: '✅ Tasdiqlash & Pro Berish', callback_data: `approve_${reqId}` },
+              { text: '❌ Rad Etish', callback_data: `reject_${reqId}` },
+            ],
+          ],
+        };
+
+        for (const admin of store.admins) {
+          await tgRequest('sendPhoto', {
+            chat_id: admin.chatId,
+            photo: fileId,
+            caption: adminCaption,
+            parse_mode: 'HTML',
+            reply_markup: inlineKeyboard,
+          });
+        }
+
+        await sendMessage(
+          chatId,
+          `✅ To'lov cheki skrinshotingiz qabul qilindi!\n\nAdminlar ko'rib chiqib 50 000 so'm to'lovni tasdiqlashi bilan sizga shu yerda bildirishnoma keladi.`
+        );
+        return;
+      }
+    }
 
     if (text.startsWith('/start') || text.startsWith('/admin')) {
       const store = loadStore();
@@ -280,3 +378,4 @@ async function startPolling() {
 }
 
 startPolling();
+

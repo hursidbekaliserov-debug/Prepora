@@ -7,5 +7,21 @@
       "addedAt": "2026-11-04T07:22:35.865Z"
     }
   ],
-  "requests": {}
+  "requests": {
+    "REQ-933272-732": {
+      "id": "REQ-933272-732",
+      "userName": "Xurshid",
+      "userPhone": "+998 991703003",
+      "transactionProof": "raqam",
+      "amount": "50 000 so'm",
+      "status": "PENDING",
+      "createdAt": "2026-11-04T09:18:53.273Z",
+      "telegramMessageIds": [
+        {
+          "chatId": 8902348376,
+          "messageId": 3
+        }
+      ]
+    }
+  }
 }
