@@ -596,37 +596,52 @@ export class StorageManager {
   }
 
   // --- Premium Verification & Activation ---
-  // To'lovsiz yoki shunchaki tugma bosish bilan premium olish qat'iyan taqiqlangan!
+  // Qat'iy tekshiruv: 12345678 kabi soxta raqamlar qat'iyan rad etiladi!
+  // Faqat rasmiy admin tomonidan berilgan aktivatsiya kaliti yoki tasdiqlangan vaucher qabul qilinadi.
   static activatePremiumWithProof(
     proofOrCode: string,
     paymentMethod: string = 'Payme'
   ): { success: boolean; message: string; status?: SubscriptionStatus } {
-    const cleaned = (proofOrCode || '').trim();
+    const cleaned = (proofOrCode || '').trim().toUpperCase();
     if (!cleaned) {
       return {
         success: false,
-        message: 'Iltimos, to\'lov cheki raqamini (Tranzaksiya ID) yoki rasmiy tasdiqlash kodini kiriting!',
+        message: 'Iltimos, to\'lov cheki tasdiqlash kodini kiriting!',
       };
     }
 
-    // Rasmiy promo-vaucherlar yoki haqiqiy 6+ xonali tranzaksiya ID tekshiruvi
-    const validPromoCodes = [
+    // Soxta ketma-ketliklar yoki quruq raqamlar (12345678, 000000, 111111 va hk) rad etiladi
+    const fakePatterns = [
+      '123456', '1234567', '12345678', '123456789', '111111', '000000', 'TEST', 'DEMO', '1234'
+    ];
+    if (fakePatterns.includes(cleaned) || /^(\d)\1+$/.test(cleaned)) {
+      return {
+        success: false,
+        message: 'To\'lov tasdiqlanmadi! Siz kiritgan raqam soxta yoki mavjud emas. Iltimos, haqiqiy to\'lov qiling va chekni adminga yuboring.',
+      };
+    }
+
+    // Rasmiy tasdiqlangan to'lov aktivatsiya kodlari
+    const officialVerifiedKeys = [
       'PREPORA-VIP-2026',
       'IELTS-GOLD-UZ',
       'SAT-PRO-1600',
       'PREPORA-PREMIUM',
-      'TOP-STUDENT-UZ'
+      'TOP-STUDENT-UZ',
+      'PAYME-CONFIRMED-50K',
+      'CLICK-CONFIRMED-50K',
+      'ADMIN-ACTIVATE-VIP'
     ];
 
-    const isPromoMatch = validPromoCodes.some(
-      (code) => code.toLowerCase() === cleaned.toLowerCase()
+    // Tekshirish: Faqat rasmiy kodlar yoki admin bergan maxsus kalit
+    const isVerified = officialVerifiedKeys.some(
+      (code) => code === cleaned
     );
-    const isTransactionIdValid = /^[A-Za-z0-9\-_]{6,32}$/.test(cleaned);
 
-    if (!isPromoMatch && !isTransactionIdValid) {
+    if (!isVerified) {
       return {
         success: false,
-        message: 'Tranzaksiya ID yoki tasdiqlash kodi noto\'g\'ri kiritildi (kamida 6 ta harf yoki raqam bo\'lishi shart)!',
+        message: 'To\'lov cheki tasdiqlanmadi! 50 000 so\'m to\'lov qilganingizdan so\'ng, chekni Telegram (@prepora_support) ga yuborib, rasmiy faollashtirish kodini oling.',
       };
     }
 
@@ -637,6 +652,7 @@ export class StorageManager {
       date: today,
       dailyChatCount: 0,
       dailyTestCount: 0,
+      dailyVideoCount: 0,
       activatedAt: new Date().toISOString(),
       paymentMethod,
       transactionProof: cleaned,
@@ -649,7 +665,7 @@ export class StorageManager {
 
     return {
       success: true,
-      message: 'To\'lov muvaffaqiyatli tasdiqlandi! Prepora Premium cheksiz imkoniyatlari faollashtirildi.',
+      message: 'To\'lov muvaffaqiyatli tasdiqlandi! Prepora Pro barcha cheksiz imkoniyatlari faollashtirildi.',
       status: this.getSubscriptionStatus(),
     };
   }

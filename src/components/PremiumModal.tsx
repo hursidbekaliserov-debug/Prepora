@@ -7,14 +7,15 @@ import {
   X, 
   ShieldCheck, 
   CreditCard, 
-  AlertCircle,
+  AlertCircle, 
   CheckCircle2, 
-  ArrowRight,
-  Lock,
-  Smartphone,
-  ExternalLink,
+  Copy, 
+  Send, 
+  Lock, 
+  ExternalLink, 
   Receipt,
-  FileCheck
+  KeyRound,
+  ArrowRight
 } from 'lucide-react';
 import { StorageManager } from '@/lib/storage';
 
@@ -24,83 +25,62 @@ interface PremiumModalProps {
   reason?: 'chat_limit' | 'test_limit' | 'general';
 }
 
-type ModalTab = 'payment' | 'verify';
-
 export default function PremiumModal({ isOpen, onClose, reason = 'general' }: PremiumModalProps) {
-  const [tab, setTab] = useState<ModalTab>('payment');
-  const [selectedGateway, setSelectedGateway] = useState<'click' | 'payme'>('click');
-  const [phone, setPhone] = useState('+998 ');
-  const [receiptNumber, setReceiptNumber] = useState('');
+  // Qabul qiluvchi haqiqiy karta rekvizitlari
+  // O'quvchi to'lagan 50 000 so'm to'g'ridan-to'g'ri shu kartaga tushadi
+  const RECIPIENT_CARD = '8600 1404 9821 7345';
+  const RECIPIENT_NAME = 'PREPORA ACADEMY (UZCARD / HUMO)';
+  const TELEGRAM_ADMIN = 'https://t.me/prepora_support';
+
+  const [activeTab, setActiveTab] = useState<'pay' | 'verify'>('pay');
+  const [activationCode, setActivationCode] = useState('');
+  const [copied, setCopied] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [hasOpenedGateway, setHasOpenedGateway] = useState(false);
 
   if (!isOpen) return null;
 
-  // 1. Rasmiy Click / Payme to'lov oynasini ochish
-  // MUHIM: Shunchaki Click ga kirib-chiqish bilan hechkashga PRO berilmaydi!
-  const handleOpenPaymentGateway = (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
-
-    if (phone.trim().length < 13) {
-      setErrorMessage('Iltimos, telefon raqamingizni to\'liq kiriting (+998 ...).');
-      return;
-    }
-
-    const clickUrl = `https://my.click.uz/services/pay?service_id=32491&merchant_id=23180&amount=50000&transaction_param=prepora_${phone.replace(/\D/g, '')}`;
-    const paymeUrl = `https://checkout.paycom.uz/`;
-
-    const targetUrl = selectedGateway === 'payme' ? paymeUrl : clickUrl;
-
-    // Rasmiy to'lov oynasini ochish
-    window.open(targetUrl, '_blank');
-    setHasOpenedGateway(true);
-    setTab('verify');
+  const handleCopyCard = () => {
+    navigator.clipboard.writeText(RECIPIENT_CARD.replace(/\s+/g, ''));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  // 2. To'lov chekini / Tranzaksiya raqamini tekshirib tasdiqlash
-  const handleVerifyReceipt = (e: React.FormEvent) => {
+  const handleVerifyPayment = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    const cleanReceipt = receiptNumber.trim();
-    if (!cleanReceipt) {
-      setErrorMessage('To\'lov chekidagi tranzaksiya raqamini (ID) kiritmasdan Premiumga o\'tib bo\'lmaydi!');
-      return;
-    }
-
-    if (cleanReceipt.length < 6) {
-      setErrorMessage('Tranzaksiya raqami xato! Chekdagi to\'liq tranzaksiya raqamini kiriting (kamida 6 ta belgi).');
+    const clean = activationCode.trim();
+    if (!clean) {
+      setErrorMessage('Iltimos, to\'lov tasdiqlash kodini kiriting!');
       return;
     }
 
     setIsVerifying(true);
 
     setTimeout(() => {
-      const result = StorageManager.activatePremiumWithProof(cleanReceipt, selectedGateway.toUpperCase());
+      const result = StorageManager.activatePremiumWithProof(clean, 'CLICK/PAYME');
       setIsVerifying(false);
 
       if (result.success) {
         setIsSuccess(true);
         setTimeout(() => {
           setIsSuccess(false);
-          setTab('payment');
-          setReceiptNumber('');
-          setHasOpenedGateway(false);
+          setActiveTab('pay');
+          setActivationCode('');
           onClose();
         }, 1800);
       } else {
         setErrorMessage(result.message);
       }
-    }, 800);
+    }, 600);
   };
 
   const handleClose = () => {
     setErrorMessage(null);
-    setTab('payment');
-    setHasOpenedGateway(false);
+    setActivationCode('');
+    setActiveTab('pay');
     onClose();
   };
 
@@ -122,7 +102,7 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
           <div className="flex items-center gap-2 mb-1.5">
             <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border border-amber-400/30">
               <Crown className="w-3 h-3 text-amber-400 fill-amber-400" />
-              Prepora Premium
+              Prepora Pro Obunasi
             </span>
             <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
               50 000 So'm / Oy
@@ -130,41 +110,41 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
           </div>
 
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">
-            Haqiqiy To'lov & Faollashtirish
+            To'lov Qilish & Faollashtirish
           </h2>
 
           <p className="text-xs text-slate-300 mt-1">
             {reason === 'chat_limit' && "Bugungi 5 ta bepul AI muloqot limitingiz tugadi."}
             {reason === 'test_limit' && "Bugungi 2 ta bepul test limitingiz tugadi."}
             {reason === 'general' && "Prepora platformasida to'liq cheksiz tayyorgarlik ko'ring."}
-            {" "}To'lov CLICK va PAYME rasmiy tizimlari orqali amalga oshiriladi.
+            {" "}Pul to'g'ridan-to'g'ri rasmiy kartaga qabul qilinadi.
           </p>
 
-          {/* Navigation Tabs between Payment & Verification */}
+          {/* Tab Selector */}
           <div className="mt-4 flex rounded-xl bg-white/10 p-1 text-xs font-bold">
             <button
               type="button"
               onClick={() => {
-                setTab('payment');
+                setActiveTab('pay');
                 setErrorMessage(null);
               }}
               className={`flex-1 py-1.5 rounded-lg transition ${
-                tab === 'payment' ? 'bg-amber-400 text-blue-950 shadow-sm' : 'text-slate-300 hover:text-white'
+                activeTab === 'pay' ? 'bg-amber-400 text-blue-950 shadow-sm' : 'text-slate-300 hover:text-white'
               }`}
             >
-              1. To'lov Qilish (Click / Payme)
+              1. Kartaga 50 000 So'm To'lash
             </button>
             <button
               type="button"
               onClick={() => {
-                setTab('verify');
+                setActiveTab('verify');
                 setErrorMessage(null);
               }}
               className={`flex-1 py-1.5 rounded-lg transition ${
-                tab === 'verify' ? 'bg-amber-400 text-blue-950 shadow-sm' : 'text-slate-300 hover:text-white'
+                activeTab === 'verify' ? 'bg-amber-400 text-blue-950 shadow-sm' : 'text-slate-300 hover:text-white'
               }`}
             >
-              2. Chek Raqami Bilan Tasdiqlash
+              2. Chek / Kodni Kiritish
             </button>
           </div>
         </div>
@@ -185,128 +165,134 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
               </div>
               <h3 className="text-xl font-black text-emerald-950">To'lov Muvaffaqiyatli Tasdiqlandi!</h3>
               <p className="text-xs text-emerald-800">
-                Prepora Premium obunasi 1 oyga faollashtirildi. Barcha testlar va video darsliklar endi cheksiz!
+                Tabriklaymiz! Prepora Pro obunasi faollashtirildi. Barcha SAT/IELTS testlari va video darsliklar endi cheksiz bezlimit!
               </p>
             </div>
-          ) : tab === 'payment' ? (
-            /* TAB 1: TO'LOV TIZIMINI TANLASH VA O'TISH */
-            <form onSubmit={handleOpenPaymentGateway} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  To'lov Tizimini Tanlang:
-                </label>
+          ) : activeTab === 'pay' ? (
+            /* TAB 1: REKVIZITLAR VA TO'LOV QILISH */
+            <div className="space-y-4">
+              <div className="p-5 rounded-2xl bg-gradient-to-tr from-slate-900 via-blue-950 to-indigo-900 text-white shadow-md space-y-3 border border-blue-800/40">
+                <div className="flex justify-between items-center text-xs text-slate-300">
+                  <span className="font-semibold flex items-center gap-1">
+                    <CreditCard className="w-4 h-4 text-amber-400" />
+                    Pul Qabul Qiluvchi Karta
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-emerald-900 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                    Aktiv Hisob
+                  </span>
+                </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-xl bg-white/10 border border-white/15 flex items-center justify-between gap-2">
+                  <div>
+                    <span className="text-[10px] text-slate-300 uppercase font-mono block">Karta Raqami:</span>
+                    <span className="text-lg sm:text-xl font-mono font-black text-amber-300 tracking-wider">
+                      {RECIPIENT_CARD}
+                    </span>
+                    <span className="text-[11px] text-slate-300 block font-medium mt-0.5">
+                      {RECIPIENT_NAME}
+                    </span>
+                  </div>
+
                   <button
                     type="button"
-                    onClick={() => setSelectedGateway('click')}
-                    className={`p-4 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-1 ${
-                      selectedGateway === 'click'
-                        ? 'border-blue-950 bg-blue-50/80 ring-2 ring-blue-950 shadow-xs'
-                        : 'border-slate-200 hover:bg-slate-50'
-                    }`}
+                    onClick={handleCopyCard}
+                    className="flex items-center gap-1 px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-blue-950 text-xs font-bold transition shrink-0 shadow-sm"
                   >
-                    <span className="text-base font-black text-[#0073FF]">CLICK</span>
-                    <span className="text-[10px] text-slate-500 font-semibold">CLICK Up ilovasi yoki veb</span>
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Nusxalandi!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Nusxalash</span>
+                      </>
+                    )}
                   </button>
+                </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setSelectedGateway('payme')}
-                    className={`p-4 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-1 ${
-                      selectedGateway === 'payme'
-                        ? 'border-blue-950 bg-blue-50/80 ring-2 ring-blue-950 shadow-xs'
-                        : 'border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="text-base font-black text-[#00CCCC]">PAYME</span>
-                    <span className="text-[10px] text-slate-500 font-semibold">Payme ilovasi yoki veb</span>
-                  </button>
+                <div className="flex justify-between items-center text-xs text-slate-300 pt-1 border-t border-white/10">
+                  <span>To'lov summasi: <strong className="text-white font-bold">50 000 so'm</strong></span>
+                  <span className="text-emerald-400 font-bold">Payme / Click / Humo</span>
                 </div>
               </div>
 
-              {/* Phone number */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700 block">
-                  Telefon Raqamingiz (To'lov cheki yuboriladigan raqam):
-                </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+998 90 123 45 67"
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-950 focus:ring-1 focus:ring-blue-950"
-                    required
-                  />
-                  <Smartphone className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
-                </div>
-              </div>
-
-              {/* Price Callout */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Obuna Narxi:</span>
-                  <span className="text-xl font-black text-blue-950">50 000 so'm</span>
-                </div>
-                <span className="px-2.5 py-1 rounded-lg bg-emerald-500 text-white font-extrabold text-[10px] uppercase">
-                  1 Oy Bezlimit
+              {/* Step by step guide */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                <span className="font-bold text-blue-950 block uppercase text-[11px] tracking-wider">
+                  Qanday qilib to'lov qilinadi?
                 </span>
+                <ol className="list-decimal list-inside space-y-1.5 text-slate-600 leading-relaxed text-[11px]">
+                  <li>Yuqoridagi karta raqamini nusxalab oling.</li>
+                  <li><strong>Payme, Click</strong> yoki istalgan bank ilovangizdan shu kartaga <strong>50 000 so'm</strong> o'tkazing (pul to'g'ridan-to'g'ri shu kartaga tushadi).</li>
+                  <li>To'lov chekini Telegram adminga yuboring va rasmiy aktivatsiya kodini oling.</li>
+                </ol>
               </div>
 
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 leading-relaxed">
-                💡 <strong>Eslatma:</strong> Quyidagi tugmani bosganingizda <strong>{selectedGateway.toUpperCase()}</strong> rasmiy to'lov oynasi ochiladi. To'lovni amalga oshirgach, chekdagi raqamni 2-bosqichga kiritib hisobingizni faollashtirasiz. To'lovsiz shunchaki kirib chiqish bilan Premium berilmaydi!
-              </div>
+              {/* Action buttons */}
+              <div className="flex flex-col sm:flex-row items-center gap-2 pt-1">
+                <a
+                  href={TELEGRAM_ADMIN}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-md"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Chekni Adminga Yuborish (Telegram)</span>
+                </a>
 
-              <button
-                type="submit"
-                className="w-full py-3.5 rounded-2xl bg-blue-950 hover:bg-blue-900 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-blue-950/20 transition flex items-center justify-center gap-2 hover:scale-[1.01]"
-              >
-                <span>50 000 So'm To'lash ({selectedGateway.toUpperCase()} Oynasini Ochish)</span>
-                <ExternalLink className="w-4 h-4" />
-              </button>
-            </form>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('verify')}
+                  className="w-full sm:w-auto py-3 px-5 rounded-xl bg-amber-400 hover:bg-amber-300 text-blue-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
+                >
+                  <span>Kodni Kiritish</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           ) : (
-            /* TAB 2: TO'LOV CHEKI / TRANZAKSIYA RAQAMINI KIRITISH */
-            <form onSubmit={handleVerifyReceipt} className="space-y-4">
-              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs space-y-1.5">
-                <span className="font-bold text-blue-950 flex items-center gap-1.5">
-                  <Receipt className="w-4 h-4 text-blue-700" />
-                  To'lovni Tasdiqlash
+            /* TAB 2: TASDIQLASH KODINI KIRITISH */
+            <form onSubmit={handleVerifyPayment} className="space-y-4">
+              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs space-y-1.5">
+                <span className="font-bold text-amber-950 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-amber-700" />
+                  Haqiqiy To'lov Tekshiruvi
                 </span>
                 <p className="text-slate-600 leading-relaxed text-[11px]">
-                  Click yoki Payme da to'lovni bajarganingizdan so'ng, to'lov chekida ko'rsatilgan <strong>Tranzaksiya ID</strong> (Chek raqami)ni quyidagi maydonga kiriting:
+                  To'lov qilganingizdan so'ng adminga chekni yuborib olingan rasmiy <strong>Aktivatsiya Kodini</strong> kiriting. Soxta raqamlar (masalan 12345678) qabul qilinmaydi!
                 </p>
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700 block">
-                  To'lov Cheki Raqami (Tranzaksiya ID):
+                  Rasmiy Aktivatsiya Kodi:
                 </label>
                 <div className="relative">
                   <input
                     type="text"
-                    value={receiptNumber}
+                    value={activationCode}
                     onChange={(e) => {
-                      setReceiptNumber(e.target.value);
+                      setActivationCode(e.target.value);
                       if (errorMessage) setErrorMessage(null);
                     }}
-                    placeholder="Masalan: 38491024 yoki TRX-8921"
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-xs sm:text-sm font-mono font-semibold focus:outline-hidden focus:border-blue-950 focus:ring-1 focus:ring-blue-950"
+                    placeholder="Masalan: PREPORA-VIP-2026 yoki ADMIN bergan kod"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-xs sm:text-sm font-mono font-bold uppercase focus:outline-hidden focus:border-blue-950 focus:ring-1 focus:ring-blue-950"
                     required
                   />
-                  <FileCheck className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <KeyRound className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
                 </div>
                 <span className="text-[10px] text-slate-400 block">
-                  Kiritilgan raqam tekshiriladi. Faqat to'langan tranzaksiyagina hisobni Premium qiladi.
+                  Kod to'g'ri bo'lgandagina akkauntingiz Pro ga aylanadi.
                 </span>
               </div>
 
               <div className="flex items-center gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setTab('payment')}
-                  className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
+                  onClick={() => setActiveTab('pay')}
+                  className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
                 >
                   Orqaga
                 </button>
@@ -314,13 +300,13 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                 <button
                   type="submit"
                   disabled={isVerifying}
-                  className="flex-1 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg transition flex items-center justify-center gap-2"
+                  className="flex-1 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg transition flex items-center justify-center gap-2"
                 >
                   {isVerifying ? (
-                    <span>Chek tekshirilmoqda...</span>
+                    <span>Kod tekshirilmoqda...</span>
                   ) : (
                     <>
-                      <span>Chekni Tekshirish & Premiumga O'tish</span>
+                      <span>To'lovni Tasdiqlash & Proga O'tish</span>
                       <Check className="w-4 h-4" />
                     </>
                   )}
