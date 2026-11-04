@@ -130,23 +130,31 @@ export default function PricingPage() {
               {/* Quota usage pills */}
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
                 <div className="flex justify-between font-semibold">
-                  <span className="text-slate-600">Bugungi AI Chat Limiti:</span>
-                  <span className="text-blue-950 font-bold">{subStatus?.isPremium ? 'Bezlimit' : `${subStatus?.dailyChatRemaining ?? 5}/5 qoldi`}</span>
+                  <span className="text-slate-600">Bugungi Test Limiti (SAT & IELTS):</span>
+                  <span className="text-blue-950 font-bold">{subStatus?.isPremium ? 'Bezlimit' : `${subStatus?.dailyTestRemaining ?? 2}/2 qoldi`}</span>
                 </div>
                 <div className="flex justify-between font-semibold">
-                  <span className="text-slate-600">Bugungi Test Limiti:</span>
-                  <span className="text-blue-950 font-bold">{subStatus?.isPremium ? 'Bezlimit' : `${subStatus?.dailyTestRemaining ?? 5}/5 qoldi`}</span>
+                  <span className="text-slate-600">Bugungi Video Darslik Limiti:</span>
+                  <span className="text-blue-950 font-bold">{subStatus?.isPremium ? 'Bezlimit' : `${subStatus?.dailyVideoRemaining ?? 1}/1 qoldi`}</span>
+                </div>
+                <div className="flex justify-between font-semibold">
+                  <span className="text-slate-600">Bugungi AI Chat Limiti:</span>
+                  <span className="text-blue-950 font-bold">{subStatus?.isPremium ? 'Bezlimit' : `${subStatus?.dailyChatRemaining ?? 5}/5 qoldi`}</span>
                 </div>
               </div>
 
               <div className="pt-2 space-y-3 text-xs text-slate-700">
                 <div className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Kuniga 5 ta AI chat & Voice AI ovozli savol</span>
+                  <span>Kuniga 2 ta test / mashq savolini yechish</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Kuniga 5 ta test/mashq savolini yechish</span>
+                  <span>Kuniga 1 ta video darslik ko'rish</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Kuniga 5 ta AI chat & Voice AI ovozli savol</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -218,6 +226,10 @@ export default function PricingPage() {
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span className="font-bold text-blue-950">To'liq IELTS & SAT Mock Imtihonlari (Cheksiz)</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className="font-bold text-blue-950">Barcha Video Darsliklar & Masterclasslar (Cheksiz Bezlimit)</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />

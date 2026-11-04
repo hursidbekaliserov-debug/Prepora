@@ -21,6 +21,9 @@ export interface SubscriptionStatus {
   dailyTestCount: number;
   dailyTestMax: number;
   dailyTestRemaining: number;
+  dailyVideoCount: number;
+  dailyVideoMax: number;
+  dailyVideoRemaining: number;
   activatedAt?: string;
   paymentMethod?: string;
 }
@@ -375,8 +378,11 @@ export class StorageManager {
       dailyChatMax: 5,
       dailyChatRemaining: 5,
       dailyTestCount: 0,
-      dailyTestMax: 5,
-      dailyTestRemaining: 5,
+      dailyTestMax: 2,
+      dailyTestRemaining: 2,
+      dailyVideoCount: 0,
+      dailyVideoMax: 1,
+      dailyVideoRemaining: 1,
     };
 
     if (!this.isClient()) return defaultStatus;
@@ -392,6 +398,7 @@ export class StorageManager {
           date: today,
           dailyChatCount: 0,
           dailyTestCount: 0,
+          dailyVideoCount: 0,
         };
         localStorage.setItem('prepora_subscription', JSON.stringify(data));
       }
@@ -401,6 +408,7 @@ export class StorageManager {
         data.date = today;
         data.dailyChatCount = 0;
         data.dailyTestCount = 0;
+        data.dailyVideoCount = 0;
         localStorage.setItem('prepora_subscription', JSON.stringify(data));
       }
 
@@ -413,8 +421,11 @@ export class StorageManager {
         dailyChatMax: 5,
         dailyChatRemaining: isPrem ? 9999 : Math.max(0, 5 - (data.dailyChatCount || 0)),
         dailyTestCount: data.dailyTestCount || 0,
-        dailyTestMax: 5,
-        dailyTestRemaining: isPrem ? 9999 : Math.max(0, 5 - (data.dailyTestCount || 0)),
+        dailyTestMax: 2,
+        dailyTestRemaining: isPrem ? 9999 : Math.max(0, 2 - (data.dailyTestCount || 0)),
+        dailyVideoCount: data.dailyVideoCount || 0,
+        dailyVideoMax: 1,
+        dailyVideoRemaining: isPrem ? 9999 : Math.max(0, 1 - (data.dailyVideoCount || 0)),
         activatedAt: data.activatedAt,
         paymentMethod: data.paymentMethod,
       };
@@ -449,8 +460,9 @@ export class StorageManager {
     }
   }
 
+  // --- Kuniga 2 ta test limiti (Bepul versiya uchun) ---
   static useTestQuota(): { allowed: boolean; remaining: number; isPremium: boolean } {
-    if (!this.isClient()) return { allowed: true, remaining: 5, isPremium: false };
+    if (!this.isClient()) return { allowed: true, remaining: 2, isPremium: false };
     const status = this.getSubscriptionStatus();
 
     if (status.isPremium) {
@@ -468,9 +480,34 @@ export class StorageManager {
       data.dailyTestCount = (data.dailyTestCount || 0) + 1;
       localStorage.setItem('prepora_subscription', JSON.stringify(data));
       window.dispatchEvent(new Event('prepora_subscription_updated'));
-      return { allowed: true, remaining: Math.max(0, 5 - data.dailyTestCount), isPremium: false };
+      return { allowed: true, remaining: Math.max(0, 2 - data.dailyTestCount), isPremium: false };
     } catch (e) {
       return { allowed: true, remaining: 1, isPremium: false };
+    }
+  }
+
+  // --- Video darsliklar: Oddiysida kuniga 1 ta, Pro da cheksiz ---
+  static useVideoQuota(): { allowed: boolean; remaining: number; isPremium: boolean } {
+    if (!this.isClient()) return { allowed: true, remaining: 1, isPremium: false };
+    const status = this.getSubscriptionStatus();
+
+    if (status.isPremium) {
+      return { allowed: true, remaining: 9999, isPremium: true };
+    }
+
+    if (status.dailyVideoRemaining <= 0) {
+      return { allowed: false, remaining: 0, isPremium: false };
+    }
+
+    try {
+      const raw = localStorage.getItem('prepora_subscription');
+      const data = raw ? JSON.parse(raw) : {};
+      data.dailyVideoCount = (data.dailyVideoCount || 0) + 1;
+      localStorage.setItem('prepora_subscription', JSON.stringify(data));
+      window.dispatchEvent(new Event('prepora_subscription_updated'));
+      return { allowed: true, remaining: Math.max(0, 1 - data.dailyVideoCount), isPremium: false };
+    } catch (e) {
+      return { allowed: true, remaining: 0, isPremium: false };
     }
   }
 

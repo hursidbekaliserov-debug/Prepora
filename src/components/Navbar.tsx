@@ -126,6 +126,18 @@ export default function Navbar() {
               <span>AI Tutor</span>
             </Link>
 
+            {/* Video Darsliklar */}
+            <Link 
+              href="/lessons" 
+              className={`px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+                pathname === '/lessons' 
+                  ? 'bg-blue-50 text-blue-950 font-bold' 
+                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
+              }`}
+            >
+              <span>Darslar 🎬</span>
+            </Link>
+
             {/* Qiziqarli O'yinlar & Kunlik Spin */}
             <Link 
               href="/arena" 
@@ -272,6 +284,13 @@ export default function Navbar() {
           >
             <Mic className="w-4 h-4 text-emerald-600" />
             Voice AI Examiner
+          </Link>
+          <Link
+            href="/lessons"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-blue-950 bg-blue-50 border border-blue-200 font-bold"
+          >
+            <span>Video Darsliklar 🎬</span>
           </Link>
           <Link
             href="/arena"

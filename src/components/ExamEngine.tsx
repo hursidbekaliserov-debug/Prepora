@@ -98,12 +98,12 @@ export default function ExamEngine({
   const handleSelectAnswer = (ans: string) => {
     if (isExamFinished) return;
 
-    // Premium bo'lmagan foydalanuvchilar uchun 5 tadan ortiq savolga javob berishni qat'iy cheklash
+    // Oddiy (bepul) foydalanuvchilar uchun kuniga 2 ta test savoliga javob berish limiti
     if (!subStatus?.isPremium) {
       const alreadyAnsweredCount = Object.keys(answers).length;
       const isAlreadyAnswered = !!answers[currentQ.id];
 
-      if (!isAlreadyAnswered && alreadyAnsweredCount >= 5) {
+      if (!isAlreadyAnswered && alreadyAnsweredCount >= 2) {
         setIsPremiumModalOpen(true);
         return;
       }

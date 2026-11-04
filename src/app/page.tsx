@@ -223,11 +223,10 @@ export default function LandingPage() {
               </Link>
 
               <Link
-                href="/ielts/mock-exam"
+                href="/lessons"
                 className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white hover:bg-slate-50 text-blue-950 border-2 border-slate-300 font-extrabold text-base transition flex items-center justify-center gap-2 shadow-xs"
               >
-                <Award className="w-5 h-5 text-blue-800" />
-                IELTS Mock
+                <span>Video Darsliklar 🎬</span>
               </Link>
 
               <Link
