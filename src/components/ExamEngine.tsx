@@ -1,18 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Clock, 
-  Flag, 
-  CheckCircle2, 
-  XCircle, 
-  HelpCircle, 
-  ChevronLeft, 
-  ChevronRight, 
-  Bookmark, 
-  RotateCcw, 
-  Calculator, 
-  Sparkles, 
+import {
+  Clock,
+  Flag,
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight,
+  Bookmark,
+  RotateCcw,
+  Calculator,
+  Sparkles,
   Award,
   AlertCircle,
   Eye,
@@ -216,13 +216,13 @@ export default function ExamEngine({
       userAnswers: answers,
       ...(exam === 'IELTS'
         ? {
-            ieltsReadingRaw: correctCount,
-            ieltsReadingBand: scoreEst,
-          }
+          ieltsReadingRaw: correctCount,
+          ieltsReadingBand: scoreEst,
+        }
         : {
-            satReadingWritingRaw: correctCount,
-            satTotalScoreEst: scoreEst,
-          }),
+          satReadingWritingRaw: correctCount,
+          satTotalScoreEst: scoreEst,
+        }),
     };
     StorageManager.saveExamResult(examResult as any);
 
@@ -246,8 +246,8 @@ export default function ExamEngine({
       exam === 'IELTS'
         ? getIeltsListeningBand(correctCount)
         : sectionName.toLowerCase().includes('math')
-        ? estimateSatMathScore(correctCount)
-        : estimateSatReadingWritingScore(correctCount);
+          ? estimateSatMathScore(correctCount)
+          : estimateSatReadingWritingScore(correctCount);
 
     return (
       <div className="max-w-5xl mx-auto py-10 px-4 sm:px-6">
@@ -331,20 +331,18 @@ export default function ExamEngine({
             return (
               <div
                 key={q.id}
-                className={`p-6 rounded-3xl border transition bg-white ${
-                  isCorrect
+                className={`p-6 rounded-3xl border transition bg-white ${isCorrect
                     ? 'border-emerald-300'
                     : 'border-rose-300'
-                }`}
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
-                        isCorrect
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${isCorrect
                           ? 'bg-emerald-100 text-emerald-800'
                           : 'bg-rose-100 text-rose-800'
-                      }`}
+                        }`}
                     >
                       {idx + 1}
                     </span>
@@ -372,11 +370,10 @@ export default function ExamEngine({
                   <div>
                     <span className="text-slate-500 font-semibold block mb-0.5">Sizning Javobingiz:</span>
                     <span
-                      className={`font-bold px-3 py-1 rounded-lg ${
-                        isCorrect
+                      className={`font-bold px-3 py-1 rounded-lg ${isCorrect
                           ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                           : 'bg-rose-50 text-rose-800 border border-rose-200'
-                      }`}
+                        }`}
                     >
                       {userAns || '(Belgilanmadi)'}
                     </span>
@@ -421,11 +418,10 @@ export default function ExamEngine({
 
         {/* Center Timer */}
         <div
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border font-mono font-bold text-sm ${
-            secondsLeft < 300
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border font-mono font-bold text-sm ${secondsLeft < 300
               ? 'bg-rose-50 border-rose-300 text-rose-700 animate-pulse'
               : 'bg-slate-100 border-slate-200 text-slate-900'
-          }`}
+            }`}
         >
           <Clock className="w-4 h-4 text-blue-950" />
           <span>{formatTime(secondsLeft)}</span>
@@ -461,11 +457,10 @@ export default function ExamEngine({
 
           <button
             onClick={() => toggleFlag(currentQ.id)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition border ${
-              flagged[currentQ.id]
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition border ${flagged[currentQ.id]
                 ? 'bg-amber-100 text-amber-900 border-amber-300'
                 : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
-            }`}
+              }`}
           >
             <Flag className={`w-3.5 h-3.5 ${flagged[currentQ.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
             <span className="hidden sm:inline">{flagged[currentQ.id] ? 'Belgilangan' : 'Belgilash'}</span>
@@ -543,16 +538,14 @@ export default function ExamEngine({
                     <button
                       key={choice.id}
                       onClick={() => handleSelectAnswer(choice.id)}
-                      className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-3 ${
-                        isSelected
+                      className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-3 ${isSelected
                           ? 'bg-blue-50 border-2 border-blue-950 text-blue-950 font-bold shadow-xs'
                           : 'bg-white border-slate-200 hover:border-slate-300 text-slate-800'
-                      }`}
+                        }`}
                     >
                       <span
-                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 mt-0.5 ${
-                          isSelected ? 'bg-blue-950 text-white' : 'bg-slate-100 text-slate-700'
-                        }`}
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 mt-0.5 ${isSelected ? 'bg-blue-950 text-white' : 'bg-slate-100 text-slate-700'
+                          }`}
                       >
                         {choice.label}
                       </span>
@@ -579,11 +572,10 @@ export default function ExamEngine({
             {/* Practice Mode feedback */}
             {!isMockExam && practiceChecked[currentQ.id] && (
               <div
-                className={`mt-4 p-4 rounded-2xl border text-xs leading-relaxed ${
-                  checkAnswer(answers[currentQ.id] || '', currentQ.correctAnswer)
+                className={`mt-4 p-4 rounded-2xl border text-xs leading-relaxed ${checkAnswer(answers[currentQ.id] || '', currentQ.correctAnswer)
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
                     : 'bg-rose-50 border-rose-300 text-rose-900'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-1.5 font-bold mb-1">
                   {checkAnswer(answers[currentQ.id] || '', currentQ.correctAnswer) ? (
@@ -689,7 +681,7 @@ export default function ExamEngine({
             <h3 className="text-xl font-bold text-blue-950 mb-2">Testni Topshirasizmi?</h3>
             <p className="text-sm text-slate-600 mb-6 leading-relaxed">
               Siz <strong className="text-blue-950 font-bold">{questions.length}</strong> tadan{' '}
-              <strong className="text-blue-950 font-bold">{Object.keys(answers).length}</strong> ta savolga javob berdingiz. 
+              <strong className="text-blue-950 font-bold">{Object.keys(answers).length}</strong> ta savolga javob berdingiz.
               Topshirilgandan so'ng ball va tahlil hisoblanadi.
             </p>
 
@@ -755,9 +747,9 @@ export default function ExamEngine({
       )}
 
       {/* 50 000 UZS Premium Modal */}
-      <PremiumModal 
-        isOpen={isPremiumModalOpen} 
-        onClose={() => setIsPremiumModalOpen(false)} 
+      <PremiumModal
+        isOpen={isPremiumModalOpen}
+        onClose={() => setIsPremiumModalOpen(false)}
         reason="test_limit"
       />
     </div>

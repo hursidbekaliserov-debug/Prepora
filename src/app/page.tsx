@@ -3,33 +3,33 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
-import { 
-  Sparkles, 
-  ArrowRight, 
-  CheckCircle, 
-  Award, 
-  Clock, 
-  Flame, 
-  TrendingUp, 
-  Headphones, 
-  BookOpen, 
-  PenTool, 
-  Mic, 
-  Calculator, 
-  Check, 
-  ChevronRight, 
-  ShieldCheck, 
-  Star, 
-  Zap, 
-  HelpCircle, 
-  GraduationCap, 
-  Layers, 
-  BarChart2, 
-  CheckCircle2, 
-  AlertCircle, 
-  FileText, 
-  Compass, 
-  Users, 
+import {
+  Sparkles,
+  ArrowRight,
+  CheckCircle,
+  Award,
+  Clock,
+  Flame,
+  TrendingUp,
+  Headphones,
+  BookOpen,
+  PenTool,
+  Mic,
+  Calculator,
+  Check,
+  ChevronRight,
+  ShieldCheck,
+  Star,
+  Zap,
+  HelpCircle,
+  GraduationCap,
+  Layers,
+  BarChart2,
+  CheckCircle2,
+  AlertCircle,
+  FileText,
+  Compass,
+  Users,
   Target,
   Volume2,
   Sliders,
@@ -182,7 +182,7 @@ export default function LandingPage() {
       {/* 1. HERO SECTION WITH REAL VISUAL PHOTOGRAPHY & DUAL CTAS */}
       <section className="relative pt-12 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-50 via-white to-white overflow-hidden border-b border-slate-200">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+
           {/* Left Text Column */}
           <div className="lg:col-span-7 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-950 text-xs font-extrabold shadow-xs">
@@ -199,8 +199,8 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed max-w-2xl">
-              Quruq nazariyadan charchadingizmi? Prepora da 98 savollik to'liq SAT, 
-              audio tinglash va insho tekshiruvchi 4-ko'nikmali IELTS dvigateli va 
+              Quruq nazariyadan charchadingizmi? Prepora da 98 savollik to'liq SAT,
+              audio tinglash va insho tekshiruvchi 4-ko'nikmali IELTS dvigateli va
               24/7 AI repetitor sizni kutmoqda.
             </p>
 
@@ -257,9 +257,9 @@ export default function LandingPage() {
           {/* Right Image Column with floating glass badges */}
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-3xl overflow-hidden border-4 border-white shadow-2xl group">
-              <img 
-                src="/images/hero_study.jpg" 
-                alt="Prepora talabasi IELTS va Digital SAT imtihonlariga tayyorlanmoqda" 
+              <img
+                src="/images/hero_study.jpg"
+                alt="Prepora talabasi IELTS va Digital SAT imtihonlariga tayyorlanmoqda"
                 className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-blue-950/60 via-transparent to-transparent" />
@@ -335,17 +335,15 @@ export default function LandingPage() {
             <div className="inline-flex p-1.5 bg-white border border-slate-200 rounded-2xl mt-6 shadow-xs">
               <button
                 onClick={() => setCalcExam('IELTS')}
-                className={`px-6 py-2 rounded-xl text-xs font-extrabold transition ${
-                  calcExam === 'IELTS' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
-                }`}
+                className={`px-6 py-2 rounded-xl text-xs font-extrabold transition ${calcExam === 'IELTS' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
+                  }`}
               >
                 IELTS Shkalasi (5.0 - 9.0)
               </button>
               <button
                 onClick={() => setCalcExam('SAT')}
-                className={`px-6 py-2 rounded-xl text-xs font-extrabold transition ${
-                  calcExam === 'SAT' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
-                }`}
+                className={`px-6 py-2 rounded-xl text-xs font-extrabold transition ${calcExam === 'SAT' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
+                  }`}
               >
                 Digital SAT Shkalasi (1000 - 1600)
               </button>
@@ -479,8 +477,8 @@ export default function LandingPage() {
                   Mos Universitetlar Diapazoni
                 </span>
                 <span className="text-base font-black text-blue-950 block mt-1">
-                  {calcExam === 'IELTS' 
-                    ? (targetScore >= 8.0 ? 'Oxford, Cambridge, MIT' : targetScore >= 7.0 ? 'Manchester, NYU, Bocconi' : 'Politecnico, WIUT') 
+                  {calcExam === 'IELTS'
+                    ? (targetScore >= 8.0 ? 'Oxford, Cambridge, MIT' : targetScore >= 7.0 ? 'Manchester, NYU, Bocconi' : 'Politecnico, WIUT')
                     : (targetSat >= 1500 ? 'Ivy League, Stanford, KAIST' : targetSat >= 1350 ? 'Boston Univ, Penn State' : 'Global Top 500')}
                 </span>
                 <span className="text-[11px] text-slate-400 block">Xalqaro Grantlar Uchun</span>
@@ -504,9 +502,9 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 relative">
             <div className="rounded-3xl overflow-hidden border-2 border-slate-200 shadow-xl">
-              <img 
-                src="/images/speaking_lab.jpg" 
-                alt="IELTS Speaking audio yozish va tahlil studiyasi" 
+              <img
+                src="/images/speaking_lab.jpg"
+                alt="IELTS Speaking audio yozish va tahlil studiyasi"
                 className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -522,8 +520,8 @@ export default function LandingPage() {
             </h2>
 
             <p className="text-slate-600 text-sm leading-relaxed">
-              IELTS Speaking imtihonida eng katta to'siq — bu hayajon va nutq ravonligidagi to'xtalishlar. 
-              Prepora Speaking studiyasi brauzeringiz mikrofonidan foydalanib, 1 daqiqalik Part 2 tayyorgarligi 
+              IELTS Speaking imtihonida eng katta to'siq — bu hayajon va nutq ravonligidagi to'xtalishlar.
+              Prepora Speaking studiyasi brauzeringiz mikrofonidan foydalanib, 1 daqiqalik Part 2 tayyorgarligi
               hamda 2 daqiqalik uzluksiz nutq yozuvini ta'minlaydi.
             </p>
 
@@ -566,7 +564,7 @@ export default function LandingPage() {
       {/* 5. PHOTO FEATURE SHOWCASE 2: DIGITAL SAT MATH & DESMOS */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-slate-50 border-y border-slate-200">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+
           <div className="lg:col-span-6 space-y-6 text-left order-2 lg:order-1">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-blue-950 text-xs font-bold border border-blue-200">
               <Calculator className="w-4 h-4 text-blue-800" /> Digital SAT Math Modullari
@@ -577,8 +575,8 @@ export default function LandingPage() {
             </h2>
 
             <p className="text-slate-600 text-sm leading-relaxed">
-              Digital SAT Math bo'limi yangi standartda kalkulyatordan to'liq erkin foydalanishni talab qiladi. 
-              Prepora platformasida o'rnatilgan formulalar jadvali (Reference Sheet), student-produced 
+              Digital SAT Math bo'limi yangi standartda kalkulyatordan to'liq erkin foydalanishni talab qiladi.
+              Prepora platformasida o'rnatilgan formulalar jadvali (Reference Sheet), student-produced
               grid-in raqam kiritish maydonlari hamda parabolalar tahlili mavjud.
             </p>
 
@@ -613,9 +611,9 @@ export default function LandingPage() {
 
           <div className="lg:col-span-6 relative order-1 lg:order-2">
             <div className="rounded-3xl overflow-hidden border-2 border-slate-200 shadow-xl">
-              <img 
-                src="/images/sat_math.jpg" 
-                alt="Talabalar Digital SAT Math parabolasini o'rganishmoqda" 
+              <img
+                src="/images/sat_math.jpg"
+                alt="Talabalar Digital SAT Math parabolasini o'rganishmoqda"
                 className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -640,17 +638,15 @@ export default function LandingPage() {
           <div className="inline-flex p-1.5 bg-slate-100 border border-slate-200 rounded-2xl mt-6">
             <button
               onClick={() => setEssayView('BAND_5')}
-              className={`px-6 py-2 rounded-xl text-xs font-bold transition ${
-                essayView === 'BAND_5' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
-              }`}
+              className={`px-6 py-2 rounded-xl text-xs font-bold transition ${essayView === 'BAND_5' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
+                }`}
             >
               Oddiy Javob (Band 5.5)
             </button>
             <button
               onClick={() => setEssayView('BAND_9')}
-              className={`px-6 py-2 rounded-xl text-xs font-bold transition ${
-                essayView === 'BAND_9' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
-              }`}
+              className={`px-6 py-2 rounded-xl text-xs font-bold transition ${essayView === 'BAND_9' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
+                }`}
             >
               Professional Javob (Band 9.0)
             </button>
@@ -664,11 +660,10 @@ export default function LandingPage() {
               <h4 className="text-sm font-bold text-blue-950">"Should governments invest heavily in renewable clean energy?"</h4>
             </div>
             <span
-              className={`px-3 py-1 rounded-full text-xs font-extrabold ${
-                essayView === 'BAND_9'
+              className={`px-3 py-1 rounded-full text-xs font-extrabold ${essayView === 'BAND_9'
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
-              }`}
+                }`}
             >
               {essayView === 'BAND_9' ? '★ Rasmiy Band 9.0 Standarti' : '⚠ Band 5.5 Takrorlanuvchi'}
             </span>
@@ -881,17 +876,15 @@ export default function LandingPage() {
           <div className="inline-flex p-1.5 bg-slate-100 border border-slate-200 rounded-2xl mt-6 shadow-xs">
             <button
               onClick={() => { setActiveTab('IELTS'); setSampleAnswer(null); }}
-              className={`px-6 py-2 rounded-xl text-xs font-extrabold transition ${
-                activeTab === 'IELTS' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
-              }`}
+              className={`px-6 py-2 rounded-xl text-xs font-extrabold transition ${activeTab === 'IELTS' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
+                }`}
             >
               IELTS Academic
             </button>
             <button
               onClick={() => { setActiveTab('SAT'); setSampleAnswer(null); }}
-              className={`px-6 py-2 rounded-xl text-xs font-extrabold transition ${
-                activeTab === 'SAT' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
-              }`}
+              className={`px-6 py-2 rounded-xl text-xs font-extrabold transition ${activeTab === 'SAT' ? 'bg-blue-950 text-white shadow-xs' : 'text-slate-600 hover:text-blue-950'
+                }`}
             >
               Digital SAT
             </button>
@@ -946,11 +939,10 @@ export default function LandingPage() {
           {/* Answer feedback */}
           {sampleAnswer && (
             <div
-              className={`p-4 rounded-2xl border text-xs leading-relaxed animate-fade-in ${
-                sampleAnswer === sampleQuestion.correct
+              className={`p-4 rounded-2xl border text-xs leading-relaxed animate-fade-in ${sampleAnswer === sampleQuestion.correct
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
                   : 'bg-rose-50 border-rose-300 text-rose-950'
-              }`}
+                }`}
             >
               <div className="font-bold flex items-center gap-2 mb-1">
                 {sampleAnswer === sampleQuestion.correct ? '✓ To\'g\'ri javob!' : '✗ Noto\'g\'ri javob.'}
@@ -1066,8 +1058,8 @@ export default function LandingPage() {
                   IELTS & SAT Bo'yicha Barcha Limitlarni Olib Tashlang!
                 </h3>
                 <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                  Bepul hisobda har kuni 5 ta AI chat va 5 ta test ishlashingiz mumkin. 
-                  To'liq <strong>Bezlimit</strong> rejimga o'tib, Voice AI bilan cheksiz ovozda gaplashing, 
+                  Bepul hisobda har kuni 5 ta AI chat va 5 ta test ishlashingiz mumkin.
+                  To'liq <strong>Bezlimit</strong> rejimga o'tib, Voice AI bilan cheksiz ovozda gaplashing,
                   to'liq testlarni yeching va Cambridge Band 9.0 insho tahliliga ega bo'ling.
                 </p>
                 <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-bold text-amber-200">
@@ -1147,7 +1139,7 @@ export default function LandingPage() {
           </h2>
 
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Haqiqiy student hisobingizni oching, IELTS yoki Digital SAT bo'yicha to'liq mock testlarni yeching 
+            Haqiqiy student hisobingizni oching, IELTS yoki Digital SAT bo'yicha to'liq mock testlarni yeching
             va xatolaringiz ustida ishlang.
           </p>
 

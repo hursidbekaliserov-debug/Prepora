@@ -11,16 +11,14 @@ import {
   Clock, 
   CheckCircle2, 
   Crown, 
-  BookOpen, 
-  Calculator, 
-  Sparkles, 
-  Award,
-  ChevronRight,
-  UserCheck
+  ExternalLink,
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 
 interface Lesson {
   id: string;
+  youtubeId: string;
   title: string;
   category: 'IELTS' | 'SAT';
   skill: string;
@@ -28,7 +26,6 @@ interface Lesson {
   instructor: string;
   instructorTitle: string;
   level: string;
-  videoUrl: string; // Embedable video or lecture
   description: string;
   topics: string[];
 }
@@ -36,80 +33,80 @@ interface Lesson {
 const LESSONS_DATA: Lesson[] = [
   {
     id: 'ielts-w-1',
+    youtubeId: 'sRFEVbyr6Kg',
     title: "IELTS Writing Task 2: Band 9.0 Insho Formulalari va Shabloni",
     category: 'IELTS',
     skill: 'Writing',
     duration: '35 daqiqa',
-    instructor: 'Mr. David Vance',
-    instructorTitle: 'Former Cambridge Examiner (Band 9)',
+    instructor: 'Christopher Pell (IELTS Advantage)',
+    instructorTitle: 'Rasmiy Cambridge Examiner (Band 9)',
     level: 'Advanced',
-    videoUrl: 'https://www.youtube.com/embed/5F_T2Wp2q80',
-    description: "Insho tuzilishining rasmiy 4 mezonini tushunish: Task Achievement, Cohesion & Coherence, Lexical Resource va Grammar.",
+    description: "Insho tuzilishining rasmiy 4 mezonini tushunish: Task Achievement, Cohesion & Coherence, Lexical Resource va Grammar bo'yicha Band 9 strategiyalari.",
     topics: ['Kirish qismini 3 daqiqada yozish', 'Asosiy fikrlar (Body Paragraphs) strukturasi', 'Band 9 lug\'atlar va akademik iboralar']
   },
   {
     id: 'sat-m-1',
+    youtubeId: 'f93125R4sK0',
     title: "SAT Math: Desmos Kalkulyatorining 10 ta Yashirin Sirlari",
     category: 'SAT',
     skill: 'Math',
     duration: '32 daqiqa',
-    instructor: 'Alex Chen',
+    instructor: 'Tutorllini SAT Test Prep',
     instructorTitle: 'Perfect 1600 Scorer / MIT Alum',
     level: 'All Levels',
-    videoUrl: 'https://www.youtube.com/embed/7U41xZf0Z4g',
     description: "Digital SAT imtihonida Desmos grafik kalkulyatoridan maksimal foydalanish: tenglamalar sistemasi, regression, va parabolalarni 5 soniyada yechish.",
     topics: ['Regression tahlili orqali funksiya topish', 'Aylana va chiziqlar kesishishi', 'Desmosda vaqtni 50% tejash']
   },
   {
     id: 'ielts-s-1',
+    youtubeId: '1b_j_O18r58',
     title: "IELTS Speaking Part 2 & 3: Examinerlarni Hayratda Qoldirish Sirlari",
     category: 'IELTS',
     skill: 'Speaking',
     duration: '28 daqiqa',
-    instructor: 'Sarah Jenkins',
+    instructor: 'Keith O\'Hare (Keith Speaking Academy)',
     instructorTitle: 'British Council Certified Trainer',
     level: 'Intermediate - Advanced',
-    videoUrl: 'https://www.youtube.com/embed/sRFEVbyr6Kg',
-    description: "Cue card bo'yicha 2 daqiqa to'xtovsiz ravon gapirish texnikasi va Part 3 dagi falsafiy savollarga mantiqiy javob berish.",
+    description: "Cue card bo'yicha 2 daqiqa to'xtovsiz ravon gapirish texnikasi va Part 3 dagi murakkab savollarga tabiiy javob berish usullari.",
     topics: ['1 daqiqalik tayyorgarlik daftari', 'Idiomalar va tabiiy bog\'lovchilar', 'Intonatsiya va urg\'u sirlari']
   },
   {
     id: 'sat-rw-1',
+    youtubeId: 'z44q8q35R84',
     title: "SAT Reading & Writing: Grammatika va Punktuatsiya Qoidalari",
     category: 'SAT',
     skill: 'Reading & Writing',
     duration: '27 daqiqa',
-    instructor: 'Rachel Adams',
+    instructor: 'Hayden Rhodea SAT Prep',
     instructorTitle: 'Stanford SAT Verbal Coach',
     level: 'All Levels',
-    videoUrl: 'https://www.youtube.com/embed/z44q8q35R84',
-    description: "Standard English Conventions: vergul, nuqta-vergul, tire va apostroflarning SAT dagi aniq qoidalari.",
+    description: "Standard English Conventions: vergul, nuqta-vergul, tire va apostroflarning SAT dagi aniq va qat'iy qoidalari.",
     topics: ['Run-on jumlalarni tuzatish', 'Subject-verb agreement qoidalari', 'Transitions va mantiqiy bog\'lovchilar']
   },
   {
     id: 'ielts-r-1',
+    youtubeId: '0kH8fBw8a8E',
     title: "IELTS Reading: Skimming & Scanning - 60 Daqiqada 40/40 Ishlash",
     category: 'IELTS',
     skill: 'Reading',
     duration: '30 daqiqa',
-    instructor: 'Dr. Michael Brown',
+    instructor: 'Asiya (Fastrack IELTS)',
     instructorTitle: 'Oxford Academic Reading Specialist',
     level: 'Intermediate - Advanced',
-    videoUrl: 'https://www.youtube.com/embed/1vR_sB22r7E',
-    description: "Matnni to'liq o'qimasdan to'g'ri javoblarni 15 soniyada topish, True/False/Not Given tuzoqlari.",
+    description: "Matnni to'liq o'qimasdan to'g'ri javoblarni 15 soniyada topish, True/False/Not Given tuzoqlaridan qochish.",
     topics: ['Kalit so\'zlarni parafraza qilish', 'Headings moslashtirish usullari', 'Vaqtni 3 ta passage ga to\'g\'ri taqsimlash']
   },
   {
     id: 'sat-m-2',
+    youtubeId: 'Yp69P0xK47I',
     title: "SAT Advanced Math: Kvadratik Tenglamalar va Murakkab Funksiyalar",
     category: 'SAT',
     skill: 'Advanced Math',
     duration: '25 daqiqa',
-    instructor: 'Alex Chen',
-    instructorTitle: 'Perfect 1600 Scorer / MIT Alum',
+    instructor: 'Huzefa Kapadia (Scalar Learning)',
+    instructorTitle: 'Perfect 800 Math Master',
     level: 'Hard / Module 2',
-    videoUrl: 'https://www.youtube.com/embed/p1m2eK34n3A',
-    description: "SAT Module 2 dagi eng qiyin 750-800 ballik algebra va funksiyalar masalalarining tezkor yechimlari.",
+    description: "SAT Module 2 dagi eng qiyin 750-800 ballik algebra va funksiyalar masalalarining tezkor qadamma-qadam yechimlari.",
     topics: ['Diskriminant va yechimlar soni', 'Funksiya simmetriyasi va vertex', 'Murakkab ildizlar']
   }
 ];
@@ -128,29 +125,31 @@ export default function LessonsPage() {
     return () => window.removeEventListener('prepora_subscription_updated', update);
   }, []);
 
-  const handleSelectLesson = (lesson: Lesson) => {
-    // Agar Pro bo'lsa: barcha videolar cheksiz ochiq
+  // Videoni YouTubeda ochish (havola to'g'ridan-to'g'ri YouTube saytida yangi tabda ochiladi)
+  const handleOpenVideoOnYouTube = (lesson: Lesson) => {
+    // 1. Agar Pro (Premium) bo'lsa: barcha videolar cheksiz ochiq
     if (subStatus?.isPremium) {
-      setSelectedLesson(lesson);
+      window.open(`https://www.youtube.com/watch?v=${lesson.youtubeId}`, '_blank');
       return;
     }
 
-    // Agar foydalanuvchi oddiy (bepul) bo'lsa:
-    // Agar bu video bugun allaqachon ochilgan bo'lsa, qayta ochishga ruxsat
+    // 2. Agar foydalanuvchi bepul bo'lsa:
+    // Agar bu video bugun allaqachon ochilgan bo'lsa, uni qayta ko'rishga ruxsat
     if (unlockedVideoId === lesson.id) {
-      setSelectedLesson(lesson);
+      window.open(`https://www.youtube.com/watch?v=${lesson.youtubeId}`, '_blank');
       return;
     }
 
-    // Yangi video ochish uchun kunlik quota tekshiriladi (kuniga 1 ta video)
+    // Yangi video ko'rish uchun kunlik 1 ta quota tekshiriladi
     const quota = StorageManager.useVideoQuota();
     if (!quota.allowed) {
       setIsPremiumModalOpen(true);
       return;
     }
 
+    // Muvaffaqiyatli ochildi: 1 ta limitdan foydalanildi
     setUnlockedVideoId(lesson.id);
-    setSelectedLesson(lesson);
+    window.open(`https://www.youtube.com/watch?v=${lesson.youtubeId}`, '_blank');
   };
 
   const filteredLessons = activeCategory === 'ALL' 
@@ -173,7 +172,7 @@ export default function LessonsPage() {
               IELTS va SAT Video Darsliklari
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Eng kuchli o'qituvchilar va imtihonchilar tomonidan tayyorlangan maxsus mahorat darslari.
+              Rasmiy YouTube darsliklari: bir marta bosishda to'g'ridan-to'g'ri YouTubeda yuqori sifatda ochiladi.
             </p>
           </div>
 
@@ -182,18 +181,18 @@ export default function LessonsPage() {
             {subStatus?.isPremium ? (
               <span className="px-3.5 py-1.5 rounded-xl bg-amber-400 text-blue-950 text-xs font-black flex items-center gap-1.5 shadow-sm">
                 <Crown className="w-4 h-4 fill-blue-950" />
-                <span>Pro: Cheksiz Videolar ⚡</span>
+                <span>Pro: Barcha Videolar Cheksiz ⚡</span>
               </span>
             ) : (
               <div className="p-2.5 rounded-xl bg-white border border-slate-200 text-xs space-y-1 shadow-2xs">
                 <div className="flex items-center justify-between gap-3 text-slate-600 font-semibold">
-                  <span>Kunlik Video Limiti:</span>
+                  <span>Bugungi Bepul Video Limiti:</span>
                   <span className="text-blue-950 font-bold">
                     {subStatus?.dailyVideoRemaining ?? 1}/1 qoldi
                   </span>
                 </div>
                 <span className="text-[10px] text-amber-700 block font-medium">
-                  Oddiy hisobda kuniga 1 ta video ruxsat etiladi.
+                  Oddiy hisobda kuniga 1 ta video ruxsat etiladi. Pro da esa cheksiz!
                 </span>
               </div>
             )}
@@ -239,16 +238,56 @@ export default function LessonsPage() {
 
         {/* Video Player & Playlist Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Main Video Screen */}
+          {/* Main Video Screen with Direct YouTube Launch */}
           <div className="lg:col-span-8 space-y-4">
-            <div className="relative rounded-3xl overflow-hidden bg-slate-900 shadow-xl border border-slate-800 aspect-video flex items-center justify-center">
-              <iframe
-                src={selectedLesson.videoUrl}
-                title={selectedLesson.title}
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+            {/* Visual HD Thumbnail Card */}
+            <div className="relative rounded-3xl overflow-hidden bg-slate-900 shadow-xl border border-slate-800 aspect-video group">
+              <img
+                src={`https://img.youtube.com/vi/${selectedLesson.youtubeId}/hqdefault.jpg`}
+                alt={selectedLesson.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
               />
+
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/40 to-transparent flex flex-col justify-between p-6">
+                <div className="flex justify-between items-start">
+                  <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                    <Play className="w-3.5 h-3.5 fill-white" /> YouTube HD
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-mono font-bold">
+                    {selectedLesson.duration}
+                  </span>
+                </div>
+
+                {/* Center YouTube Play Button */}
+                <div className="text-center space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenVideoOnYouTube(selectedLesson)}
+                    className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-sm sm:text-base shadow-2xl transition hover:scale-105 active:scale-95 group/btn"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center font-bold">
+                      <Play className="w-4 h-4 fill-current ml-0.5" />
+                    </div>
+                    <span>Videoni YouTubeda Ko'rish</span>
+                    <ExternalLink className="w-4 h-4 opacity-75" />
+                  </button>
+
+                  <p className="text-[11px] text-slate-300 font-medium">
+                    Bosganingizda video to'g'ridan-to'g'ri YouTube da ochiladi va uzluksiz o'ynaydi.
+                  </p>
+                </div>
+
+                {/* Bottom title badge */}
+                <div className="text-left">
+                  <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+                    {selectedLesson.category} • {selectedLesson.skill}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-black text-white line-clamp-1">
+                    {selectedLesson.title}
+                  </h3>
+                </div>
+              </div>
             </div>
 
             {/* Video Meta Info */}
@@ -263,9 +302,14 @@ export default function LessonsPage() {
                   </span>
                 </div>
 
-                <span className="text-xs text-slate-600 font-bold">
-                  Daraja: <span className="text-blue-950">{selectedLesson.level}</span>
-                </span>
+                <button
+                  type="button"
+                  onClick={() => handleOpenVideoOnYouTube(selectedLesson)}
+                  className="px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs transition flex items-center gap-1.5"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>YouTubeda Ochish</span>
+                </button>
               </div>
 
               <h2 className="text-xl sm:text-2xl font-black text-blue-950">
@@ -317,54 +361,79 @@ export default function LessonsPage() {
                 const isLockedForFree = !subStatus?.isPremium && (subStatus?.dailyVideoRemaining ?? 1) <= 0 && unlockedVideoId !== lesson.id;
 
                 return (
-                  <button
+                  <div
                     key={lesson.id}
-                    type="button"
-                    onClick={() => handleSelectLesson(lesson)}
-                    className={`w-full p-4 rounded-2xl text-left border transition flex items-start gap-3 group ${
+                    className={`w-full p-3.5 rounded-2xl text-left border transition flex items-start gap-3 ${
                       isCurrent
                         ? 'bg-blue-950 text-white border-blue-950 shadow-md'
                         : 'bg-white hover:bg-slate-50 border-slate-200 text-blue-950'
                     }`}
                   >
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold ${
-                      isCurrent 
-                        ? 'bg-amber-400 text-blue-950' 
-                        : isLockedForFree 
-                          ? 'bg-slate-100 text-slate-400' 
-                          : 'bg-blue-50 text-blue-900 group-hover:scale-105'
-                    }`}>
-                      {isLockedForFree ? (
-                        <Lock className="w-4 h-4 text-amber-600" />
-                      ) : (
-                        <Play className="w-4 h-4 fill-current" />
-                      )}
+                    <div 
+                      onClick={() => {
+                        setSelectedLesson(lesson);
+                        handleOpenVideoOnYouTube(lesson);
+                      }}
+                      className="relative w-20 h-14 rounded-xl overflow-hidden bg-slate-800 shrink-0 cursor-pointer group"
+                    >
+                      <img
+                        src={`https://img.youtube.com/vi/${lesson.youtubeId}/hqdefault.jpg`}
+                        alt={lesson.title}
+                        className="w-full h-full object-cover opacity-85 group-hover:scale-110 transition-transform"
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        {isLockedForFree ? (
+                          <Lock className="w-4 h-4 text-amber-400" />
+                        ) : (
+                          <Play className="w-4 h-4 text-white fill-white" />
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md ${
                           isCurrent ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {lesson.category}
                         </span>
-                        <span className={`text-[10px] ${isCurrent ? 'text-slate-300' : 'text-slate-400'}`}>
+                        <span className={`text-[9px] ${isCurrent ? 'text-slate-300' : 'text-slate-400'}`}>
                           {lesson.duration}
                         </span>
                         {isLockedForFree && (
-                          <span className="text-[9px] font-black text-amber-500 uppercase ml-auto">
-                            Pro Video
+                          <span className="text-[9px] font-black text-amber-400 uppercase ml-auto">
+                            Pro
                           </span>
                         )}
                       </div>
 
-                      <h4 className={`text-xs font-bold leading-snug line-clamp-2 ${
-                        isCurrent ? 'text-white' : 'text-blue-950'
-                      }`}>
+                      <h4 
+                        onClick={() => {
+                          setSelectedLesson(lesson);
+                          handleOpenVideoOnYouTube(lesson);
+                        }}
+                        className={`text-xs font-bold leading-snug line-clamp-2 cursor-pointer hover:underline ${
+                          isCurrent ? 'text-white' : 'text-blue-950'
+                        }`}
+                      >
                         {lesson.title}
                       </h4>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedLesson(lesson);
+                          handleOpenVideoOnYouTube(lesson);
+                        }}
+                        className={`mt-1.5 text-[10px] font-bold flex items-center gap-1 ${
+                          isCurrent ? 'text-amber-300 hover:text-white' : 'text-red-600 hover:text-red-700'
+                        }`}
+                      >
+                        <span>YouTubeda Ochish</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </button>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
