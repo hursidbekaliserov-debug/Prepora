@@ -37,6 +37,7 @@ export default function LoginPage() {
       setTimeout(() => {
         const user = StorageManager.loginUser(email, password);
         if (user) {
+          window.dispatchEvent(new Event('prepora_auth_changed'));
           router.push('/dashboard');
         } else {
           setErrorMsg('Invalid email or password');

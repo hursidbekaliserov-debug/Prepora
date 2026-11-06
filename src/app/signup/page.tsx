@@ -79,6 +79,7 @@ export default function SignUpPage() {
           return;
         }
         StorageManager.registerUser(fullName, email, password);
+        window.dispatchEvent(new Event('prepora_auth_changed'));
         router.push('/onboarding');
       } catch (err: any) {
         setErrorMsg(err.message || 'Ro\'yxatdan o\'tishda xatolik yuz berdi');
@@ -88,6 +89,7 @@ export default function SignUpPage() {
       // Real local registration
       setTimeout(() => {
         StorageManager.registerUser(fullName.trim(), email.trim(), password.trim());
+        window.dispatchEvent(new Event('prepora_auth_changed'));
         router.push('/onboarding');
       }, 400);
     }

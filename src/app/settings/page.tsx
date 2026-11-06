@@ -690,18 +690,33 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="pt-4 flex items-center justify-between border-t border-slate-200">
-              <button
-                type="button"
-                onClick={handleResetData}
-                className="px-4 py-2 rounded-xl text-xs text-rose-600 hover:bg-rose-50 transition font-semibold"
-              >
-                Ma'lumotlarni Tozalash
-              </button>
+            <div className="pt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResetData}
+                  className="px-4 py-2 rounded-xl text-xs text-rose-600 hover:bg-rose-50 transition font-semibold"
+                >
+                  Ma'lumotlarni Tozalash
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm("Haqiqatan ham hisobingizdan chiqmoqchimisiz?")) {
+                      StorageManager.logout();
+                      window.location.href = '/';
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Hisobdan Chiqish</span>
+                </button>
+              </div>
 
               <button
                 type="submit"
-                className="px-6 py-2.5 rounded-xl bg-blue-950 hover:bg-blue-900 text-white font-bold text-xs shadow-md transition flex items-center gap-2"
+                className="px-6 py-2.5 rounded-xl bg-blue-950 hover:bg-blue-900 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
               >
                 <Save className="w-4 h-4" /> Sozlamalarni Saqlash
               </button>

@@ -124,7 +124,9 @@ export default function ArenaPage() {
         try {
           const profile = StorageManager.getProfile();
           profile.totalStudyMinutes = (profile.totalStudyMinutes || 0) + 15;
+          profile.xp = (profile.xp || 0) + 200;
           StorageManager.saveProfile(profile);
+          window.dispatchEvent(new Event('prepora_profile_updated'));
         } catch {
           // ignore
         }
@@ -214,6 +216,11 @@ export default function ArenaPage() {
       setHasSpunToday(true);
       const today = new Date().toISOString().split('T')[0];
       localStorage.setItem('prepora_last_spin_date', today);
+
+      if (prize.includes('+150 XP')) StorageManager.addXP(150);
+      else if (prize.includes('+300 XP')) StorageManager.addXP(300);
+      else if (prize.includes('+100 XP')) StorageManager.addXP(100);
+      window.dispatchEvent(new Event('prepora_profile_updated'));
     }, 4000);
   };
 

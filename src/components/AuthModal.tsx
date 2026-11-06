@@ -9,16 +9,18 @@ import {
   User, 
   CheckCircle2, 
   AlertCircle,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import { StorageManager } from '@/lib/storage';
 
 interface AuthModalProps {
   isOpen: boolean;
   onSuccess?: () => void;
+  onClose?: () => void;
 }
 
-export default function AuthModal({ isOpen, onSuccess }: AuthModalProps) {
+export default function AuthModal({ isOpen, onSuccess, onClose }: AuthModalProps) {
   const [mode, setMode] = useState<'register' | 'login'>('register');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -78,6 +80,16 @@ export default function AuthModal({ isOpen, onSuccess }: AuthModalProps) {
       >
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-blue-950 to-indigo-950 text-white text-center relative">
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+              title="Yopish"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
           <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-2.5 shadow-md">
             <GraduationCap className="w-7 h-7 text-amber-400" />
           </div>

@@ -407,7 +407,14 @@ export default function LandingPage() {
 
         {/* Dribbble Signature Search Bar */}
         <div className="max-w-2xl mx-auto mb-6">
-          <div className="relative flex items-center bg-white rounded-full p-2 pl-6 shadow-lg shadow-black/[0.04] border border-black/10 focus-within:border-black/30 focus-within:ring-4 focus-within:ring-black/5 transition-all">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('shots-feed');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="relative flex items-center bg-white rounded-full p-2 pl-6 shadow-lg shadow-black/[0.04] border border-black/10 focus-within:border-black/30 focus-within:ring-4 focus-within:ring-black/5 transition-all"
+          >
             <Search className="w-5 h-5 text-[#6e6d7a] mr-3 shrink-0" />
             <input
               type="text"
@@ -418,16 +425,20 @@ export default function LandingPage() {
             />
             {searchQuery && (
               <button 
+                type="button"
                 onClick={() => setSearchQuery('')}
                 className="text-xs text-[#6e6d7a] hover:text-[#0d0c22] font-semibold px-2 py-1 mr-2"
               >
                 Tozalash
               </button>
             )}
-            <button className="px-6 py-3 rounded-full bg-[#0d0c22] hover:bg-[#3d3d4e] text-white text-xs sm:text-sm font-bold shrink-0 transition-all shadow-sm">
+            <button 
+              type="submit"
+              className="px-6 py-3 rounded-full bg-[#0d0c22] hover:bg-[#3d3d4e] text-white text-xs sm:text-sm font-bold shrink-0 transition-all shadow-sm cursor-pointer"
+            >
               Qidirish
             </button>
-          </div>
+          </form>
         </div>
 
         {/* Trending Tags (Dribbble style) */}
@@ -486,7 +497,7 @@ export default function LandingPage() {
       </section>
 
       {/* 3. DRIBBLE SIGNATURE "SHOTS" GRID FEED */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full">
+      <section id="shots-feed" className="max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full scroll-mt-24">
         {filteredShots.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-black/10 p-8">
             <Search className="w-12 h-12 text-[#6e6d7a] mx-auto mb-4" />

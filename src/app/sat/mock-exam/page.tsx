@@ -50,7 +50,7 @@ export default function SatMockExamPage() {
 
   const handleStartExam = () => {
     // Check if free user has reached limit
-    if (!subStatus?.isPremium && subStatus?.dailyTestRemaining && subStatus.dailyTestRemaining <= 0) {
+    if (!subStatus?.isPremium && typeof subStatus?.dailyTestRemaining === 'number' && subStatus.dailyTestRemaining <= 0) {
       setIsPremiumModalOpen(true);
       return;
     }
