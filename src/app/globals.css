@@ -2,31 +2,41 @@
 
 @layer base {
   :root {
-    --background: #f8fafc;
-    --foreground: #0a192f;
+    --background: #f8f7f4;
+    --foreground: #0d0c22;
     --card: #ffffff;
-    --card-foreground: #0a192f;
-    --primary: #0f172a;
+    --card-foreground: #0d0c22;
+    --primary: #0d0c22;
     --primary-foreground: #ffffff;
-    --secondary: #f1f5f9;
-    --secondary-foreground: #0f172a;
-    --muted: #f8fafc;
-    --muted-foreground: #475569;
-    --accent: #e0e7ff;
-    --accent-foreground: #1e1b4b;
-    --border: #e2e8f0;
-    --ring: #1e3a8a;
+    --secondary: #f3f3f4;
+    --secondary-foreground: #0d0c22;
+    --muted: #f8f8f8;
+    --muted-foreground: #6e6d7a;
+    --accent: #ea4c89;
+    --accent-foreground: #ffffff;
+    --border: #e7e7e9;
+    --ring: #ea4c89;
   }
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   min-height: 100vh;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dribbble signature smooth shot card hover */
+.dribbble-shot-card {
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dribbble-shot-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
 }
 
 /* Custom scrollbar */
@@ -35,19 +45,19 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f3f3f4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: #d4d4d8;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #a1a1aa;
 }
 
 /* Glassmorphism & custom utility classes */
 .glass {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }

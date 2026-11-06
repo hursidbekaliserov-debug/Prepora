@@ -66,3 +66,4 @@ export default function TelegramWebAppInit() {
 
   return null;
 }
+

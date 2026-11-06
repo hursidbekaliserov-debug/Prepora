@@ -52,129 +52,86 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md shadow-2xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-13 sm:h-14 flex items-center justify-between">
-        {/* Brand: Prepora with custom profile photo in front */}
-        <div className="flex items-center gap-6">
+    <header className="sticky top-0 z-40 w-full border-b border-black/[0.06] bg-[#f8f7f4]/90 backdrop-blur-md transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        {/* Brand: Dribbble style Prepora. */}
+        <div className="flex items-center gap-7">
           <Link href="/" className="flex items-center gap-2 group">
             {profile?.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
                 alt={profile.fullName || 'User Avatar'}
-                className="w-8 h-8 rounded-lg object-cover shadow-xs group-hover:scale-105 transition-transform border border-blue-900/30 shrink-0"
+                className="w-9 h-9 rounded-full object-cover border border-black/10 group-hover:scale-105 transition-transform shrink-0"
               />
             ) : (
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-950 to-indigo-900 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform shrink-0">
-                <GraduationCap className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-black text-sm group-hover:scale-105 transition-transform shrink-0">
+                P
               </div>
             )}
-            <div className="flex flex-col">
-              <span className="text-base sm:text-lg font-black tracking-tight text-blue-950 leading-none">
-                Prepora
-              </span>
-              <span className="text-[8px] uppercase tracking-widest text-slate-400 font-bold">
-                IELTS & SAT
+            <div className="flex items-baseline">
+              <span className="text-xl font-black tracking-tight text-[#0d0c22] leading-none font-sans">
+                Prepora<span className="text-[#ea4c89] font-black">.</span>
               </span>
             </div>
           </Link>
 
-          {/* Compact Modern Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 text-xs font-bold">
+          {/* Dribbble Pills Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 text-[13px] font-semibold text-[#0d0c22]">
             <Link 
               href="/ielts" 
-              className={`px-2.5 py-1.5 rounded-lg transition-colors ${
+              className={`px-3 py-1.5 rounded-full transition-colors ${
                 pathname.startsWith('/ielts') && !pathname.includes('/ielts-gg')
-                  ? 'bg-blue-50 text-blue-950' 
-                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
+                  ? 'bg-black text-white font-bold' 
+                  : 'text-[#6e6d7a] hover:text-[#0d0c22] hover:bg-black/5'
               }`}
             >
-              IELTS
+              IELTS Mock
             </Link>
 
             <Link 
               href="/sat" 
-              className={`px-2.5 py-1.5 rounded-lg transition-colors ${
+              className={`px-3 py-1.5 rounded-full transition-colors ${
                 pathname.startsWith('/sat') 
-                  ? 'bg-blue-50 text-blue-950' 
-                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
+                  ? 'bg-black text-white font-bold' 
+                  : 'text-[#6e6d7a] hover:text-[#0d0c22] hover:bg-black/5'
               }`}
             >
-              SAT
+              Digital SAT
             </Link>
 
-            {/* Renamed from "IELTS GG Voice AI" to clean "Voice AI" */}
             <Link 
               href="/ielts-gg" 
-              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
                 pathname === '/ielts-gg' 
-                  ? 'bg-emerald-600 text-white shadow-xs' 
-                  : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60'
+                  ? 'bg-[#ea4c89] text-white font-bold shadow-xs' 
+                  : 'text-[#0d0c22] bg-[#ea4c89]/10 hover:bg-[#ea4c89]/20 font-bold'
               }`}
             >
-              <Mic className="w-3 h-3 text-emerald-600" />
+              <Mic className="w-3.5 h-3.5 text-[#ea4c89]" />
               <span>Voice AI</span>
             </Link>
 
             <Link 
-              href="/tutor" 
-              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${
-                pathname === '/tutor' 
-                  ? 'bg-blue-50 text-blue-950' 
-                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
-              }`}
-            >
-              <Sparkles className="w-3 h-3 text-blue-600" />
-              <span>AI Tutor</span>
-            </Link>
-
-            {/* Video Darsliklar */}
-            <Link 
               href="/lessons" 
-              className={`px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-full transition-colors flex items-center gap-1 ${
                 pathname === '/lessons' 
-                  ? 'bg-blue-50 text-blue-950 font-bold' 
-                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
+                  ? 'bg-black text-white font-bold' 
+                  : 'text-[#6e6d7a] hover:text-[#0d0c22] hover:bg-black/5'
               }`}
             >
-              <span>Darslar 🎬</span>
+              <span>Darslar</span>
             </Link>
 
-            {/* Qiziqarli O'yinlar & Kunlik Spin */}
             <Link 
               href="/arena" 
-              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-extrabold transition-all ${
+              className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 font-bold transition-all ${
                 pathname === '/arena' 
                   ? 'bg-amber-500 text-white shadow-xs' 
-                  : 'bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-200/70'
+                  : 'text-amber-900 bg-amber-100/70 hover:bg-amber-200/70'
               }`}
             >
               <Gamepad2 className="w-3.5 h-3.5 text-amber-600" />
               <span>Arena 🎮</span>
-            </Link>
-
-            {/* Bepul Pro referral */}
-            <Link 
-              href="/referral" 
-              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-extrabold transition-all ${
-                pathname === '/referral' 
-                  ? 'bg-rose-600 text-white shadow-xs' 
-                  : 'text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200/60'
-              }`}
-            >
-              <Gift className="w-3.5 h-3.5 text-rose-500" />
-              <span>Bepul Pro 🎁</span>
-            </Link>
-
-            <Link 
-              href="/pricing" 
-              className={`px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
-                pathname === '/pricing' 
-                  ? 'bg-blue-50 text-blue-950' 
-                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
-              }`}
-            >
-              <Crown className="w-3 h-3 text-amber-500" />
-              <span>Tariflar</span>
             </Link>
 
             {/* More menu dropdown */}
@@ -182,7 +139,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
-                className="px-2 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center gap-0.5"
+                className="px-3 py-1.5 rounded-full text-[#6e6d7a] hover:text-[#0d0c22] hover:bg-black/5 flex items-center gap-1 transition"
               >
                 <span>Yana</span>
                 <ChevronDown className="w-3 h-3" />
@@ -190,34 +147,42 @@ export default function Navbar() {
 
               {moreDropdownOpen && (
                 <div 
-                  className="absolute left-0 mt-1 w-44 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 z-50 text-xs space-y-1"
+                  className="absolute left-0 mt-2 w-48 bg-white border border-black/10 rounded-2xl shadow-xl p-2 z-50 text-xs space-y-1 animate-in fade-in zoom-in-95"
                   onMouseLeave={() => setMoreDropdownOpen(false)}
                 >
                   <Link
+                    href="/tutor"
+                    onClick={() => setMoreDropdownOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    AI Tutor
+                  </Link>
+                  <Link
                     href="/vocabulary"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="block px-2.5 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700 font-medium"
+                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
                   >
                     Lug'at (Vocab)
                   </Link>
                   <Link
                     href="/study-plan"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="block px-2.5 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700 font-medium"
+                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
                   >
                     O'quv Rejasi
                   </Link>
                   <Link
                     href="/mistakes"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="block px-2.5 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700 font-medium"
+                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
                   >
                     Xatolar Daftari
                   </Link>
                   <Link
                     href="/analytics"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="block px-2.5 py-1.5 rounded-lg hover:bg-slate-50 text-slate-700 font-medium"
+                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
                   >
                     Statistika & Tarix
                   </Link>
@@ -227,44 +192,56 @@ export default function Navbar() {
           </nav>
         </div>
 
-        {/* Right side controls: Profile & Mobile Menu */}
-        <div className="flex items-center gap-2">
-          {/* User Profile with custom picture and Telegram-style sticker */}
+        {/* Right side controls: CTA Buttons, Profile & Mobile Menu */}
+        <div className="flex items-center gap-2.5">
+          {/* Referral Pro Pill */}
+          <Link 
+            href="/referral" 
+            className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#ea4c89]/10 text-[#ea4c89] hover:bg-[#ea4c89]/20 transition-colors"
+          >
+            <Gift className="w-3.5 h-3.5" />
+            <span>Bepul Pro 🎁</span>
+          </Link>
+
+          {/* Pricing CTA */}
+          <Link 
+            href="/pricing" 
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#0d0c22] text-white hover:bg-[#3d3d4e] shadow-sm hover:shadow transition-all"
+          >
+            <Crown className="w-3.5 h-3.5 text-amber-400" />
+            <span>Tariflar</span>
+          </Link>
+
+          {/* User Profile */}
           <Link 
             href="/settings"
-            className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200/80 border border-slate-200/80 text-xs font-semibold text-slate-800 transition"
+            className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-white hover:bg-slate-100 border border-black/10 text-xs font-bold text-[#0d0c22] shadow-2xs transition"
           >
             {profile?.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
                 alt={profile.fullName || 'User'}
-                className="w-6 h-6 rounded-full object-cover border border-slate-300 shadow-2xs"
+                className="w-6 h-6 rounded-full object-cover border border-black/10"
               />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-950 to-blue-800 flex items-center justify-center text-white font-bold text-[11px] shadow-2xs">
+              <div className="w-6 h-6 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-bold text-[10px]">
                 {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'U'}
               </div>
             )}
-            <div className="flex items-center gap-1">
-              <span className="hidden sm:inline font-bold text-blue-950 text-xs">
-                {profile?.fullName || 'Student'}
+            <span className="hidden sm:inline text-xs">
+              {profile?.fullName || 'Student'}
+            </span>
+            {subStatus?.isPremium && (
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#ea4c89] text-white">
+                PRO
               </span>
-              {/* Telegram-style Premium Sticker (Faqat haqiqiy Premium foydalanuvchilar uchun) */}
-              {subStatus?.isPremium && profile?.premiumBadge && (
-                <span 
-                  className="inline-flex items-center justify-center text-xs select-none" 
-                  title="Telegram Premium Status"
-                >
-                  {profile.premiumBadge}
-                </span>
-              )}
-            </div>
+            )}
           </Link>
 
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 rounded-lg text-slate-700 hover:bg-slate-100"
+            className="md:hidden p-2 rounded-full text-[#0d0c22] hover:bg-black/5"
             aria-label="Toggle mobile navigation"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -274,50 +251,50 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 bg-white px-4 py-3 space-y-2 shadow-lg animate-fade-in text-xs font-semibold">
+        <div className="md:hidden border-b border-black/10 bg-[#f8f7f4] px-4 py-4 space-y-2 shadow-xl animate-fade-in text-xs font-bold">
           <div className="grid grid-cols-2 gap-2">
             <Link
               href="/ielts"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg text-xs font-bold text-blue-950 bg-blue-50 border border-blue-100 text-center"
+              className="block px-3 py-2.5 rounded-full text-xs font-bold text-[#0d0c22] bg-white border border-black/10 text-center"
             >
-              IELTS
+              IELTS Mock
             </Link>
             <Link
               href="/sat"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg text-xs font-bold text-blue-950 bg-blue-50 border border-blue-100 text-center"
+              className="block px-3 py-2.5 rounded-full text-xs font-bold text-[#0d0c22] bg-white border border-black/10 text-center"
             >
-              SAT
+              Digital SAT
             </Link>
           </div>
           <Link
             href="/ielts-gg"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-emerald-900 bg-emerald-50 border border-emerald-200 font-bold"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-white bg-[#ea4c89] font-bold"
           >
-            <Mic className="w-4 h-4 text-emerald-600" />
-            Voice AI Examiner
+            <Mic className="w-4 h-4 text-white" />
+            Voice AI Speaking
           </Link>
           <Link
             href="/lessons"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-blue-950 bg-blue-50 border border-blue-200 font-bold"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[#0d0c22] bg-white border border-black/10 font-bold"
           >
             <span>Video Darsliklar 🎬</span>
           </Link>
           <Link
             href="/arena"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-amber-900 bg-amber-50 border border-amber-200 font-bold"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-amber-950 bg-amber-100 border border-amber-200 font-bold"
           >
             <Gamepad2 className="w-4 h-4 text-amber-600" />
-            Arena (Omadli Aylana & Speed Duel) 🎮
+            Arena (Omadli Aylana & 1v1 PvP) 🎮
           </Link>
           <Link
             href="/referral"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-rose-900 bg-rose-50 border border-rose-200 font-bold"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-rose-900 bg-rose-100 border border-rose-200 font-bold"
           >
             <Gift className="w-4 h-4 text-rose-600" />
             Do'stlarni Taklif Qilish (Bepul Pro) 🎁
@@ -325,7 +302,7 @@ export default function Navbar() {
           <Link
             href="/tutor"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-800 hover:bg-slate-100"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[#0d0c22] bg-white border border-black/10"
           >
             <Sparkles className="w-4 h-4 text-blue-600" />
             AI Tutor
@@ -333,15 +310,15 @@ export default function Navbar() {
           <Link
             href="/pricing"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-800 hover:bg-slate-100 font-bold"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-white bg-[#0d0c22] font-bold"
           >
-            <Crown className="w-4 h-4 text-amber-500" />
+            <Crown className="w-4 h-4 text-amber-400" />
             Tariflar
           </Link>
           <Link
             href="/settings"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-lg text-slate-800 hover:bg-slate-100"
+            className="block px-4 py-2.5 rounded-full text-[#0d0c22] bg-white border border-black/10"
           >
             Profil & Sozlamalar
           </Link>
