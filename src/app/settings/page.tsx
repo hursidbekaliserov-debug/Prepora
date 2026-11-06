@@ -22,12 +22,20 @@ import {
   GraduationCap,
   Image as ImageIcon,
   Smile,
-  X
+  X,
+  Coins,
+  ShoppingBag,
+  Zap,
+  Shirt,
+  Glasses,
+  Flame,
+  Check
 } from 'lucide-react';
 import { StorageManager, SubscriptionStatus } from '@/lib/storage';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { UserProfile, ExamType, IELTSType } from '@/types';
 import PremiumModal from '@/components/PremiumModal';
+import Avatar3DRenderer from '@/components/Avatar3DRenderer';
 
 const VIP_PREMIUM_STICKERS = [
   { emoji: '👑', label: 'Oltin Toj' },
@@ -65,9 +73,31 @@ export default function SettingsPage() {
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const [stickerAlert, setStickerAlert] = useState<string | null>(null);
   const [shopFeedback, setShopFeedback] = useState<string | null>(null);
+  const [activeWardrobeTab, setActiveWardrobeTab] = useState<'headwear' | 'outfit' | 'glasses' | 'aura'>('outfit');
 
+  const wardrobeCatalog = StorageManager.getWardrobeCatalog();
   const avatars3D = StorageManager.get3DAvatars();
   const accessoryItems = StorageManager.getAccessoryItems();
+
+  const handleSetGender = (gender: 'boy' | 'girl') => {
+    StorageManager.setAvatarGender(gender);
+    const updated = StorageManager.getProfile();
+    setProfile(updated);
+    setShopFeedback(gender === 'boy' ? "O'g'il bola qahramoni tanlandi!" : "Qiz bola qahramoni tanlandi!");
+    setTimeout(() => setShopFeedback(null), 3000);
+  };
+
+  const handleSelectWardrobe = (
+    category: 'headwear' | 'outfit' | 'glasses' | 'aura',
+    itemId: string,
+    priceXp: number
+  ) => {
+    const res = StorageManager.buyAndEquipWardrobeItem(category, itemId, priceXp);
+    setShopFeedback(res.message);
+    const updated = StorageManager.getProfile();
+    setProfile(updated);
+    setTimeout(() => setShopFeedback(null), 3500);
+  };
 
   const handleSelect3DAvatar = (avatarId: string) => {
     const res = StorageManager.buyAndEquip3DAvatar(avatarId);
@@ -433,155 +463,308 @@ export default function SettingsPage() {
           )}
         </div>
 
-        {/* SECTION 3: 5 TA 3D AVATAR & XP DO'KONI */}
+        {/* SECTION 3: 3D AVATAR KIYINTIRISH STUDIYASI & XP HAMYONI */}
         <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-black uppercase tracking-wider mb-1">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                <span>3D Avatarlar & XP Do'koni</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-pink-500/10 to-indigo-500/10 border border-pink-500/20 text-[#ea4c89] text-xs font-black uppercase tracking-wider mb-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#ea4c89]" />
+                <span>3D Kiyintirish Studiyasi & XP Do'koni</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-blue-950">
-                Profil Uchun 3D Avatarlar & Aksessuarlar
+                3D Avatar (O'g'il & Qiz bola) Kiyintirish
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Imtihon topshirib to'plagan XP ballaringiz bilan eksklyuziv 3D avatarlar va shohona aksessuarlarni oching.
+                O'g'il yoki Qiz bola qahramonini tanlang, imtihonlardan to'plagan XP laringiz evaziga shohona kiyimlar, kiber ko'zoynaklar va olovli qanotlar bilan kiyintiring!
               </p>
-            </div>
-
-            {/* Current XP Display */}
-            <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-blue-950 font-black text-sm shadow-md shrink-0">
-              <Sparkles className="w-4 h-4 fill-blue-950" />
-              <span>{profile?.xp ?? 750} XP Mavjud</span>
             </div>
           </div>
 
-          {/* Toast feedback */}
+          {/* XP STATS: JAMI YIG'ILGAN XP, ISHLATILGAN XP, BALANS XP */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            {/* 1. Jami Toplangan XP (Olgan XP) */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200/80 flex items-center justify-between shadow-xs">
+              <div className="space-y-0.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-700 flex items-center gap-1">
+                  <Coins className="w-3.5 h-3.5 text-indigo-600" />
+                  Jami To'plangan (Olgan XP)
+                </span>
+                <div className="text-2xl font-black text-indigo-950">
+                  {profile?.totalEarnedXp ?? 1200} <span className="text-sm font-bold text-indigo-600">XP</span>
+                </div>
+                <p className="text-[10px] text-slate-500">Imtihon & testlardan qozonilgan jami ball</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-md shrink-0">
+                💎
+              </div>
+            </div>
+
+            {/* 2. Ishlatilgan XP (Ishlatgan XP) */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-200/80 flex items-center justify-between shadow-xs">
+              <div className="space-y-0.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700 flex items-center gap-1">
+                  <ShoppingBag className="w-3.5 h-3.5 text-rose-600" />
+                  Ishlatilgan (Xarid qilingan)
+                </span>
+                <div className="text-2xl font-black text-rose-950">
+                  {profile?.spentXp ?? 250} <span className="text-sm font-bold text-rose-600">XP</span>
+                </div>
+                <p className="text-[10px] text-slate-500">Kiyim & aksessuarlarga sarflangan ballar</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-xl shadow-md shrink-0">
+                🛒
+              </div>
+            </div>
+
+            {/* 3. Hozirgi Balans (Mavjud XP) */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-300 flex items-center justify-between shadow-xs">
+              <div className="space-y-0.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
+                  <Zap className="w-3.5 h-3.5 text-amber-600" />
+                  Hozirgi Balans (Mavjud XP)
+                </span>
+                <div className="text-2xl font-black text-amber-950">
+                  {profile?.xp ?? 950} <span className="text-sm font-bold text-amber-600">XP</span>
+                </div>
+                <p className="text-[10px] text-slate-600">Xaridlar uchun do'konda qolgan balans</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-500 text-blue-950 flex items-center justify-center text-xl shadow-md shrink-0">
+                ⚡
+              </div>
+            </div>
+          </div>
+
+          {/* Feedback Toast */}
           {shopFeedback && (
-            <div className="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-bold flex items-center gap-2 animate-fade-in">
-              <CheckCircle2 className="w-4 h-4 text-indigo-600" />
+            <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-bold flex items-center gap-2 animate-fade-in shadow-xs">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{shopFeedback}</span>
             </div>
           )}
 
-          {/* 5 Ta 3D Avatar Kartochkalari */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Tanlash Mumkin Bo'lgan 5 Ta 3D Avatar:
-            </h3>
+          {/* Interactive Studio: Left = 3D Character Preview & Gender Switcher, Right = Wardrobe Tabs & Items */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
+            {/* LEFT COLUMN: 3D LIVE AVATAR STAGE */}
+            <div className="lg:col-span-5 p-6 rounded-3xl bg-gradient-to-b from-slate-900 via-blue-950 to-indigo-950 text-white flex flex-col items-center justify-between shadow-xl border border-blue-900/40 relative overflow-hidden">
+              {/* Decorative radial lighting */}
+              <div className="absolute top-0 w-72 h-72 bg-[#ea4c89]/15 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-              {avatars3D.map((av) => {
-                const isEquipped = (profile?.avatar3D || 'scholar_3d') === av.id;
-                const isUnlocked = (profile?.unlockedAvatars || ['scholar_3d']).includes(av.id);
-
-                return (
-                  <div
-                    key={av.id}
-                    className={`p-4 rounded-3xl border transition-all flex flex-col justify-between text-center relative ${
-                      isEquipped
-                        ? 'border-indigo-600 bg-indigo-50/50 shadow-md ring-2 ring-indigo-500'
-                        : 'border-slate-200 bg-white hover:border-slate-300 shadow-2xs'
+              {/* Gender Selector Switcher */}
+              <div className="w-full relative z-10 space-y-2 mb-4">
+                <span className="text-[10px] uppercase tracking-widest text-slate-300 font-bold block text-center">
+                  Qahramon Jinsini Tanlang:
+                </span>
+                <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
+                  <button
+                    type="button"
+                    onClick={() => handleSetGender('boy')}
+                    className={`py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
+                      (profile?.avatarConfig?.gender || 'boy') === 'boy'
+                        ? 'bg-blue-500 text-white shadow-md'
+                        : 'text-slate-300 hover:text-white hover:bg-white/5'
                     }`}
                   >
-                    {isEquipped && (
-                      <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[9px] font-black uppercase tracking-wider">
-                        Taqilgan
-                      </span>
-                    )}
+                    <span>👦</span>
+                    <span>O'g'il Bola</span>
+                  </button>
 
-                    {/* 3D Visual Preview */}
-                    <div className="py-4">
-                      <div className={`w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br ${av.gradient} flex items-center justify-center text-4xl shadow-xl transform hover:scale-105 transition duration-300`}>
-                        <span className="select-none filter drop-shadow-md">{av.emoji}</span>
-                      </div>
+                  <button
+                    type="button"
+                    onClick={() => handleSetGender('girl')}
+                    className={`py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
+                      profile?.avatarConfig?.gender === 'girl'
+                        ? 'bg-[#ea4c89] text-white shadow-md'
+                        : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span>👧</span>
+                    <span>Qiz Bola</span>
+                  </button>
+                </div>
+              </div>
 
-                      <h4 className="font-black text-sm text-blue-950 mt-3">{av.name}</h4>
-                      <span className="text-[10px] text-slate-500 font-semibold block">{av.role}</span>
-                      <p className="text-[10px] text-slate-400 italic mt-1 leading-tight">"{av.quote}"</p>
-                    </div>
+              {/* LIVE 3D AVATAR RENDERER */}
+              <div className="relative z-10 py-3 flex items-center justify-center">
+                <Avatar3DRenderer
+                  config={
+                    profile?.avatarConfig || {
+                      gender: 'boy',
+                      headwear: 'none',
+                      outfit: 'casual',
+                      glasses: 'none',
+                      aura: 'none',
+                    }
+                  }
+                  size="xl"
+                  className="filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.6)]"
+                />
+              </div>
 
-                    <div className="pt-2 border-t border-slate-100">
-                      {isEquipped ? (
-                        <button
-                          disabled
-                          className="w-full py-2 rounded-xl bg-indigo-100 text-indigo-900 font-bold text-xs cursor-default"
-                        >
-                          Faol Avatar
-                        </button>
-                      ) : isUnlocked ? (
-                        <button
-                          type="button"
-                          onClick={() => handleSelect3DAvatar(av.id)}
-                          className="w-full py-2 rounded-xl bg-blue-950 hover:bg-blue-900 text-white font-bold text-xs transition"
-                        >
-                          Tanlash
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleSelect3DAvatar(av.id)}
-                          className="w-full py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-blue-950 font-black text-xs transition flex items-center justify-center gap-1"
-                        >
-                          <span>{av.priceXp} XP Olish</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              {/* Equipped Summary Badge Chips */}
+              <div className="w-full relative z-10 pt-4 border-t border-white/10 mt-3 space-y-1.5">
+                <span className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block text-center">
+                  Hozirgi Egnidagi Liboslar:
+                </span>
+                <div className="flex flex-wrap items-center justify-center gap-1.5">
+                  <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white text-[10px] font-bold border border-white/15">
+                    🎩 {profile?.avatarConfig?.headwear === 'crown' ? 'Shohona Toj' : profile?.avatarConfig?.headwear === 'grad_cap' ? 'Garvard Shapkasi' : profile?.avatarConfig?.headwear === 'headphones' ? 'Kiber Quloqchin' : profile?.avatarConfig?.headwear === 'cap' ? 'Kepka' : 'Bosh kiyimsiz'}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white text-[10px] font-bold border border-white/15">
+                    👕 {profile?.avatarConfig?.outfit === 'suit' ? 'Oxford Kostyum' : profile?.avatarConfig?.outfit === 'hoodie' ? 'Cambridge Xudi' : profile?.avatarConfig?.outfit === 'cyber_jacket' ? 'Cyberpunk Bomber' : 'Prepora T-Shirt'}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white text-[10px] font-bold border border-white/15">
+                    👓 {profile?.avatarConfig?.glasses === 'vr_visor' ? 'VR Vizor' : profile?.avatarConfig?.glasses === 'smart_glasses' ? 'Garvard Ko\'zoynak' : profile?.avatarConfig?.glasses === 'sunglasses' ? 'VIP Ko\'zoynak' : 'Ko\'zoynaksiz'}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white text-[10px] font-bold border border-white/15">
+                    🪽 {profile?.avatarConfig?.aura === 'fire_wings' ? 'Olovli Qanotlar' : profile?.avatarConfig?.aura === 'neon_glow' ? 'Neon Doira' : profile?.avatarConfig?.aura === 'golden_sparkles' ? 'Oltin Zarrachalar' : 'Aurasiz'}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* XP Aksessuarlar (Do'kon) */}
-          <div className="pt-4 border-t border-slate-100 space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              3D Avatar Uchun Aksessuarlar & Qanotlar:
-            </h3>
+            {/* RIGHT COLUMN: WARDROBE CATEGORY TABS & SHOP ITEMS */}
+            <div className="lg:col-span-7 space-y-4">
+              {/* Category Switcher Tabs */}
+              <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 border border-slate-200 overflow-x-auto">
+                <button
+                  type="button"
+                  onClick={() => setActiveWardrobeTab('outfit')}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap ${
+                    activeWardrobeTab === 'outfit'
+                      ? 'bg-white text-blue-950 shadow-sm'
+                      : 'text-slate-600 hover:text-blue-950'
+                  }`}
+                >
+                  <Shirt className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Liboslar (Kiyim)</span>
+                </button>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {accessoryItems.map((item) => {
-                const isEquipped = profile?.equippedItem === item.id;
-                const isUnlocked = (profile?.unlockedItems || []).includes(item.id);
+                <button
+                  type="button"
+                  onClick={() => setActiveWardrobeTab('headwear')}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap ${
+                    activeWardrobeTab === 'headwear'
+                      ? 'bg-white text-blue-950 shadow-sm'
+                      : 'text-slate-600 hover:text-blue-950'
+                  }`}
+                >
+                  <Crown className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Bosh Kiyimlar</span>
+                </button>
 
-                return (
-                  <div
-                    key={item.id}
-                    className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                      isEquipped 
-                        ? 'bg-amber-50/70 border-amber-300 shadow-xs' 
-                        : 'bg-slate-50 border-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-2xl shadow-2xs shrink-0">
-                        {item.emoji}
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-black text-blue-950">{item.name}</h4>
-                        <p className="text-[10px] text-slate-500 line-clamp-1">{item.description}</p>
-                        <span className="text-[10px] font-bold text-amber-600 block mt-0.5">
-                          {isUnlocked ? 'Sizda bor' : `${item.priceXp} XP`}
-                        </span>
-                      </div>
-                    </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveWardrobeTab('glasses')}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap ${
+                    activeWardrobeTab === 'glasses'
+                      ? 'bg-white text-blue-950 shadow-sm'
+                      : 'text-slate-600 hover:text-blue-950'
+                  }`}
+                >
+                  <Glasses className="w-3.5 h-3.5 text-cyan-500" />
+                  <span>Ko'zoynaklar</span>
+                </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleSelectAccessory(item.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition shrink-0 ${
+                <button
+                  type="button"
+                  onClick={() => setActiveWardrobeTab('aura')}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap ${
+                    activeWardrobeTab === 'aura'
+                      ? 'bg-white text-blue-950 shadow-sm'
+                      : 'text-slate-600 hover:text-blue-950'
+                  }`}
+                >
+                  <Flame className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Qanotlar & Aura</span>
+                </button>
+              </div>
+
+              {/* Items List Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {wardrobeCatalog[activeWardrobeTab].map((item) => {
+                  const currentEquipped = profile?.avatarConfig?.[activeWardrobeTab];
+                  const isEquipped = currentEquipped === item.id;
+                  const isUnlocked = item.priceXp === 0 || (profile?.unlockedWardrobe || ['casual', 'none']).includes(item.id);
+                  const canAfford = (profile?.xp || 0) >= item.priceXp;
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`p-4 rounded-2xl border transition-all flex flex-col justify-between gap-3 ${
                         isEquipped
-                          ? 'bg-amber-500 text-white shadow-2xs'
-                          : isUnlocked
-                          ? 'bg-blue-950 hover:bg-blue-900 text-white'
-                          : 'bg-white hover:bg-amber-50 text-blue-950 border border-slate-200'
+                          ? 'border-indigo-500 bg-indigo-50/60 ring-2 ring-indigo-400 shadow-xs'
+                          : 'border-slate-200 bg-slate-50/80 hover:bg-white hover:border-slate-300'
                       }`}
                     >
-                      {isEquipped ? 'Taqilgan' : isUnlocked ? 'Taqish' : `${item.priceXp} XP`}
-                    </button>
-                  </div>
-                );
-              })}
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center text-2xl shrink-0">
+                          {item.emoji}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <h4 className="text-xs font-black text-blue-950 truncate">{item.name}</h4>
+                            {item.badge && (
+                              <span className="px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[9px] font-black uppercase">
+                                {item.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-snug">
+                            {item.description}
+                          </p>
+                          <div className="mt-1 flex items-center gap-2">
+                            <span className="text-[11px] font-bold text-indigo-700">
+                              {item.priceXp === 0 ? '🎁 Bepul' : `${item.priceXp} XP`}
+                            </span>
+                            {isUnlocked && item.priceXp > 0 && (
+                              <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
+                                Xarid qilingan
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      <div>
+                        {isEquipped ? (
+                          <button
+                            type="button"
+                            disabled
+                            className="w-full py-2 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-default"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Taqilgan</span>
+                          </button>
+                        ) : isUnlocked ? (
+                          <button
+                            type="button"
+                            onClick={() => handleSelectWardrobe(activeWardrobeTab, item.id, item.priceXp)}
+                            className="w-full py-2 rounded-xl bg-blue-950 hover:bg-blue-900 text-white font-bold text-xs transition"
+                          >
+                            Taqish
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleSelectWardrobe(activeWardrobeTab, item.id, item.priceXp)}
+                            disabled={!canAfford}
+                            className={`w-full py-2 rounded-xl font-black text-xs transition flex items-center justify-center gap-1.5 ${
+                              canAfford
+                                ? 'bg-amber-400 hover:bg-amber-300 text-blue-950 shadow-xs'
+                                : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                            }`}
+                          >
+                            <Coins className="w-3.5 h-3.5" />
+                            <span>{canAfford ? `${item.priceXp} XP bilan Kiyish` : `Yetarli emas (${item.priceXp} XP)`}</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

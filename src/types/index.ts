@@ -86,6 +86,14 @@ export interface SpeakingPrompt {
   };
 }
 
+export interface AvatarConfig {
+  gender: 'boy' | 'girl';
+  headwear: string;
+  outfit: string;
+  glasses: string;
+  aura: string;
+}
+
 export interface UserProfile {
   id: string;
   fullName: string;
@@ -108,6 +116,10 @@ export interface UserProfile {
   unlockedAvatars?: string[];
   unlockedItems?: string[];
   xp?: number;
+  totalEarnedXp?: number;
+  spentXp?: number;
+  avatarConfig?: AvatarConfig;
+  unlockedWardrobe?: string[];
   premiumBadge?: string;
   createdAt: string;
 }

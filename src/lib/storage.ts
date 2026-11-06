@@ -49,7 +49,17 @@ const DEFAULT_PROFILE: UserProfile = {
   equippedItem: '',
   unlockedAvatars: ['scholar_3d'],
   unlockedItems: [],
-  xp: 750,
+  xp: 950,
+  totalEarnedXp: 1200,
+  spentXp: 250,
+  avatarConfig: {
+    gender: 'boy',
+    headwear: 'none',
+    outfit: 'casual',
+    glasses: 'none',
+    aura: 'none',
+  },
+  unlockedWardrobe: ['casual', 'none'],
   premiumBadge: '',
   createdAt: new Date().toISOString(),
 };
@@ -207,8 +217,29 @@ export class StorageManager {
     try {
       const data = localStorage.getItem('prepora_profile');
       if (data) {
-        const parsed = JSON.parse(data);
+        const parsed: UserProfile = JSON.parse(data);
         parsed.isDemoUser = false; // Never show demo user
+        if (!parsed.avatarConfig) {
+          parsed.avatarConfig = {
+            gender: 'boy',
+            headwear: 'none',
+            outfit: 'casual',
+            glasses: 'none',
+            aura: 'none',
+          };
+        }
+        if (!parsed.unlockedWardrobe) {
+          parsed.unlockedWardrobe = ['casual', 'none'];
+        }
+        if (parsed.spentXp === undefined) {
+          parsed.spentXp = 250;
+        }
+        if (parsed.xp === undefined) {
+          parsed.xp = 950;
+        }
+        if (parsed.totalEarnedXp === undefined) {
+          parsed.totalEarnedXp = (parsed.xp || 950) + (parsed.spentXp || 250);
+        }
         return parsed;
       }
     } catch (e) {
@@ -945,8 +976,235 @@ export class StorageManager {
   static addXP(amount: number): number {
     const profile = this.getProfile();
     profile.xp = (profile.xp || 0) + amount;
+    profile.totalEarnedXp = (profile.totalEarnedXp || 0) + amount;
     this.saveProfile(profile);
     return profile.xp;
+  }
+
+  // --- 3D Avatar Kiyintirish Studiyasi (Interactive Wardrobe & Dress-up) ---
+  static getWardrobeCatalog() {
+    return {
+      headwear: [
+        {
+          id: 'none',
+          name: 'Bosh kiyimsiz',
+          category: 'headwear' as const,
+          priceXp: 0,
+          emoji: '👤',
+          description: 'Tabiiy soch turmagi',
+          badge: 'Standart',
+        },
+        {
+          id: 'crown',
+          name: 'Shohona Oltin Toj 3D',
+          category: 'headwear' as const,
+          priceXp: 250,
+          emoji: '👑',
+          description: 'Imtihon g\'oliblari uchun yoqut va zumradli shohona toj',
+          badge: 'VIP Elita',
+        },
+        {
+          id: 'grad_cap',
+          name: 'Garvard Bitiruv Shapkasi',
+          category: 'headwear' as const,
+          priceXp: 200,
+          emoji: '🎓',
+          description: 'Top universitetlar bitiruvchisining akademik shlyapasi',
+          badge: 'Akademik',
+        },
+        {
+          id: 'headphones',
+          name: 'Kiber RGB Quloqchinlar',
+          category: 'headwear' as const,
+          priceXp: 150,
+          emoji: '🎧',
+          description: 'IELTS Listening uchun fokus kuchaytiruvchi neon quloqchin',
+          badge: 'Kiber',
+        },
+        {
+          id: 'cap',
+          name: 'Trenddagi Prepora Kepkasi',
+          category: 'headwear' as const,
+          priceXp: 100,
+          emoji: '🧢',
+          description: 'Zamonaviy ko\'cha uslubidagi sportiv kepka',
+          badge: 'Casual',
+        },
+      ],
+      outfit: [
+        {
+          id: 'casual',
+          name: 'Prepora Brend T-Shirt',
+          category: 'outfit' as const,
+          priceXp: 0,
+          emoji: '👕',
+          description: 'Qulay va erkin boshlang\'ich libos',
+          badge: 'Standart',
+        },
+        {
+          id: 'suit',
+          name: 'Oxford Klassik Kostyum',
+          category: 'outfit' as const,
+          priceXp: 300,
+          emoji: '👔',
+          description: 'Rasmiy diplomatiya va Speaking intervyusi uchun galstukli kostyum',
+          badge: 'Elita',
+        },
+        {
+          id: 'hoodie',
+          name: 'Cambridge Band 9 Xudi',
+          category: 'outfit' as const,
+          priceXp: 250,
+          emoji: '🧥',
+          description: 'Kembrij kollejlari uslubidagi premium qalin xudi',
+          badge: 'Band 9',
+        },
+        {
+          id: 'cyber_jacket',
+          name: 'Cyberpunk Neon Bomber Jaket',
+          category: 'outfit' as const,
+          priceXp: 350,
+          emoji: '🥼',
+          description: 'Digital SAT 1600 kiber neon yaltiroq sportiv kurtka',
+          badge: 'Afsonaviy',
+        },
+      ],
+      glasses: [
+        {
+          id: 'none',
+          name: 'Ko\'zoynaksiz',
+          category: 'glasses' as const,
+          priceXp: 0,
+          emoji: '👀',
+          description: 'Tabiiy ko\'rinish',
+          badge: 'Standart',
+        },
+        {
+          id: 'vr_visor',
+          name: 'VR Kiber Vizor (Smart AR)',
+          category: 'glasses' as const,
+          priceXp: 200,
+          emoji: '🥽',
+          description: 'Desmos formulalar va test tahlili uchun kiber vizor',
+          badge: 'Futuristik',
+        },
+        {
+          id: 'smart_glasses',
+          name: 'Garvard Smart Ko\'zoynagi',
+          category: 'glasses' as const,
+          priceXp: 120,
+          emoji: '👓',
+          description: 'Ziyoli olimlar uchun dumaloq klassik ko\'zoynak',
+          badge: 'Olimona',
+        },
+        {
+          id: 'sunglasses',
+          name: 'VIP Qora Quyosh Ko\'zoynagi',
+          category: 'glasses' as const,
+          priceXp: 100,
+          emoji: '🕶️',
+          description: 'Salobatli va cool ko\'rinish beruvchi qora ko\'zoynak',
+          badge: 'Trend',
+        },
+      ],
+      aura: [
+        {
+          id: 'none',
+          name: 'Aurasiz',
+          category: 'aura' as const,
+          priceXp: 0,
+          emoji: '⚪',
+          description: 'Oddiy tinch ko\'rinish',
+          badge: 'Standart',
+        },
+        {
+          id: 'fire_wings',
+          name: 'Olovli Qaqnus Qanotlari',
+          category: 'aura' as const,
+          priceXp: 400,
+          emoji: '🪽',
+          description: 'Orqada yonib turuvchi olovli afsonaviy qanotlar',
+          badge: 'Mifologik',
+        },
+        {
+          id: 'neon_glow',
+          name: 'Kiber Neon Doira Aulasi',
+          category: 'aura' as const,
+          priceXp: 250,
+          emoji: '⚡',
+          description: 'Avatarni o\'rab turuvchi aylanuvchi elektr-neon halqa',
+          badge: 'Kiber',
+        },
+        {
+          id: 'golden_sparkles',
+          name: 'Shohona Oltin Zarrachalar',
+          category: 'aura' as const,
+          priceXp: 300,
+          emoji: '✨',
+          description: 'Yulduzdek miltillovchi oltin sehrli nur va zarrachalar',
+          badge: 'VIP',
+        },
+      ],
+    };
+  }
+
+  static setAvatarGender(gender: 'boy' | 'girl'): void {
+    const profile = this.getProfile();
+    if (!profile.avatarConfig) {
+      profile.avatarConfig = {
+        gender: 'boy',
+        headwear: 'none',
+        outfit: 'casual',
+        glasses: 'none',
+        aura: 'none',
+      };
+    }
+    profile.avatarConfig.gender = gender;
+    this.saveProfile(profile);
+  }
+
+  static buyAndEquipWardrobeItem(
+    category: 'headwear' | 'outfit' | 'glasses' | 'aura',
+    itemId: string,
+    priceXp: number
+  ): { success: boolean; message: string } {
+    const profile = this.getProfile();
+    if (!profile.avatarConfig) {
+      profile.avatarConfig = {
+        gender: 'boy',
+        headwear: 'none',
+        outfit: 'casual',
+        glasses: 'none',
+        aura: 'none',
+      };
+    }
+    const unlocked = profile.unlockedWardrobe || ['casual', 'none'];
+
+    const isAlreadyUnlocked = priceXp === 0 || unlocked.includes(itemId);
+
+    if (!isAlreadyUnlocked) {
+      const currentXp = profile.xp || 0;
+      if (currentXp < priceXp) {
+        return {
+          success: false,
+          message: `XP yetarli emas! Sizda ${currentXp} XP bor, kerak: ${priceXp} XP`,
+        };
+      }
+      profile.xp = currentXp - priceXp;
+      profile.spentXp = (profile.spentXp || 0) + priceXp;
+      unlocked.push(itemId);
+      profile.unlockedWardrobe = unlocked;
+    }
+
+    profile.avatarConfig[category] = itemId as any;
+    this.saveProfile(profile);
+
+    return {
+      success: true,
+      message: isAlreadyUnlocked
+        ? "Kiyim muvaffaqiyatli taqildi!"
+        : `Xarid qilindi va taqildi (-${priceXp} XP)!`,
+    };
   }
 
   static buyAndEquip3DAvatar(avatarId: string): { success: boolean; message: string } {

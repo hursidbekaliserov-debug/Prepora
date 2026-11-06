@@ -4,13 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import PremiumModal from '@/components/PremiumModal';
 import { StorageManager, SubscriptionStatus } from '@/lib/storage';
-import { 
-  Video, 
-  Play, 
-  Lock, 
-  Clock, 
-  CheckCircle2, 
-  Crown, 
+import {
+  Video,
+  Play,
+  Lock,
+  Clock,
+  CheckCircle2,
+  Crown,
   ExternalLink,
   ShieldCheck,
   AlertCircle,
@@ -131,8 +131,8 @@ export default function LessonsPage() {
     setIsPlaying(true);
   };
 
-  const filteredLessons = activeCategory === 'ALL' 
-    ? LESSONS_DATA 
+  const filteredLessons = activeCategory === 'ALL'
+    ? LESSONS_DATA
     : LESSONS_DATA.filter((l) => l.category === activeCategory);
 
   return (
@@ -175,33 +175,30 @@ export default function LessonsPage() {
           <button
             type="button"
             onClick={() => setActiveCategory('ALL')}
-            className={`px-4 py-2 rounded-full transition ${
-              activeCategory === 'ALL'
+            className={`px-4 py-2 rounded-full transition ${activeCategory === 'ALL'
                 ? 'bg-[#0d0c22] text-white shadow-xs'
                 : 'bg-white hover:bg-black/5 text-[#6e6d7a] border border-black/10'
-            }`}
+              }`}
           >
             Barcha Darslar ({LESSONS_DATA.length})
           </button>
           <button
             type="button"
             onClick={() => setActiveCategory('IELTS')}
-            className={`px-4 py-2 rounded-full transition ${
-              activeCategory === 'IELTS'
+            className={`px-4 py-2 rounded-full transition ${activeCategory === 'IELTS'
                 ? 'bg-[#0d0c22] text-white shadow-xs'
                 : 'bg-white hover:bg-black/5 text-[#6e6d7a] border border-black/10'
-            }`}
+              }`}
           >
             IELTS Darsliklari
           </button>
           <button
             type="button"
             onClick={() => setActiveCategory('SAT')}
-            className={`px-4 py-2 rounded-full transition ${
-              activeCategory === 'SAT'
+            className={`px-4 py-2 rounded-full transition ${activeCategory === 'SAT'
                 ? 'bg-[#0d0c22] text-white shadow-xs'
                 : 'bg-white hover:bg-black/5 text-[#6e6d7a] border border-black/10'
-            }`}
+              }`}
           >
             Digital SAT Darsliklari
           </button>
@@ -221,7 +218,7 @@ export default function LessonsPage() {
                   className="w-full h-full border-0 rounded-3xl"
                 />
               ) : (
-                <div 
+                <div
                   onClick={() => setIsPlaying(true)}
                   className="w-full h-full relative cursor-pointer group"
                 >
@@ -316,11 +313,10 @@ export default function LessonsPage() {
                     key={lesson.id}
                     type="button"
                     onClick={() => handleSelectLesson(lesson)}
-                    className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 group ${
-                      isCurrent
+                    className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 group ${isCurrent
                         ? 'bg-white border-[#0d0c22] shadow-md ring-2 ring-black/5'
                         : 'bg-white hover:bg-slate-50 border-black/10'
-                    }`}
+                      }`}
                   >
                     <div className="w-20 h-14 rounded-xl overflow-hidden bg-slate-900 shrink-0 relative">
                       <img
@@ -352,9 +348,9 @@ export default function LessonsPage() {
         </div>
       </main>
 
-      <PremiumModal 
-        isOpen={isPremiumModalOpen} 
-        onClose={() => setIsPremiumModalOpen(false)} 
+      <PremiumModal
+        isOpen={isPremiumModalOpen}
+        onClose={() => setIsPremiumModalOpen(false)}
         reason="general"
       />
     </div>

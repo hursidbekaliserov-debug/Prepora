@@ -63,13 +63,13 @@ const BLITZ_QUESTIONS: BlitzQuestion[] = [
 
 const SPIN_PRIZES = [
   { label: '+150 XP', fullLabel: "+150 XP Tajriba Balli", icon: '⚡', color: '#4f46e5' },
-  { label: '1 AI Savol', fullLabel: "1 Bepul AI Savoli", icon: '🤖', color: '#059669' },
-  { label: 'Super VIP', fullLabel: "Super VIP Talaba Mavqei", icon: '💎', color: '#0891b2' },
+  { label: '1 Test', fullLabel: "1 Bepul AI Savoli", icon: '🤖', color: '#059669' },
+  { label: 'VIP', fullLabel: "Super VIP Talaba Mavqei", icon: '💎', color: '#0891b2' },
   { label: '+300 XP', fullLabel: "+300 XP Katta Bonus", icon: '✨', color: '#d97706' },
-  { label: 'Sertifikat', fullLabel: "Oltin Sertifikat Mavqei", icon: '🏆', color: '#7c3aed' },
-  { label: 'Grammar', fullLabel: "Grammar Ninja Unvoni", icon: '🎯', color: '#e11d48' },
+  { label: 'Oltin', fullLabel: "Oltin Sertifikat Mavqei", icon: '🏆', color: '#7c3aed' },
+  { label: 'Ninja', fullLabel: "Grammar Ninja Unvoni", icon: '🎯', color: '#e11d48' },
   { label: '+100 XP', fullLabel: "+100 XP Kunlik Tajriba", icon: '⭐', color: '#2563eb' },
-  { label: 'Olov Streak', fullLabel: "Olovli O'rganish Mavqei", icon: '🔥', color: '#ea580c' },
+  { label: 'Olov', fullLabel: "Olovli O'rganish Mavqei", icon: '🔥', color: '#ea580c' },
 ];
 
 export default function ArenaPage() {
@@ -388,28 +388,28 @@ export default function ArenaPage() {
                           strokeOpacity="0.3"
                         />
                         <g transform={`rotate(${midAngle}, 150, 150)`}>
-                          {/* Label Text aligned along radius */}
+                          {/* Icon in inner radius zone */}
                           <text
-                            x="210"
-                            y="154"
-                            textAnchor="middle"
-                            fill="#ffffff"
-                            fontSize="11"
-                            fontWeight="900"
-                            letterSpacing="0.3px"
-                            className="select-none font-sans"
-                          >
-                            {prize.label}
-                          </text>
-                          {/* Icon near the rim */}
-                          <text
-                            x="266"
+                            x="208"
                             y="154"
                             textAnchor="middle"
                             fontSize="13"
                             className="select-none"
                           >
                             {prize.icon}
+                          </text>
+                          {/* Label Text placed comfortably in the wide outer sector (no overflow) */}
+                          <text
+                            x="250"
+                            y="153.5"
+                            textAnchor="middle"
+                            fill="#ffffff"
+                            fontSize="9"
+                            fontWeight="900"
+                            letterSpacing="0.2px"
+                            className="select-none font-sans"
+                          >
+                            {prize.label}
                           </text>
                         </g>
                       </g>

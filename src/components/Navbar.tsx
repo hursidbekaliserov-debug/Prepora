@@ -20,6 +20,7 @@ import { StorageManager, SubscriptionStatus } from '@/lib/storage';
 import { SessionManager } from '@/lib/session';
 import { UserProfile } from '@/types';
 import PremiumModal from '@/components/PremiumModal';
+import Avatar3DRenderer from '@/components/Avatar3DRenderer';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -258,6 +259,10 @@ export default function Navbar() {
                   alt={profile.fullName || 'User'}
                   className="w-6 h-6 rounded-full object-cover border border-black/10"
                 />
+              ) : profile?.avatarConfig ? (
+                <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 border border-black/10">
+                  <Avatar3DRenderer config={profile.avatarConfig} size="sm" className="w-6 h-6" />
+                </div>
               ) : (
                 <div className="w-6 h-6 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-bold text-[10px]">
                   {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'U'}
@@ -267,7 +272,13 @@ export default function Navbar() {
                 {profile?.fullName || 'Foydalanuvchi'}
               </span>
               {/* 3D avatar & equipped accessories */}
-              {profile?.equippedItem && (
+              {profile?.avatarConfig?.headwear === 'crown' ? (
+                <span className="text-xs" title="Shohona Toj">👑</span>
+              ) : profile?.avatarConfig?.aura === 'fire_wings' ? (
+                <span className="text-xs" title="Olovli Qanotlar">🪽</span>
+              ) : profile?.avatarConfig?.glasses === 'vr_visor' ? (
+                <span className="text-xs" title="VR Vizor">🥽</span>
+              ) : profile?.equippedItem ? (
                 <span className="text-xs" title="Taqilgan 3D aksessuar">
                   {profile.equippedItem === 'crown_3d' ? '👑' :
                    profile.equippedItem === 'aura_3d' ? '⚡' :
@@ -276,7 +287,7 @@ export default function Navbar() {
                    profile.equippedItem === 'diamond_frame' ? '💎' :
                    profile.equippedItem === 'shield_band9' ? '🛡️' : ''}
                 </span>
-              )}
+              ) : null}
               {subStatus?.isPremium && (
                 <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#ea4c89] text-white">
                   PRO
