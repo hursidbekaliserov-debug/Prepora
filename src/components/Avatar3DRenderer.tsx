@@ -349,3 +349,4 @@ export default function Avatar3DRenderer({
     </div>
   );
 }
+

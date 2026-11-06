@@ -15,7 +15,10 @@ const PUBLIC_ROUTES = [
   '/arena',
   '/vocabulary',
   '/ielts',
-  '/sat'
+  '/sat',
+  '/settings',
+  '/tutor',
+  '/ielts-gg'
 ];
 
 export default function GlobalAuthGate() {

@@ -129,6 +129,9 @@ export default function LessonsPage() {
   const handleSelectLesson = (lesson: Lesson) => {
     setSelectedLesson(lesson);
     setIsPlaying(true);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 100, behavior: 'smooth' });
+    }
   };
 
   const filteredLessons = activeCategory === 'ALL'
@@ -211,7 +214,8 @@ export default function LessonsPage() {
             <div className="relative rounded-3xl overflow-hidden bg-black shadow-xl border border-black/10 aspect-video">
               {isPlaying ? (
                 <iframe
-                  src={`https://www.youtube.com/embed/${selectedLesson.youtubeId}?autoplay=1&rel=0`}
+                  key={selectedLesson.youtubeId}
+                  src={`https://www.youtube-nocookie.com/embed/${selectedLesson.youtubeId}?autoplay=1&rel=0&enablejsapi=1`}
                   title={selectedLesson.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
