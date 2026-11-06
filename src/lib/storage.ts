@@ -691,5 +691,89 @@ export class StorageManager {
     }
     return this.getSubscriptionStatus();
   }
+
+  // --- Referral System (Do'stlarni taklif qilib Bepul Pro yutish) ---
+  static getReferralData(): {
+    code: string;
+    invitedCount: number;
+    maxGoal: number;
+    isProUnlocked: boolean;
+    invitedFriends: { id: string; name: string; date: string }[];
+  } {
+    if (!this.isClient()) {
+      return {
+        code: 'PREP-777',
+        invitedCount: 0,
+        maxGoal: 3,
+        isProUnlocked: false,
+        invitedFriends: [],
+      };
+    }
+
+    try {
+      const stored = localStorage.getItem('prepora_referral_data');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch {
+      // fallback
+    }
+
+    // Generate stable unique referral code for user
+    const profile = this.getProfile();
+    const cleanId = (profile?.id || 'usr').replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase();
+    const initialCode = `PREP-${cleanId || '7281'}`;
+
+    const defaultRef = {
+      code: initialCode,
+      invitedCount: 0,
+      maxGoal: 3,
+      isProUnlocked: false,
+      invitedFriends: [],
+    };
+
+    if (this.isClient()) {
+      localStorage.setItem('prepora_referral_data', JSON.stringify(defaultRef));
+    }
+    return defaultRef;
+  }
+
+  static addReferralFriend(name?: string): {
+    success: boolean;
+    invitedCount: number;
+    isProUnlocked: boolean;
+    justUnlockedPro: boolean;
+  } {
+    const data = this.getReferralData();
+    const newCount = data.invitedCount + 1;
+    const friendName = name || `Do'st #${newCount}`;
+
+    data.invitedCount = newCount;
+    data.invitedFriends.unshift({
+      id: `ref_${Date.now()}`,
+      name: friendName,
+      date: new Date().toLocaleDateString('uz-UZ'),
+    });
+
+    let justUnlockedPro = false;
+    if (newCount >= data.maxGoal && !data.isProUnlocked) {
+      data.isProUnlocked = true;
+      justUnlockedPro = true;
+      // Auto-unlock Pro for 1 month!
+      this.activatePremiumWithProof('PREPORA-VIP-2026', 'Referral 3 Friends Bonus');
+    }
+
+    if (this.isClient()) {
+      localStorage.setItem('prepora_referral_data', JSON.stringify(data));
+      window.dispatchEvent(new Event('prepora_referral_updated'));
+    }
+
+    return {
+      success: true,
+      invitedCount: newCount,
+      isProUnlocked: data.isProUnlocked,
+      justUnlockedPro,
+    };
+  }
 }
 

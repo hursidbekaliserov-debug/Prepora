@@ -17,9 +17,29 @@ import {
   Crown,
   Play,
   RotateCcw,
-  Gift
+  Gift,
+  Swords,
+  Radio,
+  User,
+  ShieldAlert
 } from 'lucide-react';
 import { StorageManager } from '@/lib/storage';
+
+interface Opponent {
+  name: string;
+  city: string;
+  avatar: string;
+  exam: string;
+  rating: number;
+}
+
+const PVP_OPPONENTS: Opponent[] = [
+  { name: 'Azizbek Karimov', city: 'Toshkent', avatar: '👨‍🎓', exam: 'IELTS 7.5', rating: 1420 },
+  { name: 'Madina Olimova', city: 'Samarqand', avatar: '👩‍🎓', exam: 'SAT 1490', rating: 1510 },
+  { name: 'Shahzod Bekmurodov', city: 'Buxoro', avatar: '🧑‍💻', exam: 'IELTS 8.0', rating: 1640 },
+  { name: 'Diyora Rahimova', city: 'Andijon', avatar: '👩‍💼', exam: 'SAT Math 790', rating: 1480 },
+  { name: 'Islom Yusupov', city: 'Namangan', avatar: '👨‍💼', exam: 'IELTS 7.0', rating: 1390 },
+];
 
 interface BlitzQuestion {
   question: string;
@@ -53,7 +73,7 @@ const SPIN_PRIZES = [
 ];
 
 export default function ArenaPage() {
-  const [activeTab, setActiveTab] = useState<'spin' | 'blitz' | 'leaderboard'>('spin');
+  const [activeTab, setActiveTab] = useState<'spin' | 'blitz' | 'pvp' | 'leaderboard'>('spin');
 
   // Spin Wheel State
   const [isSpinning, setIsSpinning] = useState(false);
@@ -68,6 +88,89 @@ export default function ArenaPage() {
   const [blitzScore, setBlitzScore] = useState(0);
   const [blitzCombo, setBlitzCombo] = useState(1);
   const [blitzFinished, setBlitzFinished] = useState(false);
+
+  // 1v1 PvP Duel State
+  const [pvpState, setPvpState] = useState<'idle' | 'searching' | 'battling' | 'finished'>('idle');
+  const [opponent, setOpponent] = useState<Opponent | null>(null);
+  const [pvpTimeLeft, setPvpTimeLeft] = useState(60);
+  const [userPvpScore, setUserPvpScore] = useState(0);
+  const [opponentPvpScore, setOpponentPvpScore] = useState(0);
+  const [pvpQIndex, setPvpQIndex] = useState(0);
+  const [pvpUserCombo, setPvpUserCombo] = useState(1);
+
+  // 1v1 PvP Timer & Opponent Live Simulator
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    let aiSim: NodeJS.Timeout;
+
+    if (pvpState === 'battling' && pvpTimeLeft > 0) {
+      timer = setInterval(() => {
+        setPvpTimeLeft((t) => t - 1);
+      }, 1000);
+
+      // Opponent simulates real-time competitive answers
+      aiSim = setInterval(() => {
+        setOpponentPvpScore((prev) => {
+          const rand = Math.random();
+          if (rand > 0.25) {
+            return prev + Math.floor(10 + Math.random() * 15);
+          }
+          return prev;
+        });
+      }, 3400);
+    } else if (pvpState === 'battling' && pvpTimeLeft === 0) {
+      setPvpState('finished');
+      if (userPvpScore > opponentPvpScore) {
+        try {
+          const profile = StorageManager.getProfile();
+          profile.totalStudyMinutes = (profile.totalStudyMinutes || 0) + 15;
+          StorageManager.saveProfile(profile);
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+      if (aiSim) clearInterval(aiSim);
+    };
+  }, [pvpState, pvpTimeLeft, userPvpScore, opponentPvpScore]);
+
+  const startPvpSearch = () => {
+    setPvpState('searching');
+    setOpponent(null);
+    setUserPvpScore(0);
+    setOpponentPvpScore(0);
+    setPvpTimeLeft(60);
+    setPvpUserCombo(1);
+    setPvpQIndex(0);
+
+    setTimeout(() => {
+      const picked = PVP_OPPONENTS[Math.floor(Math.random() * PVP_OPPONENTS.length)];
+      setOpponent(picked);
+
+      setTimeout(() => {
+        setPvpState('battling');
+      }, 1800);
+    }, 2400);
+  };
+
+  const handlePvpAnswer = (selectedIdx: number) => {
+    const q = BLITZ_QUESTIONS[pvpQIndex];
+    if (selectedIdx === q.correct) {
+      setUserPvpScore((s) => s + (15 * pvpUserCombo));
+      setPvpUserCombo((c) => Math.min(c + 1, 4));
+    } else {
+      setPvpUserCombo(1);
+    }
+
+    if (pvpQIndex < BLITZ_QUESTIONS.length - 1) {
+      setPvpQIndex((idx) => idx + 1);
+    } else {
+      setPvpQIndex(0);
+    }
+  };
 
   useEffect(() => {
     const lastSpin = localStorage.getItem('prepora_last_spin_date');
@@ -191,7 +294,20 @@ export default function ArenaPage() {
                 }`}
               >
                 <Zap className="w-4 h-4" />
-                <span>60-Soniya Blitz Jangi ⚡</span>
+                <span>60-Soniya Blitz ⚡</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('pvp')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
+                  activeTab === 'pvp'
+                    ? 'bg-rose-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-blue-950 hover:bg-slate-50'
+                }`}
+              >
+                <Swords className="w-4 h-4 text-rose-400" />
+                <span>1v1 PvP Duel ⚔️</span>
               </button>
 
               <button
@@ -435,6 +551,214 @@ export default function ArenaPage() {
                 >
                   <RotateCcw className="w-4 h-4" />
                   <span>Qayta O'ynash</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 2.5 JONLI 1V1 PVP DUEL */}
+        {activeTab === 'pvp' && (
+          <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-xl space-y-6 max-w-2xl mx-auto text-center">
+            {pvpState === 'idle' && (
+              <div className="space-y-4 py-8">
+                <div className="w-16 h-16 rounded-3xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-md">
+                  <Swords className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-black text-blue-950">Jonli 1v1 Intellektual Duel</h3>
+                <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+                  O'zbekiston bo'yicha boshqa onlayn tayyorlanayotgan talabalar bilan real vaqtda 60 soniyada bilim sinashing!
+                  Kim ko'p va tezroq topsa, g'olib bo'ladi va <strong>+300 XP</strong> hamda <strong>Arena Kubogini</strong> qo'lga kiritadi.
+                </p>
+
+                <div className="flex flex-wrap justify-center gap-2 pt-2">
+                  <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-800 text-[11px] font-bold border border-rose-200">
+                    ⚡ 60 Soniya
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-800 text-[11px] font-bold border border-indigo-200">
+                    🧠 IELTS & SAT Drills
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200">
+                    🏆 +300 XP G'alabaga
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={startPvpSearch}
+                  className="px-8 py-4 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-sm shadow-xl transition flex items-center justify-center gap-2 mx-auto hover:scale-105 active:scale-95 cursor-pointer mt-4"
+                >
+                  <Swords className="w-5 h-5" />
+                  <span>Raqib Qidirish va Jangni Boshlash</span>
+                </button>
+              </div>
+            )}
+
+            {pvpState === 'searching' && (
+              <div className="space-y-6 py-12 animate-fade-in">
+                <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full border-4 border-rose-200 animate-ping opacity-60" />
+                  <div className="w-20 h-20 rounded-full bg-rose-50 border-2 border-rose-400 flex items-center justify-center text-rose-600 shadow-lg">
+                    <Radio className="w-8 h-8 animate-spin" />
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xl font-black text-blue-950">
+                    {!opponent ? "Onlayn Raqib Qidirilmoqda..." : "Raqib Topildi!"}
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {!opponent ? "O'zbekiston bo'yicha mos darajadagi talaba tanlanmoqda..." : "Jang boshlanmoqda..."}
+                  </p>
+                </div>
+
+                {opponent && (
+                  <div className="p-4 rounded-2xl bg-slate-900 text-white max-w-sm mx-auto shadow-xl flex items-center justify-between border border-rose-500/40 animate-bounce">
+                    <div className="flex items-center gap-3">
+                      <div className="text-3xl">{opponent.avatar}</div>
+                      <div className="text-left">
+                        <span className="font-bold text-xs text-white block">{opponent.name}</span>
+                        <span className="text-[10px] text-slate-400 block">{opponent.city} • {opponent.exam}</span>
+                      </div>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-black font-mono">
+                      {opponent.rating} Elo
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {pvpState === 'battling' && opponent && (
+              <div className="space-y-6 text-left">
+                {/* Real-time Matchup Header: Siz vs Raqib */}
+                <div className="p-4 rounded-3xl bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white shadow-xl border border-blue-800/40">
+                  <div className="flex items-center justify-between">
+                    {/* User side */}
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-sm">
+                        Siz
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold block text-slate-200">Siz</span>
+                        <span className="text-lg font-black font-mono text-emerald-400">{userPvpScore} XP</span>
+                      </div>
+                    </div>
+
+                    {/* Timer & VS Badge in Center */}
+                    <div className="flex flex-col items-center">
+                      <span className="px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black uppercase tracking-wider mb-1">
+                        VS
+                      </span>
+                      <div className="flex items-center gap-1 font-mono text-xl font-black text-amber-400">
+                        <Clock className="w-4 h-4 animate-pulse" />
+                        <span>{pvpTimeLeft}s</span>
+                      </div>
+                    </div>
+
+                    {/* Opponent side */}
+                    <div className="flex items-center gap-2.5 text-right">
+                      <div>
+                        <span className="text-xs font-bold block text-slate-200 truncate max-w-[90px]">{opponent.name}</span>
+                        <span className="text-lg font-black font-mono text-rose-400">{opponentPvpScore} XP</span>
+                      </div>
+                      <div className="w-10 h-10 rounded-xl bg-rose-950 border border-rose-500/40 flex items-center justify-center text-2xl shadow-sm">
+                        {opponent.avatar}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Combo pill */}
+                  <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between text-[11px]">
+                    <span className="text-amber-300 font-bold">
+                      Combo bonus: x{pvpUserCombo} (+{15 * pvpUserCombo} ball)
+                    </span>
+                    <span className="text-slate-400">
+                      Raqib: {opponent.city}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Question */}
+                <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    Savol #{pvpQIndex + 1} • {BLITZ_QUESTIONS[pvpQIndex].type.toUpperCase()}
+                  </span>
+                  <h4 className="text-base sm:text-lg font-black text-blue-950">
+                    {BLITZ_QUESTIONS[pvpQIndex].question}
+                  </h4>
+                </div>
+
+                {/* 4 Options */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {BLITZ_QUESTIONS[pvpQIndex].options.map((opt, oIdx) => (
+                    <button
+                      key={oIdx}
+                      type="button"
+                      onClick={() => handlePvpAnswer(oIdx)}
+                      className="p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-rose-600 hover:bg-rose-50 font-bold text-xs sm:text-sm text-blue-950 text-left transition active:scale-95 shadow-2xs cursor-pointer"
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {pvpState === 'finished' && opponent && (
+              <div className="space-y-4 py-6 animate-fade-in text-center">
+                {userPvpScore > opponentPvpScore ? (
+                  <div className="space-y-3">
+                    <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mx-auto shadow-md border-2 border-amber-300 animate-bounce">
+                      <Trophy className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-3xl font-black text-emerald-600">G'ALABA (VICTORY)! 🏆</h3>
+                    <p className="text-xs text-slate-600">
+                      Siz <strong>{opponent.name}</strong> ustidan g'alaba qozondingiz va <strong>+300 XP</strong> qo'lga kiritdingiz!
+                    </p>
+                  </div>
+                ) : userPvpScore < opponentPvpScore ? (
+                  <div className="space-y-3">
+                    <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-md">
+                      <Swords className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl font-black text-rose-600">Mag'lubiyat ⚔️</h3>
+                    <p className="text-xs text-slate-600">
+                      Raqibingiz <strong>{opponent.name}</strong> biroz tezroq harakat qildi. Ishtirok uchun +60 XP berildi.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center mx-auto shadow-md">
+                      <ShieldAlert className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl font-black text-blue-950">DURANG! 🤝</h3>
+                    <p className="text-xs text-slate-600">
+                      Ikkala o'quvchi ham teng ball to'pladi!
+                    </p>
+                  </div>
+                )}
+
+                {/* Final Scoreboard Comparison */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 max-w-sm mx-auto flex items-center justify-around">
+                  <div className="text-center">
+                    <span className="text-[11px] font-bold text-slate-500 block">Siz</span>
+                    <span className="text-2xl font-black text-blue-950 font-mono">{userPvpScore}</span>
+                  </div>
+                  <span className="text-xs font-black text-slate-400">VS</span>
+                  <div className="text-center">
+                    <span className="text-[11px] font-bold text-slate-500 block">{opponent.name}</span>
+                    <span className="text-2xl font-black text-rose-600 font-mono">{opponentPvpScore}</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={startPvpSearch}
+                  className="px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 mx-auto cursor-pointer"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Yangi Raqib Bilan Bellashish</span>
                 </button>
               </div>
             )}

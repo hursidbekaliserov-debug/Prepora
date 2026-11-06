@@ -138,7 +138,25 @@ Siz kartangizga pul tushganini tekshirib, 1 ta tugma bilan foydalanuvchiga Pro b
 ⏳ /pending - Hozir kutilayotgan to'lovlar
 ❓ /help - Botdan foydalanish yo'riqnomasi`;
 
-        await sendTelegramMessage(chatId, welcomeText);
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://prepora.uz';
+        await sendTelegramMessage(chatId, welcomeText, {
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: '🚀 Prepora Platformasini Ochish (Web App)',
+                  web_app: { url: siteUrl },
+                },
+              ],
+              [
+                {
+                  text: '🎁 Do\'stlarni Taklif Qilish (Bepul Pro)',
+                  web_app: { url: `${siteUrl}/referral` },
+                },
+              ],
+            ],
+          },
+        });
         return NextResponse.json({ ok: true });
       }
 

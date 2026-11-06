@@ -11,7 +11,8 @@ import {
   Mic,
   Crown,
   Gamepad2,
-  ChevronDown
+  ChevronDown,
+  Gift
 } from 'lucide-react';
 import { StorageManager, SubscriptionStatus } from '@/lib/storage';
 import { UserProfile } from '@/types';
@@ -144,11 +145,24 @@ export default function Navbar() {
               className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-extrabold transition-all ${
                 pathname === '/arena' 
                   ? 'bg-amber-500 text-white shadow-xs' 
-                  : 'bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-200/70 animate-pulse'
+                  : 'bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-200/70'
               }`}
             >
               <Gamepad2 className="w-3.5 h-3.5 text-amber-600" />
               <span>Arena 🎮</span>
+            </Link>
+
+            {/* Bepul Pro referral */}
+            <Link 
+              href="/referral" 
+              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-extrabold transition-all ${
+                pathname === '/referral' 
+                  ? 'bg-rose-600 text-white shadow-xs' 
+                  : 'text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200/60'
+              }`}
+            >
+              <Gift className="w-3.5 h-3.5 text-rose-500" />
+              <span>Bepul Pro 🎁</span>
             </Link>
 
             <Link 
@@ -299,6 +313,14 @@ export default function Navbar() {
           >
             <Gamepad2 className="w-4 h-4 text-amber-600" />
             Arena (Omadli Aylana & Speed Duel) 🎮
+          </Link>
+          <Link
+            href="/referral"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-rose-900 bg-rose-50 border border-rose-200 font-bold"
+          >
+            <Gift className="w-4 h-4 text-rose-600" />
+            Do'stlarni Taklif Qilish (Bepul Pro) 🎁
           </Link>
           <Link
             href="/tutor"
