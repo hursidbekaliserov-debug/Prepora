@@ -103,6 +103,11 @@ export interface UserProfile {
   totalStudyMinutes: number;
   isDemoUser: boolean;
   avatarUrl?: string;
+  avatar3D?: string;
+  equippedItem?: string;
+  unlockedAvatars?: string[];
+  unlockedItems?: string[];
+  xp?: number;
   premiumBadge?: string;
   createdAt: string;
 }

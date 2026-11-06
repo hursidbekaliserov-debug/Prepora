@@ -14,6 +14,18 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [refCode, setRefCode] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref') || localStorage.getItem('prepora_referred_by');
+      if (ref) {
+        setRefCode(ref);
+        localStorage.setItem('prepora_referred_by', ref);
+      }
+    }
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +36,32 @@ export default function SignUpPage() {
       setErrorMsg('Iltimos, barcha maydonlarni to\'ldiring');
       setLoading(false);
       return;
+    }
+
+    // Process referral verification if referred
+    if (refCode) {
+      try {
+        const storedRef = localStorage.getItem('prepora_referral_data');
+        if (storedRef) {
+          const parsed = JSON.parse(storedRef);
+          parsed.invitedFriends = parsed.invitedFriends || [];
+          parsed.invitedFriends.unshift({
+            id: `ref_${Date.now()}`,
+            name: fullName.trim(),
+            date: new Date().toLocaleDateString('uz-UZ'),
+            status: 'verified',
+            joinedExam: 'Digital SAT & IELTS',
+          });
+          parsed.invitedCount = parsed.invitedFriends.length;
+          parsed.verifiedCount = parsed.invitedFriends.filter((f: any) => f.status === 'verified').length;
+          if (parsed.verifiedCount >= 5) {
+            parsed.isProUnlocked = true;
+            StorageManager.activatePremiumWithProof('PREPORA-VIP-2026', '5 Friends Referral Verified Bonus');
+          }
+          localStorage.setItem('prepora_referral_data', JSON.stringify(parsed));
+          window.dispatchEvent(new Event('prepora_referral_updated'));
+        }
+      } catch {}
     }
 
     if (isSupabaseConfigured && supabase) {

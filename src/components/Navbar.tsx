@@ -12,35 +12,53 @@ import {
   Crown,
   Gamepad2,
   ChevronDown,
-  Gift
+  Gift,
+  UserPlus,
+  LogIn
 } from 'lucide-react';
 import { StorageManager, SubscriptionStatus } from '@/lib/storage';
+import { SessionManager } from '@/lib/session';
 import { UserProfile } from '@/types';
 import PremiumModal from '@/components/PremiumModal';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [subStatus, setSubStatus] = useState<SubscriptionStatus | null>(null);
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const updateProfile = () => {
-      setProfile(StorageManager.getProfile());
+    // Start 10-minute inactivity watcher & cookie touch
+    const cleanupWatcher = SessionManager.initSessionWatcher();
+
+    const checkAuthAndProfile = () => {
+      const logged = StorageManager.isUserLoggedIn();
+      setIsLoggedIn(logged);
+      if (logged) {
+        setProfile(StorageManager.getProfile());
+      } else {
+        setProfile(null);
+      }
     };
+
     const updateSub = () => {
       setSubStatus(StorageManager.getSubscriptionStatus());
     };
 
-    updateProfile();
+    checkAuthAndProfile();
     updateSub();
 
-    window.addEventListener('prepora_profile_updated', updateProfile);
+    window.addEventListener('prepora_profile_updated', checkAuthAndProfile);
+    window.addEventListener('prepora_auth_changed', checkAuthAndProfile);
     window.addEventListener('prepora_subscription_updated', updateSub);
+
     return () => {
-      window.removeEventListener('prepora_profile_updated', updateProfile);
+      cleanupWatcher();
+      window.removeEventListener('prepora_profile_updated', checkAuthAndProfile);
+      window.removeEventListener('prepora_auth_changed', checkAuthAndProfile);
       window.removeEventListener('prepora_subscription_updated', updateSub);
     };
   }, []);
@@ -212,31 +230,60 @@ export default function Navbar() {
             <span>Tariflar</span>
           </Link>
 
-          {/* User Profile */}
-          <Link 
-            href="/settings"
-            className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-white hover:bg-slate-100 border border-black/10 text-xs font-bold text-[#0d0c22] shadow-2xs transition"
-          >
-            {profile?.avatarUrl ? (
-              <img
-                src={profile.avatarUrl}
-                alt={profile.fullName || 'User'}
-                className="w-6 h-6 rounded-full object-cover border border-black/10"
-              />
-            ) : (
-              <div className="w-6 h-6 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-bold text-[10px]">
-                {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'U'}
-              </div>
-            )}
-            <span className="hidden sm:inline text-xs">
-              {profile?.fullName || 'Student'}
-            </span>
-            {subStatus?.isPremium && (
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#ea4c89] text-white">
-                PRO
+          {/* Authentication State: Register / Login vs User Profile */}
+          {!isLoggedIn ? (
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Link 
+                href="/login" 
+                className="px-3 py-1.5 rounded-full text-xs font-bold text-[#0d0c22] hover:bg-black/5 transition"
+              >
+                Kirish
+              </Link>
+              <Link 
+                href="/signup" 
+                className="flex items-center gap-1 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold bg-[#0d0c22] text-white hover:bg-[#3d3d4e] shadow-sm transition"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Ro'yxatdan o'tish</span>
+              </Link>
+            </div>
+          ) : (
+            <Link 
+              href="/settings"
+              className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-white hover:bg-slate-100 border border-black/10 text-xs font-bold text-[#0d0c22] shadow-2xs transition"
+            >
+              {profile?.avatarUrl ? (
+                <img
+                  src={profile.avatarUrl}
+                  alt={profile.fullName || 'User'}
+                  className="w-6 h-6 rounded-full object-cover border border-black/10"
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-bold text-[10px]">
+                  {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'U'}
+                </div>
+              )}
+              <span className="hidden sm:inline text-xs">
+                {profile?.fullName || 'Foydalanuvchi'}
               </span>
-            )}
-          </Link>
+              {/* 3D avatar & equipped accessories */}
+              {profile?.equippedItem && (
+                <span className="text-xs" title="Taqilgan 3D aksessuar">
+                  {profile.equippedItem === 'crown_3d' ? '👑' :
+                   profile.equippedItem === 'aura_3d' ? '⚡' :
+                   profile.equippedItem === 'visors_3d' ? '🕶️' :
+                   profile.equippedItem === 'wings_3d' ? '🪽' :
+                   profile.equippedItem === 'diamond_frame' ? '💎' :
+                   profile.equippedItem === 'shield_band9' ? '🛡️' : ''}
+                </span>
+              )}
+              {subStatus?.isPremium && (
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#ea4c89] text-white">
+                  PRO
+                </span>
+              )}
+            </Link>
+          )}
 
           {/* Mobile hamburger */}
           <button
@@ -251,7 +298,46 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-black/10 bg-[#f8f7f4] px-4 py-4 space-y-2 shadow-xl animate-fade-in text-xs font-bold">
+        <div className="md:hidden border-b border-black/10 bg-[#f8f7f4] px-4 py-4 space-y-2.5 shadow-xl animate-fade-in text-xs font-bold">
+          {/* Guest state in mobile drawer */}
+          {!isLoggedIn ? (
+            <div className="p-3 rounded-2xl bg-white border border-black/10 flex items-center justify-between gap-2 mb-2 shadow-2xs">
+              <span className="text-[#6e6d7a] font-medium text-xs">Akkauntingiz yo'qmi?</span>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-1.5 rounded-full bg-slate-100 text-[#0d0c22] font-bold"
+                >
+                  Kirish
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-1.5 rounded-full bg-[#0d0c22] text-white font-bold"
+                >
+                  Ro'yxatdan o'tish
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="p-2.5 rounded-2xl bg-white border border-black/10 flex items-center justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-bold text-xs">
+                  {profile?.fullName?.charAt(0) || 'U'}
+                </div>
+                <span className="font-bold text-[#0d0c22]">{profile?.fullName}</span>
+              </div>
+              <Link
+                href="/settings"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xs text-[#ea4c89] font-bold underline"
+              >
+                Sozlamalar
+              </Link>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-2">
             <Link
               href="/ielts"

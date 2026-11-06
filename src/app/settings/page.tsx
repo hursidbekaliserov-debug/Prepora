@@ -29,7 +29,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { UserProfile, ExamType, IELTSType } from '@/types';
 import PremiumModal from '@/components/PremiumModal';
 
-const TELEGRAM_PREMIUM_STICKERS = [
+const VIP_PREMIUM_STICKERS = [
   { emoji: '👑', label: 'Oltin Toj' },
   { emoji: '💎', label: 'Olmos' },
   { emoji: '⚡', label: 'Yashin' },
@@ -64,6 +64,24 @@ export default function SettingsPage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const [stickerAlert, setStickerAlert] = useState<string | null>(null);
+  const [shopFeedback, setShopFeedback] = useState<string | null>(null);
+
+  const avatars3D = StorageManager.get3DAvatars();
+  const accessoryItems = StorageManager.getAccessoryItems();
+
+  const handleSelect3DAvatar = (avatarId: string) => {
+    const res = StorageManager.buyAndEquip3DAvatar(avatarId);
+    setShopFeedback(res.message);
+    setProfile(StorageManager.getProfile());
+    setTimeout(() => setShopFeedback(null), 3500);
+  };
+
+  const handleSelectAccessory = (itemId: string) => {
+    const res = StorageManager.buyAndEquipAccessory(itemId);
+    setShopFeedback(res.message);
+    setProfile(StorageManager.getProfile());
+    setTimeout(() => setShopFeedback(null), 3500);
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -109,7 +127,7 @@ export default function SettingsPage() {
 
   const handleSelectSticker = (sticker: string) => {
     if (!subStatus?.isPremium) {
-      setStickerAlert("🔒 Nik yoniga Telegram stikerlari qo'yish faqat Premium obunachilar uchun mavjud! Oddiy foydalanuvchilar qo'ya olmaydi.");
+      setStickerAlert("🔒 Nik yoniga maxsus VIP stiker qo'yish faqat Premium obunachilar uchun mavjud! Oddiy foydalanuvchilar qo'ya olmaydi.");
       setTimeout(() => setStickerAlert(null), 4000);
       return;
     }
@@ -186,7 +204,7 @@ export default function SettingsPage() {
                 )}
               </div>
               <p className="text-xs text-slate-600">
-                Profilingiz rasmi, ismingiz, Telegram stikerlaringiz va maqsadli ballaringizni boshqaring.
+                Profilingiz rasmi, ismingiz, VIP stikerlaringiz va maqsadli ballaringizni boshqaring.
               </p>
             </div>
           </div>
@@ -311,19 +329,19 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* SECTION 2: TELEGRAM-STYLE PREMIUM STICKER STATUS */}
+        {/* SECTION 2: VIP PREMIUM STATUS STICKER */}
         <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div>
               <h2 className="text-lg font-black text-blue-950 flex items-center gap-2">
                 <Smile className="w-5 h-5 text-amber-500" />
-                Telegram-Style Nik Yonidagi Premium Stiker
+                VIP Nik Yonidagi Maxsus Stiker
                 <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black uppercase">
                   Faqat Premium
                 </span>
               </h2>
               <p className="text-xs text-slate-500">
-                Xuddi Telegramdagi kabi ismingiz yoniga premium status emoji-stikerini qo'ying. Oddiy foydalanuvchilar buni qo'ya olishmaydi!
+                Ismingiz yoniga eksklyuziv VIP status emoji-stikerini qo'ying.
               </p>
             </div>
 
@@ -362,9 +380,9 @@ export default function SettingsPage() {
                 <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-2 shadow-xs">
                   <Lock className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-black text-blue-950">Oddiy Foydalanuvchilarga Ruxsat Yo'q</h4>
+                <h4 className="text-sm font-black text-blue-950">Faqat Premium Foydalanuvchilar Uchun</h4>
                 <p className="text-xs text-slate-600 max-w-md mt-1">
-                  Telegram-style maxsus stikerlarni faqat <strong>Prepora Premium</strong> obunachilari ismining yoniga qo'ya oladi.
+                  VIP maxsus stikerlarni faqat <strong>Prepora Premium</strong> obunachilari ismining yoniga qo'ya oladi.
                 </p>
                 <div className="mt-3 flex items-center gap-2">
                   <Link
@@ -378,7 +396,7 @@ export default function SettingsPage() {
             )}
 
             <div className={`p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-4 sm:grid-cols-8 gap-2.5 ${!subStatus?.isPremium ? 'opacity-40 pointer-events-none' : ''}`}>
-              {TELEGRAM_PREMIUM_STICKERS.map((stk) => {
+              {VIP_PREMIUM_STICKERS.map((stk) => {
                 const isSelected = premiumBadge === stk.emoji;
                 return (
                   <button
@@ -413,6 +431,159 @@ export default function SettingsPage() {
               Stikerni olib tashlash
             </button>
           )}
+        </div>
+
+        {/* SECTION 3: 5 TA 3D AVATAR & XP DO'KONI */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-black uppercase tracking-wider mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                <span>3D Avatarlar & XP Do'koni</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-blue-950">
+                Profil Uchun 3D Avatarlar & Aksessuarlar
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Imtihon topshirib to'plagan XP ballaringiz bilan eksklyuziv 3D avatarlar va shohona aksessuarlarni oching.
+              </p>
+            </div>
+
+            {/* Current XP Display */}
+            <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-blue-950 font-black text-sm shadow-md shrink-0">
+              <Sparkles className="w-4 h-4 fill-blue-950" />
+              <span>{profile?.xp ?? 750} XP Mavjud</span>
+            </div>
+          </div>
+
+          {/* Toast feedback */}
+          {shopFeedback && (
+            <div className="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-bold flex items-center gap-2 animate-fade-in">
+              <CheckCircle2 className="w-4 h-4 text-indigo-600" />
+              <span>{shopFeedback}</span>
+            </div>
+          )}
+
+          {/* 5 Ta 3D Avatar Kartochkalari */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Tanlash Mumkin Bo'lgan 5 Ta 3D Avatar:
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+              {avatars3D.map((av) => {
+                const isEquipped = (profile?.avatar3D || 'scholar_3d') === av.id;
+                const isUnlocked = (profile?.unlockedAvatars || ['scholar_3d']).includes(av.id);
+
+                return (
+                  <div
+                    key={av.id}
+                    className={`p-4 rounded-3xl border transition-all flex flex-col justify-between text-center relative ${
+                      isEquipped
+                        ? 'border-indigo-600 bg-indigo-50/50 shadow-md ring-2 ring-indigo-500'
+                        : 'border-slate-200 bg-white hover:border-slate-300 shadow-2xs'
+                    }`}
+                  >
+                    {isEquipped && (
+                      <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[9px] font-black uppercase tracking-wider">
+                        Taqilgan
+                      </span>
+                    )}
+
+                    {/* 3D Visual Preview */}
+                    <div className="py-4">
+                      <div className={`w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br ${av.gradient} flex items-center justify-center text-4xl shadow-xl transform hover:scale-105 transition duration-300`}>
+                        <span className="select-none filter drop-shadow-md">{av.emoji}</span>
+                      </div>
+
+                      <h4 className="font-black text-sm text-blue-950 mt-3">{av.name}</h4>
+                      <span className="text-[10px] text-slate-500 font-semibold block">{av.role}</span>
+                      <p className="text-[10px] text-slate-400 italic mt-1 leading-tight">"{av.quote}"</p>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100">
+                      {isEquipped ? (
+                        <button
+                          disabled
+                          className="w-full py-2 rounded-xl bg-indigo-100 text-indigo-900 font-bold text-xs cursor-default"
+                        >
+                          Faol Avatar
+                        </button>
+                      ) : isUnlocked ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSelect3DAvatar(av.id)}
+                          className="w-full py-2 rounded-xl bg-blue-950 hover:bg-blue-900 text-white font-bold text-xs transition"
+                        >
+                          Tanlash
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleSelect3DAvatar(av.id)}
+                          className="w-full py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-blue-950 font-black text-xs transition flex items-center justify-center gap-1"
+                        >
+                          <span>{av.priceXp} XP Olish</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* XP Aksessuarlar (Do'kon) */}
+          <div className="pt-4 border-t border-slate-100 space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              3D Avatar Uchun Aksessuarlar & Qanotlar:
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {accessoryItems.map((item) => {
+                const isEquipped = profile?.equippedItem === item.id;
+                const isUnlocked = (profile?.unlockedItems || []).includes(item.id);
+
+                return (
+                  <div
+                    key={item.id}
+                    className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                      isEquipped 
+                        ? 'bg-amber-50/70 border-amber-300 shadow-xs' 
+                        : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-2xl shadow-2xs shrink-0">
+                        {item.emoji}
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black text-blue-950">{item.name}</h4>
+                        <p className="text-[10px] text-slate-500 line-clamp-1">{item.description}</p>
+                        <span className="text-[10px] font-bold text-amber-600 block mt-0.5">
+                          {isUnlocked ? 'Sizda bor' : `${item.priceXp} XP`}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectAccessory(item.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition shrink-0 ${
+                        isEquipped
+                          ? 'bg-amber-500 text-white shadow-2xs'
+                          : isUnlocked
+                          ? 'bg-blue-950 hover:bg-blue-900 text-white'
+                          : 'bg-white hover:bg-amber-50 text-blue-950 border border-slate-200'
+                      }`}
+                    >
+                      {isEquipped ? 'Taqilgan' : isUnlocked ? 'Taqish' : `${item.priceXp} XP`}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* SECTION 3: EXAM TARGET & STUDY PLAN FORM */}

@@ -213,6 +213,17 @@ const SHOTS_DATA: ShotCard[] = [
 ];
 
 export default function LandingPage() {
+  // Capture referral code if arriving via referral link
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      if (ref) {
+        localStorage.setItem('prepora_referred_by', ref);
+      }
+    }
+  }, []);
+
   // Dribbble category filter state
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');

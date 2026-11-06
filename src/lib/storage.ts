@@ -45,6 +45,11 @@ const DEFAULT_PROFILE: UserProfile = {
   totalStudyMinutes: 120,
   isDemoUser: false,
   avatarUrl: '',
+  avatar3D: 'scholar_3d',
+  equippedItem: '',
+  unlockedAvatars: ['scholar_3d'],
+  unlockedItems: [],
+  xp: 750,
   premiumBadge: '',
   createdAt: new Date().toISOString(),
 };
@@ -176,6 +181,19 @@ export class StorageManager {
   static isUserLoggedIn(): boolean {
     if (!this.isClient()) return false;
     try {
+      // Check 10-minute session expiry from cookies/localStorage
+      const cookieTime = document.cookie.match(/(^|;\s*)prepora_last_activity_time=([^;]*)/);
+      const storageTime = localStorage.getItem('prepora_last_active_ts');
+      const lastActiveStr = cookieTime ? decodeURIComponent(cookieTime[2]) : storageTime;
+      if (lastActiveStr) {
+        const lastActive = parseInt(lastActiveStr, 10);
+        if (!isNaN(lastActive) && Date.now() - lastActive > 10 * 60 * 1000) {
+          // Expired after 10 minutes of inactivity!
+          localStorage.removeItem('prepora_active_session');
+          localStorage.removeItem('prepora_last_active_ts');
+          return false;
+        }
+      }
       const session = localStorage.getItem('prepora_active_session');
       return !!session;
     } catch {
@@ -696,15 +714,17 @@ export class StorageManager {
   static getReferralData(): {
     code: string;
     invitedCount: number;
+    verifiedCount: number;
     maxGoal: number;
     isProUnlocked: boolean;
-    invitedFriends: { id: string; name: string; date: string }[];
+    invitedFriends: { id: string; name: string; date: string; status: 'pending' | 'verified'; joinedExam?: string }[];
   } {
     if (!this.isClient()) {
       return {
         code: 'PREP-777',
         invitedCount: 0,
-        maxGoal: 3,
+        verifiedCount: 0,
+        maxGoal: 5,
         isProUnlocked: false,
         invitedFriends: [],
       };
@@ -713,7 +733,10 @@ export class StorageManager {
     try {
       const stored = localStorage.getItem('prepora_referral_data');
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        parsed.maxGoal = 5; // Updated to 5 friends
+        parsed.verifiedCount = (parsed.invitedFriends || []).filter((f: any) => f.status === 'verified').length;
+        return parsed;
       }
     } catch {
       // fallback
@@ -727,7 +750,8 @@ export class StorageManager {
     const defaultRef = {
       code: initialCode,
       invitedCount: 0,
-      maxGoal: 3,
+      verifiedCount: 0,
+      maxGoal: 5,
       isProUnlocked: false,
       invitedFriends: [],
     };
@@ -741,6 +765,7 @@ export class StorageManager {
   static addReferralFriend(name?: string): {
     success: boolean;
     invitedCount: number;
+    verifiedCount: number;
     isProUnlocked: boolean;
     justUnlockedPro: boolean;
   } {
@@ -750,18 +775,14 @@ export class StorageManager {
 
     data.invitedCount = newCount;
     data.invitedFriends.unshift({
-      id: `ref_${Date.now()}`,
+      id: `ref_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
       name: friendName,
       date: new Date().toLocaleDateString('uz-UZ'),
+      status: 'pending', // Pending verification
+      joinedExam: newCount % 2 === 0 ? 'Digital SAT' : 'IELTS Academic',
     });
 
-    let justUnlockedPro = false;
-    if (newCount >= data.maxGoal && !data.isProUnlocked) {
-      data.isProUnlocked = true;
-      justUnlockedPro = true;
-      // Auto-unlock Pro for 1 month!
-      this.activatePremiumWithProof('PREPORA-VIP-2026', 'Referral 3 Friends Bonus');
-    }
+    data.verifiedCount = data.invitedFriends.filter((f) => f.status === 'verified').length;
 
     if (this.isClient()) {
       localStorage.setItem('prepora_referral_data', JSON.stringify(data));
@@ -771,8 +792,222 @@ export class StorageManager {
     return {
       success: true,
       invitedCount: newCount,
+      verifiedCount: data.verifiedCount,
+      isProUnlocked: data.isProUnlocked,
+      justUnlockedPro: false,
+    };
+  }
+
+  static verifyReferralFriend(friendId: string): {
+    success: boolean;
+    verifiedCount: number;
+    isProUnlocked: boolean;
+    justUnlockedPro: boolean;
+  } {
+    const data = this.getReferralData();
+    const friend = data.invitedFriends.find((f) => f.id === friendId);
+    let justUnlockedPro = false;
+
+    if (friend) {
+      friend.status = 'verified';
+      data.verifiedCount = data.invitedFriends.filter((f) => f.status === 'verified').length;
+
+      // When 5 friends are successfully verified, unlock Pro!
+      if (data.verifiedCount >= data.maxGoal && !data.isProUnlocked) {
+        data.isProUnlocked = true;
+        justUnlockedPro = true;
+        this.activatePremiumWithProof('PREPORA-VIP-2026', '5 Friends Referral Verified Bonus');
+      }
+
+      if (this.isClient()) {
+        localStorage.setItem('prepora_referral_data', JSON.stringify(data));
+        window.dispatchEvent(new Event('prepora_referral_updated'));
+      }
+    }
+
+    return {
+      success: true,
+      verifiedCount: data.verifiedCount,
       isProUnlocked: data.isProUnlocked,
       justUnlockedPro,
+    };
+  }
+
+  // --- 3D Avatarlar va XP Do'koni (Gamified Profile System) ---
+  static get3DAvatars() {
+    return [
+      {
+        id: 'scholar_3d',
+        name: 'Cyber Scholar 3D',
+        role: 'IELTS Band 9 Master',
+        priceXp: 0,
+        gradient: 'from-blue-600 via-indigo-600 to-purple-600',
+        badge: 'Boshlang\'ich',
+        emoji: '🎓',
+        quote: 'Har bir qoidani chuqur anglaydi',
+      },
+      {
+        id: 'astronaut_3d',
+        name: 'Cosmic Astronaut 3D',
+        role: 'Digital SAT 1600 Pioneer',
+        priceXp: 300,
+        gradient: 'from-cyan-500 via-blue-600 to-indigo-900',
+        badge: 'Eksklyuziv',
+        emoji: '🚀',
+        quote: 'Yulduzlarga intiluvchi izlanuvchi',
+      },
+      {
+        id: 'wizard_3d',
+        name: 'Cambridge Wizard 3D',
+        role: 'Oksford & Kembrij Bilimdoni',
+        priceXp: 400,
+        gradient: 'from-purple-600 via-pink-600 to-rose-600',
+        badge: 'Afsonaviy',
+        emoji: '🧙‍♂️',
+        quote: 'Murakkab insholarni sekundlarda hal qiladi',
+      },
+      {
+        id: 'phoenix_3d',
+        name: 'Neon Phoenix 3D',
+        role: 'Olovli Qaqnus & Speaking Star',
+        priceXp: 500,
+        gradient: 'from-amber-500 via-orange-600 to-rose-600',
+        badge: 'Mifologik',
+        emoji: '🔥',
+        quote: 'Xatolardan qayta va yanada kuchli tug\'iladi',
+      },
+      {
+        id: 'champion_3d',
+        name: 'Royal Champion 3D',
+        role: 'Mutlaq Arena G\'olibi',
+        priceXp: 600,
+        gradient: 'from-yellow-400 via-amber-500 to-amber-700',
+        badge: 'VIP Elita',
+        emoji: '👑',
+        quote: 'Top 1% talabalar safiga kirgan',
+      },
+    ];
+  }
+
+  static getAccessoryItems() {
+    return [
+      {
+        id: 'crown_3d',
+        name: 'Oltin Toj 3D (Golden Crown)',
+        type: 'crown',
+        priceXp: 250,
+        emoji: '👑',
+        description: 'Profilingiz va 3D avataringiz tepasida porlab turuvchi shohona toj',
+      },
+      {
+        id: 'aura_3d',
+        name: 'Neon Kiber Aura (Cyber Glow)',
+        type: 'aura',
+        priceXp: 200,
+        emoji: '⚡',
+        description: 'Avataringiz atrofida aylanuvchi futuristik neon zaryad aulasi',
+      },
+      {
+        id: 'visors_3d',
+        name: 'VR Kiber Ko\'zoynak (Smart Visor)',
+        type: 'visors',
+        priceXp: 150,
+        emoji: '🕶️',
+        description: 'Desmos va testlarni tahlil qiluvchi aqlli kiber ko\'zoynak',
+      },
+      {
+        id: 'wings_3d',
+        name: 'Olovli Qanotlar 3D (Fire Wings)',
+        type: 'wings',
+        priceXp: 350,
+        emoji: '🪽',
+        description: 'Imtihon sari dadil uchishingizni ifodalovchi nurli qanotlar',
+      },
+      {
+        id: 'diamond_frame',
+        name: 'Olmos Ramka (Diamond Border)',
+        type: 'frame',
+        priceXp: 300,
+        emoji: '💎',
+        description: 'Profilingiz atrofidagi yaltiroq olmos hoshiya',
+      },
+      {
+        id: 'shield_band9',
+        name: 'Band 9 Himoya Qalqoni (Aegis)',
+        type: 'shield',
+        priceXp: 180,
+        emoji: '🛡️',
+        description: 'Grammatik va hisob-kitob xatolaridan himoya qiluvchi ramziy qalqon',
+      },
+    ];
+  }
+
+  static addXP(amount: number): number {
+    const profile = this.getProfile();
+    profile.xp = (profile.xp || 0) + amount;
+    this.saveProfile(profile);
+    return profile.xp;
+  }
+
+  static buyAndEquip3DAvatar(avatarId: string): { success: boolean; message: string } {
+    const profile = this.getProfile();
+    const avatars = this.get3DAvatars();
+    const target = avatars.find((a) => a.id === avatarId);
+    if (!target) return { success: false, message: 'Avatar topilmadi' };
+
+    const unlocked = profile.unlockedAvatars || ['scholar_3d'];
+    const currentXp = profile.xp || 0;
+
+    if (!unlocked.includes(avatarId)) {
+      if (currentXp < target.priceXp) {
+        return {
+          success: false,
+          message: `XP yetarli emas! Sizda ${currentXp} XP bor, kerak: ${target.priceXp} XP`,
+        };
+      }
+      profile.xp = currentXp - target.priceXp;
+      unlocked.push(avatarId);
+      profile.unlockedAvatars = unlocked;
+    }
+
+    profile.avatar3D = avatarId;
+    this.saveProfile(profile);
+    if (this.isClient()) {
+      window.dispatchEvent(new Event('prepora_profile_updated'));
+    }
+    return { success: true, message: `${target.name} muvaffaqiyatli tanlandi!` };
+  }
+
+  static buyAndEquipAccessory(itemId: string): { success: boolean; message: string } {
+    const profile = this.getProfile();
+    const items = this.getAccessoryItems();
+    const target = items.find((i) => i.id === itemId);
+    if (!target) return { success: false, message: 'Narsa topilmadi' };
+
+    const unlocked = profile.unlockedItems || [];
+    const currentXp = profile.xp || 0;
+
+    if (!unlocked.includes(itemId)) {
+      if (currentXp < target.priceXp) {
+        return {
+          success: false,
+          message: `XP yetarli emas! Sizda ${currentXp} XP bor, kerak: ${target.priceXp} XP`,
+        };
+      }
+      profile.xp = currentXp - target.priceXp;
+      unlocked.push(itemId);
+      profile.unlockedItems = unlocked;
+    }
+
+    // Toggle equipment: if already equipped, unequip; otherwise equip
+    profile.equippedItem = profile.equippedItem === itemId ? '' : itemId;
+    this.saveProfile(profile);
+    if (this.isClient()) {
+      window.dispatchEvent(new Event('prepora_profile_updated'));
+    }
+    return {
+      success: true,
+      message: profile.equippedItem === itemId ? `${target.name} taqildi!` : `${target.name} yechildi.`,
     };
   }
 }
