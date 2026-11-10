@@ -116,15 +116,6 @@ export default function LandingPage() {
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-[#5146E5]/10 via-[#8B7CF6]/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-            {/* Pill Announcement */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#E5E7EB] shadow-xs text-xs font-semibold text-[#171A2B] animate-in fade-in slide-in-from-top-4 duration-500">
-              <span className="w-2 h-2 rounded-full bg-[#5146E5] animate-ping" />
-              <span className="text-[#5146E5] font-black uppercase tracking-wider text-[11px]">Yangi</span>
-              <span className="text-[#85899B]">•</span>
-              <span>2026/2027 Yangilangan Cambridge 19 & Digital SAT Formati</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#5146E5]" />
-            </div>
-
             {/* Main Headline */}
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-[#171A2B] tracking-tight leading-[1.08] max-w-4xl mx-auto">
               Your Journey to <br className="hidden sm:inline" />
@@ -631,11 +622,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
             <div className="col-span-2 space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#5146E5] text-white flex items-center justify-center font-black text-sm">
-                  P
-                </div>
-                <span className="text-base font-black text-[#171A2B]">Prepora.</span>
+              <div className="flex items-center gap-2.5">
+                <img src="/logo.png" alt="Prepora" className="w-8 h-8 object-contain rounded-lg" />
+                <span className="text-base font-black text-[#171A2B]">Prepora<span className="text-[#5146E5]">.</span></span>
               </div>
               <p className="text-xs text-[#85899B] max-w-sm leading-relaxed">
                 IELTS va Digital SAT imtihonlariga xalqaro standartda tayyorlovchi zamonaviy sun'iy intellekt ta'lim platformasi.

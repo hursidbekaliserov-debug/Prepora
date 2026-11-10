@@ -1,60 +1,65 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { StorageManager } from '@/lib/storage';
 import AuthModal from './AuthModal';
 
 const PUBLIC_ROUTES = [
   '/',
   '/pricing',
-  '/lessons',
-  '/referral',
   '/login',
   '/signup',
-  '/arena',
-  '/vocabulary',
-  '/ielts',
-  '/sat',
-  '/settings',
-  '/tutor',
-  '/ielts-gg'
+  '/referral',
 ];
 
 export default function GlobalAuthGate() {
   const pathname = usePathname();
+  const router = useRouter();
   const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
-    // Agar ochiq (public) sahifalarda bo'lsa, avtomatik bloklash kerak emas
     const isPublic = PUBLIC_ROUTES.includes(pathname);
     if (isPublic) {
       setShowAuth(false);
       return;
     }
 
-    const check = () => {
+    const checkAuth = () => {
       const loggedIn = StorageManager.isUserLoggedIn();
-      // Faqat himoyalangan sahifalarda (settings, dashboard, mock-exam) majburiy auth
-      if (!loggedIn && !isPublic) {
+      if (!loggedIn) {
         setShowAuth(true);
       } else {
         setShowAuth(false);
       }
     };
 
-    check();
+    checkAuth();
 
-    window.addEventListener('prepora_auth_changed', check);
-    return () => window.removeEventListener('prepora_auth_changed', check);
+    window.addEventListener('prepora_auth_changed', checkAuth);
+    return () => window.removeEventListener('prepora_auth_changed', checkAuth);
   }, [pathname]);
+
+  const handleModalClose = () => {
+    const isPublic = PUBLIC_ROUTES.includes(pathname);
+    if (!isPublic) {
+      // Unauthenticated users are not permitted to remain on protected pages
+      router.push('/');
+    }
+    setShowAuth(false);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuth(false);
+  };
 
   return (
     <AuthModal
       isOpen={showAuth}
-      onSuccess={() => setShowAuth(false)}
-      onClose={() => setShowAuth(false)}
+      onSuccess={handleAuthSuccess}
+      onClose={handleModalClose}
+      title="Ushbu Bo'limga Kirish Cheklangan"
+      subtitle="Darsliklar, testlar, audio AI va barcha amaliyotlardan foydalanish uchun ro'yxatdan o'ting yoki tizimga kiring."
     />
   );
 }
-

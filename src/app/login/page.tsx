@@ -52,14 +52,16 @@ export default function LoginPage() {
       <div className="max-w-md w-full bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-xl relative">
         {/* Top logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-blue-950 flex items-center justify-center text-white shadow-md shadow-blue-950/20 group-hover:scale-105 transition-transform">
-              <GraduationCap className="w-6 h-6" />
-            </div>
-            <span className="text-2xl font-black text-blue-950 tracking-tight">Prepora</span>
+          <Link href="/" className="inline-flex items-center gap-2.5 mb-3 group">
+            <img 
+              src="/logo.png" 
+              alt="Prepora" 
+              className="w-11 h-11 object-contain rounded-2xl group-hover:scale-105 transition-transform" 
+            />
+            <span className="text-2xl font-black text-[#171A2B] dark:text-white tracking-tight">Prepora<span className="text-[#5146E5]">.</span></span>
           </Link>
-          <h1 className="text-xl font-extrabold text-slate-900">Kirish / Sign In</h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <h1 className="text-xl font-extrabold text-[#171A2B] dark:text-white">Kirish / Sign In</h1>
+          <p className="text-xs text-[#85899B] mt-1">
             IELTS va Digital SAT platformangizga kiring
           </p>
         </div>
