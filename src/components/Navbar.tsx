@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   Sparkles, 
-  GraduationCap, 
   Menu, 
   X,
   Mic,
@@ -14,7 +13,10 @@ import {
   ChevronDown,
   Gift,
   UserPlus,
-  LogIn
+  LogIn,
+  BookOpen,
+  HelpCircle,
+  Video
 } from 'lucide-react';
 import { StorageManager, SubscriptionStatus } from '@/lib/storage';
 import { SessionManager } from '@/lib/session';
@@ -32,7 +34,6 @@ export default function Navbar() {
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
 
   useEffect(() => {
-    // Start 10-minute inactivity watcher & cookie touch
     const cleanupWatcher = SessionManager.initSessionWatcher();
 
     const checkAuthAndProfile = () => {
@@ -71,108 +72,120 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-black/[0.06] bg-[#f8f7f4]/90 backdrop-blur-md transition-all">
+    <header className="sticky top-0 z-40 w-full border-b border-[#E5E7EB] bg-[#F8F9FC]/90 backdrop-blur-md transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Brand: Dribbble style Prepora. */}
+        {/* Brand: Prepora in Deep Indigo */}
         <div className="flex items-center gap-7">
-          <Link href="/" className="flex items-center gap-2 group">
-            {profile?.avatarUrl ? (
-              <img
-                src={profile.avatarUrl}
-                alt={profile.fullName || 'User Avatar'}
-                className="w-9 h-9 rounded-full object-cover border border-black/10 group-hover:scale-105 transition-transform shrink-0"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-black text-sm group-hover:scale-105 transition-transform shrink-0">
-                P
-              </div>
-            )}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#5146E5] to-[#8B7CF6] text-white flex items-center justify-center font-black text-base shadow-sm group-hover:scale-105 transition-transform shrink-0">
+              P
+            </div>
             <div className="flex items-baseline">
-              <span className="text-xl font-black tracking-tight text-[#0d0c22] leading-none font-sans">
-                Prepora<span className="text-[#ea4c89] font-black">.</span>
+              <span className="text-xl font-black tracking-tight text-[#171A2B] leading-none font-sans">
+                Prepora<span className="text-[#5146E5] font-black">.</span>
               </span>
             </div>
           </Link>
 
-          {/* Dribbble Pills Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 text-[13px] font-semibold text-[#0d0c22]">
+          {/* Minimalist Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 text-[13px] font-semibold text-[#171A2B]">
+            <Link 
+              href="/" 
+              className={`px-3 py-1.5 rounded-full transition-colors ${
+                pathname === '/' 
+                  ? 'bg-[#171A2B] text-white font-bold' 
+                  : 'text-[#85899B] hover:text-[#171A2B] hover:bg-black/5'
+              }`}
+            >
+              Home
+            </Link>
+
             <Link 
               href="/ielts" 
               className={`px-3 py-1.5 rounded-full transition-colors ${
                 pathname.startsWith('/ielts') && !pathname.includes('/ielts-gg')
-                  ? 'bg-black text-white font-bold' 
-                  : 'text-[#6e6d7a] hover:text-[#0d0c22] hover:bg-black/5'
+                  ? 'bg-[#171A2B] text-white font-bold' 
+                  : 'text-[#85899B] hover:text-[#171A2B] hover:bg-black/5'
               }`}
             >
-              IELTS Mock
+              IELTS
             </Link>
 
             <Link 
               href="/sat" 
               className={`px-3 py-1.5 rounded-full transition-colors ${
                 pathname.startsWith('/sat') 
-                  ? 'bg-black text-white font-bold' 
-                  : 'text-[#6e6d7a] hover:text-[#0d0c22] hover:bg-black/5'
+                  ? 'bg-[#171A2B] text-white font-bold' 
+                  : 'text-[#85899B] hover:text-[#171A2B] hover:bg-black/5'
               }`}
             >
-              Digital SAT
-            </Link>
-
-            <Link 
-              href="/ielts-gg" 
-              className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
-                pathname === '/ielts-gg' 
-                  ? 'bg-[#ea4c89] text-white font-bold shadow-xs' 
-                  : 'text-[#0d0c22] bg-[#ea4c89]/10 hover:bg-[#ea4c89]/20 font-bold'
-              }`}
-            >
-              <Mic className="w-3.5 h-3.5 text-[#ea4c89]" />
-              <span>Voice AI</span>
+              SAT
             </Link>
 
             <Link 
               href="/lessons" 
               className={`px-3 py-1.5 rounded-full transition-colors flex items-center gap-1 ${
                 pathname === '/lessons' 
-                  ? 'bg-black text-white font-bold' 
-                  : 'text-[#6e6d7a] hover:text-[#0d0c22] hover:bg-black/5'
+                  ? 'bg-[#171A2B] text-white font-bold' 
+                  : 'text-[#85899B] hover:text-[#171A2B] hover:bg-black/5'
               }`}
             >
-              <span>Darslar</span>
+              <Video className="w-3.5 h-3.5 text-[#5146E5]" />
+              <span>Lessons</span>
+            </Link>
+
+            <Link 
+              href="/ielts-gg" 
+              className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                pathname === '/ielts-gg' 
+                  ? 'bg-[#5146E5] text-white font-bold shadow-xs' 
+                  : 'text-[#5146E5] bg-[#5146E5]/10 hover:bg-[#5146E5]/20 font-bold'
+              }`}
+            >
+              <Mic className="w-3.5 h-3.5 text-[#5146E5]" />
+              <span>Voice AI</span>
             </Link>
 
             <Link 
               href="/arena" 
-              className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-full transition-colors flex items-center gap-1 ${
                 pathname === '/arena' 
-                  ? 'bg-amber-500 text-white shadow-xs' 
-                  : 'text-amber-900 bg-amber-100/70 hover:bg-amber-200/70'
+                  ? 'bg-[#171A2B] text-white font-bold' 
+                  : 'text-[#85899B] hover:text-[#171A2B] hover:bg-black/5'
               }`}
             >
-              <Gamepad2 className="w-3.5 h-3.5 text-amber-600" />
-              <span>Arena 🎮</span>
+              <Gamepad2 className="w-3.5 h-3.5" />
+              <span>Arena</span>
             </Link>
 
-            {/* More menu dropdown */}
+            {/* Dropdown More */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
-                className="px-3 py-1.5 rounded-full text-[#6e6d7a] hover:text-[#0d0c22] hover:bg-black/5 flex items-center gap-1 transition"
+                className="px-3 py-1.5 rounded-full text-[#85899B] hover:text-[#171A2B] hover:bg-black/5 flex items-center gap-1 transition"
               >
-                <span>Yana</span>
+                <span>Features</span>
                 <ChevronDown className="w-3 h-3" />
               </button>
 
               {moreDropdownOpen && (
                 <div 
-                  className="absolute left-0 mt-2 w-48 bg-white border border-black/10 rounded-2xl shadow-xl p-2 z-50 text-xs space-y-1 animate-in fade-in zoom-in-95"
+                  className="absolute left-0 mt-2 w-48 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-2 z-50 text-xs space-y-1 animate-in fade-in zoom-in-95"
                   onMouseLeave={() => setMoreDropdownOpen(false)}
                 >
                   <Link
+                    href="/dashboard"
+                    onClick={() => setMoreDropdownOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-50 text-[#171A2B] font-semibold"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#5146E5]" />
+                    Dashboard
+                  </Link>
+                  <Link
                     href="/tutor"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-50 text-[#171A2B] font-semibold"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                     AI Tutor
@@ -180,30 +193,30 @@ export default function Navbar() {
                   <Link
                     href="/vocabulary"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
+                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#171A2B] font-semibold"
                   >
-                    Lug'at (Vocab)
+                    Vocabulary
                   </Link>
                   <Link
                     href="/study-plan"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
+                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#171A2B] font-semibold"
                   >
-                    O'quv Rejasi
+                    Study Plan
                   </Link>
                   <Link
                     href="/mistakes"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
+                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#171A2B] font-semibold"
                   >
-                    Xatolar Daftari
+                    Mistakes Notebook
                   </Link>
                   <Link
                     href="/analytics"
                     onClick={() => setMoreDropdownOpen(false)}
-                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#0d0c22] font-semibold"
+                    className="block px-3 py-2 rounded-xl hover:bg-slate-50 text-[#171A2B] font-semibold"
                   >
-                    Statistika & Tarix
+                    Analytics & Stats
                   </Link>
                 </div>
               )}
@@ -216,7 +229,7 @@ export default function Navbar() {
           {/* Referral Pro Pill */}
           <Link 
             href="/referral" 
-            className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#ea4c89]/10 text-[#ea4c89] hover:bg-[#ea4c89]/20 transition-colors"
+            className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#5146E5]/10 text-[#5146E5] hover:bg-[#5146E5]/20 transition-colors"
           >
             <Gift className="w-3.5 h-3.5" />
             <span>Bepul Pro 🎁</span>
@@ -225,10 +238,10 @@ export default function Navbar() {
           {/* Pricing CTA */}
           <Link 
             href="/pricing" 
-            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#0d0c22] text-white hover:bg-[#3d3d4e] shadow-sm hover:shadow transition-all"
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#171A2B] text-white hover:bg-[#252A40] shadow-sm hover:shadow transition-all"
           >
             <Crown className="w-3.5 h-3.5 text-amber-400" />
-            <span>Tariflar</span>
+            <span>Pricing</span>
           </Link>
 
           {/* Authentication State: Register / Login vs User Profile */}
@@ -236,40 +249,40 @@ export default function Navbar() {
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Link 
                 href="/login" 
-                className="px-3 py-1.5 rounded-full text-xs font-bold text-[#0d0c22] hover:bg-black/5 transition"
+                className="px-3 py-1.5 rounded-full text-xs font-bold text-[#171A2B] hover:bg-black/5 transition"
               >
-                Kirish
+                Login
               </Link>
               <Link 
                 href="/signup" 
-                className="flex items-center gap-1 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold bg-[#0d0c22] text-white hover:bg-[#3d3d4e] shadow-sm transition"
+                className="flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold bg-[#5146E5] text-white hover:bg-[#4338CA] shadow-sm transition"
               >
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>Ro'yxatdan o'tish</span>
+                <span>Sign Up</span>
               </Link>
             </div>
           ) : (
             <Link 
               href="/settings"
-              className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-white hover:bg-slate-100 border border-black/10 text-xs font-bold text-[#0d0c22] shadow-2xs transition"
+              className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-white hover:bg-slate-100 border border-[#E5E7EB] text-xs font-bold text-[#171A2B] shadow-2xs transition"
             >
               {profile?.avatarUrl ? (
                 <img
                   src={profile.avatarUrl}
                   alt={profile.fullName || 'User'}
-                  className="w-6 h-6 rounded-full object-cover border border-black/10"
+                  className="w-6 h-6 rounded-full object-cover border border-[#E5E7EB]"
                 />
               ) : profile?.avatarConfig ? (
                 <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 border border-black/10">
                   <Avatar3DRenderer config={profile.avatarConfig} size="sm" className="w-6 h-6" />
                 </div>
               ) : (
-                <div className="w-6 h-6 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-bold text-[10px]">
+                <div className="w-6 h-6 rounded-full bg-[#171A2B] text-white flex items-center justify-center font-bold text-[10px]">
                   {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'U'}
                 </div>
               )}
               <span className="hidden sm:inline text-xs">
-                {profile?.fullName || 'Foydalanuvchi'}
+                {profile?.fullName || 'Student'}
               </span>
               {/* 3D avatar & equipped accessories */}
               {profile?.avatarConfig?.headwear === 'crown' ? (
@@ -289,7 +302,7 @@ export default function Navbar() {
                 </span>
               ) : null}
               {subStatus?.isPremium && (
-                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#ea4c89] text-white">
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#5146E5] text-white">
                   PRO
                 </span>
               )}
@@ -299,7 +312,7 @@ export default function Navbar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-full text-[#0d0c22] hover:bg-black/5"
+            className="md:hidden p-2 rounded-full text-[#171A2B] hover:bg-black/5"
             aria-label="Toggle mobile navigation"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -309,125 +322,111 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-black/10 bg-[#f8f7f4] px-4 py-4 space-y-2.5 shadow-xl animate-fade-in text-xs font-bold">
-          {/* Guest state in mobile drawer */}
+        <div className="md:hidden border-b border-[#E5E7EB] bg-[#F8F9FC] px-4 py-4 space-y-2.5 shadow-xl animate-fade-in text-xs font-bold">
           {!isLoggedIn ? (
-            <div className="p-3 rounded-2xl bg-white border border-black/10 flex items-center justify-between gap-2 mb-2 shadow-2xs">
-              <span className="text-[#6e6d7a] font-medium text-xs">Akkauntingiz yo'qmi?</span>
+            <div className="p-3 rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-between gap-2 mb-2 shadow-2xs">
+              <span className="text-[#85899B] font-medium text-xs">Akkauntingiz yo'qmi?</span>
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-1.5 rounded-full bg-slate-100 text-[#0d0c22] font-bold"
+                  className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-[#171A2B] text-xs font-bold transition"
                 >
                   Kirish
                 </Link>
                 <Link
                   href="/signup"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-1.5 rounded-full bg-[#0d0c22] text-white font-bold"
+                  className="px-3.5 py-1.5 rounded-full bg-[#5146E5] hover:bg-[#4338CA] text-white text-xs font-bold transition"
                 >
                   Ro'yxatdan o'tish
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="p-2.5 rounded-2xl bg-white border border-black/10 flex items-center justify-between gap-2 mb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-[#0d0c22] text-white flex items-center justify-center font-bold text-xs">
-                  {profile?.fullName?.charAt(0) || 'U'}
+            <Link
+              href="/settings"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-3 rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-between gap-3 mb-2 shadow-2xs"
+            >
+              <div className="flex items-center gap-2.5">
+                {profile?.avatarConfig ? (
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-900 flex items-center justify-center">
+                    <Avatar3DRenderer config={profile.avatarConfig} size="sm" className="w-8 h-8" />
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-[#171A2B] text-white flex items-center justify-center font-bold text-xs">
+                    {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
+                <div>
+                  <h4 className="text-xs font-bold text-[#171A2B]">{profile?.fullName || 'Student'}</h4>
+                  <span className="text-[10px] text-[#85899B] font-normal">{profile?.email || 'student@prepora.uz'}</span>
                 </div>
-                <span className="font-bold text-[#0d0c22]">{profile?.fullName}</span>
               </div>
-              <Link
-                href="/settings"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-xs text-[#ea4c89] font-bold underline"
-              >
+              <span className="px-2.5 py-1 rounded-full bg-[#5146E5]/10 text-[#5146E5] text-[10px] font-bold">
                 Sozlamalar
-              </Link>
-            </div>
+              </span>
+            </Link>
           )}
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 pt-1">
             <Link
               href="/ielts"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2.5 rounded-full text-xs font-bold text-[#0d0c22] bg-white border border-black/10 text-center"
+              className="p-3 rounded-xl bg-white border border-[#E5E7EB] text-[#171A2B] hover:bg-indigo-50/50 flex items-center gap-2"
             >
-              IELTS Mock
+              <BookOpen className="w-4 h-4 text-[#5146E5]" />
+              <span>IELTS Mock</span>
             </Link>
+
             <Link
               href="/sat"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2.5 rounded-full text-xs font-bold text-[#0d0c22] bg-white border border-black/10 text-center"
+              className="p-3 rounded-xl bg-white border border-[#E5E7EB] text-[#171A2B] hover:bg-indigo-50/50 flex items-center gap-2"
             >
-              Digital SAT
+              <Sparkles className="w-4 h-4 text-blue-600" />
+              <span>Digital SAT</span>
+            </Link>
+
+            <Link
+              href="/lessons"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-3 rounded-xl bg-white border border-[#E5E7EB] text-[#171A2B] hover:bg-indigo-50/50 flex items-center gap-2"
+            >
+              <Video className="w-4 h-4 text-[#5146E5]" />
+              <span>20 Ta Darslik</span>
+            </Link>
+
+            <Link
+              href="/ielts-gg"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-3 rounded-xl bg-white border border-[#E5E7EB] text-[#171A2B] hover:bg-indigo-50/50 flex items-center gap-2"
+            >
+              <Mic className="w-4 h-4 text-[#5146E5]" />
+              <span>Voice AI</span>
+            </Link>
+
+            <Link
+              href="/arena"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-3 rounded-xl bg-white border border-[#E5E7EB] text-[#171A2B] hover:bg-indigo-50/50 flex items-center gap-2"
+            >
+              <Gamepad2 className="w-4 h-4 text-emerald-600" />
+              <span>Arena PvP</span>
+            </Link>
+
+            <Link
+              href="/referral"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-3 rounded-xl bg-white border border-[#E5E7EB] text-[#5146E5] hover:bg-indigo-50/50 flex items-center gap-2 font-black"
+            >
+              <Gift className="w-4 h-4 text-[#5146E5]" />
+              <span>Bepul Pro 🎁</span>
             </Link>
           </div>
-          <Link
-            href="/ielts-gg"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-white bg-[#ea4c89] font-bold"
-          >
-            <Mic className="w-4 h-4 text-white" />
-            Voice AI Speaking
-          </Link>
-          <Link
-            href="/lessons"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[#0d0c22] bg-white border border-black/10 font-bold"
-          >
-            <span>Video Darsliklar 🎬</span>
-          </Link>
-          <Link
-            href="/arena"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-amber-950 bg-amber-100 border border-amber-200 font-bold"
-          >
-            <Gamepad2 className="w-4 h-4 text-amber-600" />
-            Arena (Omadli Aylana & 1v1 PvP) 🎮
-          </Link>
-          <Link
-            href="/referral"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-rose-900 bg-rose-100 border border-rose-200 font-bold"
-          >
-            <Gift className="w-4 h-4 text-rose-600" />
-            Do'stlarni Taklif Qilish (Bepul Pro) 🎁
-          </Link>
-          <Link
-            href="/tutor"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[#0d0c22] bg-white border border-black/10"
-          >
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            AI Tutor
-          </Link>
-          <Link
-            href="/pricing"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-white bg-[#0d0c22] font-bold"
-          >
-            <Crown className="w-4 h-4 text-amber-400" />
-            Tariflar
-          </Link>
-          <Link
-            href="/settings"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-4 py-2.5 rounded-full text-[#0d0c22] bg-white border border-black/10"
-          >
-            Profil & Sozlamalar
-          </Link>
         </div>
       )}
-
-      {/* Interactive Premium Modal */}
-      <PremiumModal 
-        isOpen={isPremiumModalOpen} 
-        onClose={() => setIsPremiumModalOpen(false)} 
-        reason="general"
-      />
     </header>
   );
 }

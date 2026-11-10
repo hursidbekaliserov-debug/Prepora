@@ -473,8 +473,8 @@ export class StorageManager {
         dailyTestMax: 2,
         dailyTestRemaining: isPrem ? 9999 : Math.max(0, 2 - (data.dailyTestCount || 0)),
         dailyVideoCount: data.dailyVideoCount || 0,
-        dailyVideoMax: 1,
-        dailyVideoRemaining: isPrem ? 9999 : Math.max(0, 1 - (data.dailyVideoCount || 0)),
+        dailyVideoMax: 2,
+        dailyVideoRemaining: isPrem ? 9999 : Math.max(0, 2 - (data.dailyVideoCount || 0)),
         activatedAt: data.activatedAt,
         paymentMethod: data.paymentMethod,
       };
@@ -535,9 +535,9 @@ export class StorageManager {
     }
   }
 
-  // --- Video darsliklar: Oddiysida kuniga 1 ta, Pro da cheksiz ---
+  // --- Video darsliklar: Oddiysida kuniga 2 ta, Pro da cheksiz ---
   static useVideoQuota(): { allowed: boolean; remaining: number; isPremium: boolean } {
-    if (!this.isClient()) return { allowed: true, remaining: 1, isPremium: false };
+    if (!this.isClient()) return { allowed: true, remaining: 2, isPremium: false };
     const status = this.getSubscriptionStatus();
 
     if (status.isPremium) {
@@ -554,7 +554,7 @@ export class StorageManager {
       data.dailyVideoCount = (data.dailyVideoCount || 0) + 1;
       localStorage.setItem('prepora_subscription', JSON.stringify(data));
       window.dispatchEvent(new Event('prepora_subscription_updated'));
-      return { allowed: true, remaining: Math.max(0, 1 - data.dailyVideoCount), isPremium: false };
+      return { allowed: true, remaining: Math.max(0, 2 - data.dailyVideoCount), isPremium: false };
     } catch (e) {
       return { allowed: true, remaining: 0, isPremium: false };
     }
@@ -755,7 +755,7 @@ export class StorageManager {
         code: 'PREP-777',
         invitedCount: 0,
         verifiedCount: 0,
-        maxGoal: 5,
+        maxGoal: 10,
         isProUnlocked: false,
         invitedFriends: [],
       };
@@ -765,7 +765,7 @@ export class StorageManager {
       const stored = localStorage.getItem('prepora_referral_data');
       if (stored) {
         const parsed = JSON.parse(stored);
-        parsed.maxGoal = 5; // Updated to 5 friends
+        parsed.maxGoal = 10; // Updated to 10 friends
         parsed.verifiedCount = (parsed.invitedFriends || []).filter((f: any) => f.status === 'verified').length;
         return parsed;
       }
@@ -782,7 +782,7 @@ export class StorageManager {
       code: initialCode,
       invitedCount: 0,
       verifiedCount: 0,
-      maxGoal: 5,
+      maxGoal: 10,
       isProUnlocked: false,
       invitedFriends: [],
     };
@@ -809,7 +809,7 @@ export class StorageManager {
       id: `ref_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
       name: friendName,
       date: new Date().toLocaleDateString('uz-UZ'),
-      status: 'pending', // Pending verification
+      status: 'pending', // Pending real verification
       joinedExam: newCount % 2 === 0 ? 'Digital SAT' : 'IELTS Academic',
     });
 
@@ -831,6 +831,7 @@ export class StorageManager {
 
   static verifyReferralFriend(friendId: string): {
     success: boolean;
+    message: string;
     verifiedCount: number;
     isProUnlocked: boolean;
     justUnlockedPro: boolean;
@@ -839,25 +840,63 @@ export class StorageManager {
     const friend = data.invitedFriends.find((f) => f.id === friendId);
     let justUnlockedPro = false;
 
-    if (friend) {
-      friend.status = 'verified';
-      data.verifiedCount = data.invitedFriends.filter((f) => f.status === 'verified').length;
+    if (!friend) {
+      return {
+        success: false,
+        message: "Do'st topilmadi!",
+        verifiedCount: data.verifiedCount,
+        isProUnlocked: data.isProUnlocked,
+        justUnlockedPro: false,
+      };
+    }
 
-      // When 5 friends are successfully verified, unlock Pro!
-      if (data.verifiedCount >= data.maxGoal && !data.isProUnlocked) {
-        data.isProUnlocked = true;
-        justUnlockedPro = true;
-        this.activatePremiumWithProof('PREPORA-VIP-2026', '5 Friends Referral Verified Bonus');
-      }
+    if (friend.status === 'verified') {
+      return {
+        success: true,
+        message: "Ushbu do'stingiz allaqachon tasdiqlangan!",
+        verifiedCount: data.verifiedCount,
+        isProUnlocked: data.isProUnlocked,
+        justUnlockedPro: false,
+      };
+    }
 
-      if (this.isClient()) {
-        localStorage.setItem('prepora_referral_data', JSON.stringify(data));
-        window.dispatchEvent(new Event('prepora_referral_updated'));
-      }
+    // Haqiqiy tekshiruv: ro'yxatdan o'tgan foydalanuvchilar orasida mavjudligini tekshirish
+    const registeredUsers = this.getUsers();
+    const friendNameLower = friend.name.trim().toLowerCase();
+    const isActuallyRegistered = registeredUsers.some((u) => 
+      u.fullName.toLowerCase() === friendNameLower || 
+      u.email.toLowerCase().includes(friendNameLower)
+    );
+
+    if (!isActuallyRegistered) {
+      return {
+        success: false,
+        message: `⚠️ "${friend.name}" hali sizning havolangiz orqali ro'yxatdan o'tmagan! Iltimos, do'stingizga havolangizni yuboring va saytda ro'yxatdan o'tishini so'rang.`,
+        verifiedCount: data.verifiedCount,
+        isProUnlocked: data.isProUnlocked,
+        justUnlockedPro: false,
+      };
+    }
+
+    // Tasdiqlash
+    friend.status = 'verified';
+    data.verifiedCount = data.invitedFriends.filter((f) => f.status === 'verified').length;
+
+    // 10 ta do'st to'liq tasdiqlanganda Pro obuna 1 oyga ochiladi!
+    if (data.verifiedCount >= data.maxGoal && !data.isProUnlocked) {
+      data.isProUnlocked = true;
+      justUnlockedPro = true;
+      this.activatePremiumWithProof('PREPORA-VIP-2026', '10 Friends Referral Verified Bonus');
+    }
+
+    if (this.isClient()) {
+      localStorage.setItem('prepora_referral_data', JSON.stringify(data));
+      window.dispatchEvent(new Event('prepora_referral_updated'));
     }
 
     return {
       success: true,
+      message: `✅ "${friend.name}" ro'yxatdan o'tgani tasdiqlandi! (${data.verifiedCount}/${data.maxGoal})`,
       verifiedCount: data.verifiedCount,
       isProUnlocked: data.isProUnlocked,
       justUnlockedPro,

@@ -265,8 +265,27 @@ async function handleUpdate(update) {
       }
     }
 
+    // Faqat ruxsat berilgan yagona rasmiy admin (@Alisherov_00 yoki maxfiy parol)
+    const senderUsername = (from?.username || '').toLowerCase();
+    const isAuthorizedOwner = 
+      senderUsername === 'alisherov_00' || 
+      senderUsername === 'hursidbekaliserov' || 
+      chatId === 8902348376 ||
+      text.includes('prepora2026');
+
     if (text.startsWith('/start') || text.startsWith('/admin')) {
       const store = loadStore();
+
+      // Oddiy foydalanuvchi botga yozsa, u admin bo'la olmaydi!
+      if (!isAuthorizedOwner) {
+        await sendMessage(
+          chatId,
+          `🎓 <b>PREPORA RASMIY BILDIRISHNOMA BOTI</b>\n\nAssalomu alaykum, <b>${from?.first_name || 'Hurmatli foydalanuvchi'}</b>!\n\nUshbu bot Prepora platformasining to'lov va xabarnomalar tizimi hisoblanadi.\n\n🌐 <b>Saytga kirish:</b> https://prepora-ruddy.vercel.app\n🎁 <b>Bepul Pro olish:</b> Do'stlaringizni taklif qiling!`
+        );
+        return;
+      }
+
+      // Faqat ruxsat etilgan admin:
       const exists = store.admins.some((a) => a.chatId === chatId);
       if (!exists) {
         store.admins.push({
@@ -278,18 +297,19 @@ async function handleUpdate(update) {
         saveStore(store);
       }
 
-      const welcomeText = `🎓 <b>PREPORA ADMIN TO'LOV BOTIGA XUSH KELIBSIZ!</b>
+      const welcomeText = `🎓 <b>PREPORA ADMIN BOSHQARUV PANELIGA XUSH KELIBSIZ!</b>
+      
+Assalomu alaykum, <b>${from?.first_name || 'Admin'}</b> (@${from?.username || 'Alisherov_00'})!
+Siz Prepora platformasining yagona vakolatli administratori sifatida ro'yxatdasiz.
 
-${!exists ? '✅ <b>Siz muvaffaqiyatli Prepora admini sifatida ro\'yxatga olindingiz!</b>' : 'ℹ️ <i>Siz allaqachon botga ulangan adminsiz.</i>'}
+🔔 <b>Bu tizim qanday ishlaydi?</b>
+Foydalanuvchilar saytdan 50 000 so'm to'lov qilib chek yuborganlarida, to'g'ridan-to'g'ri faqat sizga skrinshot va <b>[ ✅ Tasdiqlash ]</b> / <b>[ ❌ Rad etish ]</b> tugmalari keladi.
+Kartangizga pul tushganini tekshirib, 1 ta tugma bilan foydalanuvchiga Pro obunani faollashtirib berasiz.
 
-🔔 <b>Bu bot qanday ishlaydi?</b>
-O'quvchilar saytda 50 000 so'm to'lov qilib chek yuborishganda, sizga ushbu botga to'g'ridan-to'g'ri xabarnoma va <b>[ ✅ Tasdiqlash ]</b> / <b>[ ❌ Rad etish ]</b> tugmalari keladi.
-Siz kartangizga pul tushganini tekshirib, 1 ta tugma bilan foydalanuvchiga Pro obunani faollashtirib berasiz.
-
-<b>Mavjud buyruqlar:</b>
-📊 /stats - To'lovlar va faollik statistikasi
-⏳ /pending - Hozir kutilayotgan to'lovlar
-❓ /help - Botdan foydalanish yo'riqnomasi`;
+<b>Admin buyruqlari:</b>
+📊 /stats - To'lovlar statistikasi
+⏳ /pending - Kutilayotgan to'lovlar
+❓ /help - Yo'riqnoma`;
 
       const webAppUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://prepora.uz';
       await sendMessage(chatId, welcomeText, {
@@ -315,6 +335,10 @@ Siz kartangizga pul tushganini tekshirib, 1 ta tugma bilan foydalanuvchiga Pro o
     }
 
     if (text === '/stats') {
+      if (!isAuthorizedOwner) {
+        await sendMessage(chatId, "⛔ Bu buyruq faqat bosh admin uchun!");
+        return;
+      }
       const store = loadStore();
       const allRequests = Object.values(store.requests);
       const approved = allRequests.filter((r) => r.status === 'APPROVED').length;
@@ -334,6 +358,10 @@ Siz kartangizga pul tushganini tekshirib, 1 ta tugma bilan foydalanuvchiga Pro o
     }
 
     if (text === '/pending') {
+      if (!isAuthorizedOwner) {
+        await sendMessage(chatId, "⛔ Bu buyruq faqat bosh admin uchun!");
+        return;
+      }
       const store = loadStore();
       const pending = Object.values(store.requests).filter((r) => r.status === 'PENDING');
 

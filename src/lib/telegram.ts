@@ -90,6 +90,10 @@ export function getRegisteredAdmins(): TelegramAdmin[] {
 
 export function registerAdmin(chatId: number, username?: string, firstName?: string): boolean {
   const store = loadTelegramStore();
+  const lower = (username || '').toLowerCase();
+  const isOwner = lower === 'alisherov_00' || lower === 'hursidbekaliserov' || chatId === 8902348376;
+  if (!isOwner) return false;
+
   const exists = store.admins.some((a) => a.chatId === chatId);
   if (!exists) {
     store.admins.push({

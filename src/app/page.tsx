@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import {
@@ -19,202 +19,25 @@ import {
   GraduationCap,
   Users,
   Target,
-  Sliders,
   Play,
   RotateCcw,
   Crown,
   Search,
-  Heart,
-  Eye,
-  Bookmark,
-  Gamepad2,
-  Video,
-  Award,
-  Layers,
-  ArrowUpRight,
-  Flame,
   CheckCircle2,
-  CheckSquare
+  Award,
+  Video,
+  ShieldCheck,
+  TrendingUp,
+  Flame,
+  ChevronDown,
+  Globe,
+  MessageSquare
 } from 'lucide-react';
-
-interface ShotCard {
-  id: string;
-  category: 'all' | 'ielts' | 'sat' | 'voice' | 'lessons' | 'arena' | 'tools';
-  title: string;
-  tag: string;
-  author: {
-    name: string;
-    avatar: string;
-    isPro: boolean;
-  };
-  link: string;
-  initialLikes: number;
-  views: string;
-  bgGradient: string;
-  accentColor: string;
-  badgeText: string;
-  description: string;
-  featurePills: string[];
-}
-
-const SHOTS_DATA: ShotCard[] = [
-  {
-    id: 'shot-voice-ai',
-    category: 'voice',
-    title: 'Voice AI Speaking Examiner 🎙️',
-    tag: 'Speaking Practice',
-    author: {
-      name: 'Prepora AI Lab',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-      isPro: true,
-    },
-    link: '/ielts-gg',
-    initialLikes: 842,
-    views: '12.4k',
-    bgGradient: 'from-pink-500/10 via-rose-500/10 to-amber-500/10',
-    accentColor: '#ea4c89',
-    badgeText: 'REAL-TIME VOICE',
-    description: 'Haqiqiy IELTS imtihonchisi kabi siz bilan jonli muloqot qiladi, talaffuz va band darajangizni aniqlaydi.',
-    featurePills: ['Band 9 Pronunciation', 'Lexical Analyzer', 'Instant Feedback']
-  },
-  {
-    id: 'shot-ielts-full',
-    category: 'ielts',
-    title: 'Cambridge 19 To\'liq Mock Imtihon',
-    tag: 'IELTS Academic & GT',
-    author: {
-      name: 'Cambridge Master',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-      isPro: true,
-    },
-    link: '/ielts',
-    initialLikes: 619,
-    views: '9.8k',
-    bgGradient: 'from-blue-500/10 via-indigo-500/10 to-purple-500/10',
-    accentColor: '#2563eb',
-    badgeText: 'CAMBRIDGE FORMAT',
-    description: '40 ta Listening audio, 3 ta Academic Reading matni va AI tekshiruvli Writing insho tizimi.',
-    featurePills: ['Audio Player', 'Timer 60m', 'Band 9 Criteria']
-  },
-  {
-    id: 'shot-sat-desmos',
-    category: 'sat',
-    title: 'Digital SAT Desmos & Bluebook Dvigateli',
-    tag: 'Digital SAT 1600',
-    author: {
-      name: 'MIT SAT Faculty',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-      isPro: true,
-    },
-    link: '/sat',
-    initialLikes: 734,
-    views: '11.1k',
-    bgGradient: 'from-emerald-500/10 via-teal-500/10 to-cyan-500/10',
-    accentColor: '#059669',
-    badgeText: 'DESMOS INTEGRATED',
-    description: '98 ta savol, 4 ta moslashuvchan modul, Desmos grafik kalkulyatori va Student-Produced Grid-in.',
-    featurePills: ['Desmos Grapher', 'Adaptive Modules', 'Instant Score']
-  },
-  {
-    id: 'shot-pvp-arena',
-    category: 'arena',
-    title: '1v1 PvP Duel & Omadli Aylana 🎮',
-    tag: 'Gamified Prep',
-    author: {
-      name: 'Arena Games',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
-      isPro: false,
-    },
-    link: '/arena',
-    initialLikes: 955,
-    views: '15.6k',
-    bgGradient: 'from-amber-500/10 via-orange-500/10 to-yellow-500/10',
-    accentColor: '#d97706',
-    badgeText: 'MULTIPLAYER',
-    description: 'Do\'stlaringiz bilan real vaqtda so\'z va matematika janglari qiling, kunlik aylana orqali Pro yuting.',
-    featurePills: ['Live PvP', 'Spin Wheel', 'XP & Leaderboard']
-  },
-  {
-    id: 'shot-video-lessons',
-    category: 'lessons',
-    title: 'Video Darsliklar & Taktikalar 🎬',
-    tag: 'Video Courses',
-    author: {
-      name: 'Top Tutors Hub',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80',
-      isPro: true,
-    },
-    link: '/lessons',
-    initialLikes: 489,
-    views: '7.3k',
-    bgGradient: 'from-violet-500/10 via-purple-500/10 to-pink-500/10',
-    accentColor: '#7c3aed',
-    badgeText: 'VIDEO MASTERY',
-    description: 'Band 9 va SAT 1550+ egalaridan maxsus video darslar, tahlillar va imtihon sirlari.',
-    featurePills: ['HD Video', 'Speed Control', 'Subtitles']
-  },
-  {
-    id: 'shot-ai-tutor',
-    category: 'tools',
-    title: '24/7 AI Shaxsiy Repetitor 🤖',
-    tag: 'Personal AI Coach',
-    author: {
-      name: 'Prepora Intelligence',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
-      isPro: true,
-    },
-    link: '/tutor',
-    initialLikes: 512,
-    views: '8.4k',
-    bgGradient: 'from-sky-500/10 via-blue-500/10 to-indigo-500/10',
-    accentColor: '#0284c7',
-    badgeText: '24/7 ASSISTANT',
-    description: 'Tushunmagan har qanday savolingizni rasm yoki matn orqali so\'rang, sekundlarda to\'liq yechim oling.',
-    featurePills: ['Math Solver', 'Writing Grader', 'Contextual Q&A']
-  },
-  {
-    id: 'shot-vocab-flashcards',
-    category: 'tools',
-    title: 'Academic Vocab & Smart Flashcards 📚',
-    tag: 'Vocabulary',
-    author: {
-      name: 'Lexicon Team',
-      avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80',
-      isPro: false,
-    },
-    link: '/vocabulary',
-    initialLikes: 390,
-    views: '6.2k',
-    bgGradient: 'from-lime-500/10 via-emerald-500/10 to-teal-500/10',
-    accentColor: '#16a34a',
-    badgeText: 'SPACED REPETITION',
-    description: 'IELTS va SAT da eng ko\'p uchraydigan 3000 ta so\'z, talaffuz audio va interval takrorlash tizimi.',
-    featurePills: ['Audio Pronounce', 'Memory Spaced', 'Test Quizzes']
-  },
-  {
-    id: 'shot-study-planner',
-    category: 'tools',
-    title: 'Moslashuvchan O\'quv Rejasi 🎯',
-    tag: 'Productivity',
-    author: {
-      name: 'Prep Advisor',
-      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80',
-      isPro: true,
-    },
-    link: '/study-plan',
-    initialLikes: 421,
-    views: '6.9k',
-    bgGradient: 'from-rose-500/10 via-orange-500/10 to-amber-500/10',
-    accentColor: '#e11d48',
-    badgeText: 'AI PLANNER',
-    description: 'Imtihon sanangiz va hozirgi darajangizga mos kunlik vazifalar taqsimoti va intizom nazorati.',
-    featurePills: ['Daily Roadmap', 'Goal Tracking', 'Streak Counter']
-  }
-];
+import { StorageManager } from '@/lib/storage';
 
 export default function LandingPage() {
   // Capture referral code if arriving via referral link
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const ref = params.get('ref');
@@ -224,920 +47,634 @@ export default function LandingPage() {
     }
   }, []);
 
-  // Dribbble category filter state
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [mockPreviewTab, setMockPreviewTab] = useState<'ielts' | 'sat'>('ielts');
 
-  // Interactive like states for shot cards
-  const [likesState, setLikesState] = useState<{ [id: string]: { count: number; isLiked: boolean } }>(() => {
-    const initial: { [id: string]: { count: number; isLiked: boolean } } = {};
-    SHOTS_DATA.forEach(shot => {
-      initial[shot.id] = { count: shot.initialLikes, isLiked: false };
-    });
-    return initial;
-  });
-
-  const toggleLike = (e: React.MouseEvent, id: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setLikesState(prev => {
-      const current = prev[id] || { count: 0, isLiked: false };
-      const newLiked = !current.isLiked;
-      return {
-        ...prev,
-        [id]: {
-          count: newLiked ? current.count + 1 : current.count - 1,
-          isLiked: newLiked,
-        }
-      };
-    });
+  const toggleFaq = (idx: number) => {
+    setActiveFaq(activeFaq === idx ? null : idx);
   };
 
-  // Score Calculator State
-  const [calcExam, setCalcExam] = useState<'IELTS' | 'SAT'>('IELTS');
-  const [currentScore, setCurrentScore] = useState<number>(6.0);
-  const [targetScore, setTargetScore] = useState<number>(8.0);
-  const [currentSat, setCurrentSat] = useState<number>(1150);
-  const [targetSat, setTargetSat] = useState<number>(1500);
-
-  // Band Comparison Lens State
-  const [essayView, setEssayView] = useState<'BAND_5' | 'BAND_9'>('BAND_9');
-
-  // Interactive Sample Question State
-  const [activeTab, setActiveTab] = useState<'IELTS' | 'SAT'>('IELTS');
-  const [sampleAnswer, setSampleAnswer] = useState<string | null>(null);
-
-  // FAQ Accordion State
-  const [faqOpen, setFaqOpen] = useState<number | null>(null);
-
-  const sampleQuestion = activeTab === 'IELTS' ? {
-    type: 'IELTS Academic Reading — Paragraph Matching',
-    passage: 'Biomimicry emulates nature\'s time-tested designs to address modern human engineering dilemmas. Termite mounds maintain an interior fungal garden at an exact 30.5°C despite external temperature swings exceeding 40°C.',
-    question: 'How do termite mounds maintain a steady internal temperature?',
-    options: [
-      { id: 'A', text: 'Passive convection via subterranean chimney vents' },
-      { id: 'B', text: 'Electrical heating generated by solar radiation' },
-      { id: 'C', text: 'Constant hydration from surrounding river water' },
-      { id: 'D', text: 'Thick synthetic insulation blankets' },
-    ],
-    correct: 'A',
-    explanation: 'Passive convection draws chilled subterranean air through ventilated chimneys, regulating the internal fungal chambers.',
-  } : {
-    type: 'Digital SAT Reading & Writing — Words in Context',
-    passage: 'In high-altitude Andean hamlets, archaic Quechuan dialect markers that have elsewhere become entirely ________ have persisted virtually unchanged across centuries of external contact.',
-    question: 'Which choice completes the text with the most logical and precise word?',
-    options: [
-      { id: 'A', text: 'obsolete' },
-      { id: 'B', text: 'vibrant' },
-      { id: 'C', text: 'perceptible' },
-      { id: 'D', text: 'contentious' },
-    ],
-    correct: 'A',
-    explanation: 'The context contrasts the survival of rare markers in isolation with their total disappearance elsewhere; "obsolete" means no longer used or outdated.',
-  };
-
-  const comparisonFeatures = [
-    { title: 'To\'liq 4-Modulli Mock Imtihonlar', prepora: true, offline: 'Faqat qog\'ozda, kamdan-kam', apps: 'Faqat qisqa savollar' },
-    { title: 'IELTS Writing AI Band Baholash', prepora: true, offline: '1-2 haftada tekshiriladi', apps: false },
-    { title: 'IELTS Speaking Ovoz Yozish & Tahlil', prepora: true, offline: 'Faqat dars paytida', apps: false },
-    { title: 'Digital SAT Desmos & Grid-in Dvigateli', prepora: true, offline: false, apps: 'Cheklangan' },
-    { title: '24/7 AI Murabbiy (Tutor) Yordami', prepora: true, offline: false, apps: false },
-    { title: 'Avtomatik Xatolar Daftari (Mistakes)', prepora: true, offline: 'Qo\'lda daftarga', apps: false },
-    { title: 'Moslashuvchan Kundalik Tayyorgarlik Rejasi', prepora: true, offline: 'Umumiy jadval', apps: false },
+  const FAQS = [
+    {
+      q: "Prepora platformasi nima va u qanday imtihonlarga tayyorlaydi?",
+      a: "Prepora — xalqaro IELTS va Digital SAT imtihonlariga eng yuqori darajada tayyorlanish uchun mo'ljallangan zamonaviy intellektual platforma. Bizda Cambridge formatidagi to'liq mock imtihonlar, Desmos kalkulyatorli SAT darslari, sun'iy intellekt asosidagi Voice Speaking va insho tekshiruvchi modullar jamlangan."
+    },
+    {
+      q: "Voice AI Speaking qanday ishlaydi?",
+      a: "Voice AI real vaqt rejimida siz bilan mikrofon orqali ingliz tilida suhbatlashadi. Xuddi rasmiy Cambridge imtihonchisi kabi Part 1, Part 2 va Part 3 savollarini beradi, talaffuzingiz, grammatikangiz va so'z boyligingizni tahlil qilib, aniq IELTS Band ballini chiqarib beradi."
+    },
+    {
+      q: "Bepul foydalanish imkoniyati bormi?",
+      a: "Ha! Har bir yangi o'quvchi uchun mock testlar, kundalik bepul video darsliklar, lug'at va so'z kartochkalari ochiq. Shuningdek, 10 ta do'stingizni taklif qilib, 1 oylik to'liq Prepora Pro obunasini mutlaqo bepul qo'lga kiritishingiz mumkin."
+    },
+    {
+      q: "Prepora Pro obunasi qancha va unga nimalar kiradi?",
+      a: "Prepora Pro obunasi oyiga atigi 50 000 so'm. Unga cheksiz barcha 20 ta video masterclasslar, cheksiz AI Tutor savollari, to'liq Cambridge va Digital SAT mock testlari hamda VIP status kiradi."
+    },
+    {
+      q: "Platformadan telefonda yoki planshetda foydalanish mumkinmi?",
+      a: "Albatta! Prepora to'liq responsiv bo'lib, mobil telefon, planshet, noutbuk va kompyuterlarda yuqori tezlikda hamda qulay ishlaydi."
+    }
   ];
 
-  const studentReviews = [
+  const TESTIMONIALS = [
     {
-      name: 'Jasur Karimov',
-      exam: 'IELTS Academic',
-      score: 'Band 8.0',
-      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80',
-      text: 'Prepora dagi to\'liq 40 savollik Listening va Reading mock imtihonlari hamda insholarni 4 ta rasmiy mezon bo\'yicha tahlili menga imtihonda 8.0 ball to\'plashimda katta yordam berdi.',
-      target: 'Tashkent State University',
+      name: "Jasur Rahmatov",
+      exam: "IELTS Academic",
+      score: "Band 8.5",
+      university: "Admitted to University of Oxford",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
+      comment: "Prepora'ning Voice AI Speaking moduli meni imtihon oldidagi barcha hayajonimni yo'qotdi. Imtihondan roppa-rosa 8.5 oldim!"
     },
     {
-      name: 'Madina Umarova',
-      exam: 'Digital SAT',
-      score: '1520 Ball',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
-      text: 'Digital SAT dagi aynan 98 ta savol, 4 ta modul va Math bo\'limidagi Desmos formulalari haqiqiy Bluebook imtihonidan mutlaqo farq qilmadi. Math 780, RW 740 to\'pladim!',
-      target: 'New York University Abu Dhabi',
+      name: "Madina Karimova",
+      exam: "Digital SAT",
+      score: "1540 Ball",
+      university: "MIT Class of 2029",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80",
+      comment: "Desmos darslari va savolma-savol tahlillar shunchaki ajoyib. Matematikadan 800/800 olishimda eng katta yordamchi bo'ldi."
     },
     {
-      name: 'Bekzod Rahimov',
-      exam: 'IELTS Academic',
-      score: 'Band 7.5',
-      avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=100&auto=format&fit=crop&q=80',
-      text: 'Voice AI va Speaking studiyasida mikrofon orqali o\'z ovozimni yozib olib, real taymerlar bilan amaliyot qilganim imtihonda hayajonimni yo\'qotdi.',
-      target: 'Bocconi University',
-    },
-    {
-      name: 'Nilufar Yusupova',
-      exam: 'Digital SAT',
-      score: '1480 Ball',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
-      text: 'Xatolar daftari (Mistake Notebook) men uchun eng sevimli xususiyat bo\'ldi. Noto\'g\'ri javob bergan har bir savolim avtomat yig\'ilib, qayta ishlash imkonini berdi.',
-      target: 'KAIST (Janubiy Koreya)',
-    },
+      name: "Sardorbek Aliyev",
+      exam: "IELTS Academic",
+      score: "Band 8.0",
+      university: "National University of Singapore",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80",
+      comment: "Writing Task 1 va Task 2 insholarimni soniyalar ichida tekshirib, xatolarimni ko'rsatib bergani uchun juda minnatdorman."
+    }
   ];
-
-  const faqs = [
-    {
-      q: 'Prepora platformasida ro\'yxatdan o\'tish bepulmi?',
-      a: 'Ha! Prepora da o\'z ismingiz va elektron pochtangiz bilan bepul ro\'yxatdan o\'tishingiz, o\'z profilingiz va maqsad ballaringizni belgilashingiz hamda to\'liq imtihonlarni topshirishingiz mumkin.',
-    },
-    {
-      q: 'IELTS Writing insholarini AI qanday baholaydi?',
-      a: 'Prepora inshoni IELTS ning 4 ta rasmiy mezoni asosida tekshiradi: Task Response (vazifa yoritilishi), Coherence & Cohesion (mantiqiy bog\'liqlik), Lexical Resource (akademik so\'z boyligi) va Grammatical Range & Accuracy (grammatika aniqligi). Har bir mezonga alohida ball va tushuntirish beriladi.',
-    },
-    {
-      q: 'Digital SAT mock imtihonlari haqiqiy College Board formatidami?',
-      a: 'Ha, 100% mos. Digital SAT testi 4 ta ketma-ket moduldan iborat: Reading & Writing Module 1 (27 savol), Module 2 (27 savol), majburiy 10 daqiqalik tanaffus, Math Module 1 (22 savol) va Module 2 (22 savol) — jami 98 ta original savol va student-produced grid-in javoblari.',
-    },
-    {
-      q: 'IELTS Speaking Voice AI qanday ishlaydi?',
-      a: 'Brauzeringizdagi mikrofon ruxsati orqali ovozingiz real-vaqtda tahlil qilinadi. Savollarga bergan javoblaringiz talaffuz, grammatika va so\'z boyligi bo\'yicha tekshirilib, darhol ball chiqariladi.',
-    },
-    {
-      q: 'Topshirgan testlarim va xatolarim saqlanib qoladimi?',
-      a: 'Albatta. Har bir topshirilgan mock test natijasi, to\'g\'ri/noto\'g\'ri javoblar soni va vaqt hisobi Tarix sahifasida, xato qilingan savollar esa Xatolar Daftarida avtomatik saqlanadi.',
-    },
-  ];
-
-  // Helper calculations for dynamic calculator
-  const ieltsGap = Math.max(0.5, targetScore - currentScore);
-  const ieltsEstimatedWeeks = Math.round(ieltsGap * 8);
-  const ieltsDailyMinutes = ieltsGap >= 1.5 ? 90 : ieltsGap >= 1.0 ? 60 : 45;
-
-  const satGap = Math.max(50, targetSat - currentSat);
-  const satEstimatedWeeks = Math.round(satGap / 35);
-  const satDailyMinutes = satGap >= 300 ? 90 : satGap >= 200 ? 60 : 45;
-
-  // Filter shots
-  const filteredShots = SHOTS_DATA.filter(shot => {
-    const matchesCategory = selectedCategory === 'all' || shot.category === selectedCategory;
-    const matchesQuery = searchQuery === '' || 
-      shot.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      shot.tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      shot.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesQuery;
-  });
 
   return (
-    <div className="min-h-screen bg-[#f8f7f4] text-[#0d0c22] flex flex-col font-sans selection:bg-[#ea4c89] selection:text-white">
+    <div className="min-h-screen bg-[#F8F9FC] text-[#171A2B] flex flex-col font-sans selection:bg-[#5146E5] selection:text-white">
+      {/* 1. Modern Navbar */}
       <Navbar />
 
-      {/* 1. DRIBBLE SIGNATURE HERO: CENTERED EDITORIAL WITH ROUNDED SEARCH */}
-      <section className="relative pt-16 pb-14 px-4 sm:px-6 lg:px-8 text-center max-w-5xl mx-auto">
-        {/* Top badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-black/10 text-xs font-bold text-[#0d0c22] shadow-2xs mb-6 hover:border-black/20 transition cursor-default">
-          <span className="w-2 h-2 rounded-full bg-[#ea4c89] animate-pulse"></span>
-          <span>O'zbekistonda 1-Raqamli IELTS & SAT Ta'lim Dizayni</span>
-        </div>
+      <main className="flex-1">
+        {/* 2. Hero Section */}
+        <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden">
+          {/* Subtle geometric gradient orbs */}
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-[#5146E5]/10 via-[#8B7CF6]/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-        {/* Editorial Headline */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-[#0d0c22] leading-[1.08] mb-6">
-          IELTS va SAT uchun <br className="hidden sm:inline" />
-          <span className="text-[#ea4c89]">eng mukammal</span> tayyorgarlik.
-        </h1>
-
-        <p className="text-base sm:text-xl text-[#6e6d7a] font-normal leading-relaxed max-w-2xl mx-auto mb-9">
-          Cambridge 19 mock testlari, Digital SAT Desmos kalkulyatori, Real-vaqt AI Voice Examiner va 1v1 PvP do'stona janglar.
-        </p>
-
-        {/* Dribbble Signature Search Bar */}
-        <div className="max-w-2xl mx-auto mb-6">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              const el = document.getElementById('shots-feed');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="relative flex items-center bg-white rounded-full p-2 pl-6 shadow-lg shadow-black/[0.04] border border-black/10 focus-within:border-black/30 focus-within:ring-4 focus-within:ring-black/5 transition-all"
-          >
-            <Search className="w-5 h-5 text-[#6e6d7a] mr-3 shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Qidiring: Speaking Voice AI, SAT Desmos, Cambridge 19..."
-              className="w-full bg-transparent text-sm sm:text-base font-medium text-[#0d0c22] placeholder-[#6e6d7a] focus:outline-hidden"
-            />
-            {searchQuery && (
-              <button 
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="text-xs text-[#6e6d7a] hover:text-[#0d0c22] font-semibold px-2 py-1 mr-2"
-              >
-                Tozalash
-              </button>
-            )}
-            <button 
-              type="submit"
-              className="px-6 py-3 rounded-full bg-[#0d0c22] hover:bg-[#3d3d4e] text-white text-xs sm:text-sm font-bold shrink-0 transition-all shadow-sm cursor-pointer"
-            >
-              Qidirish
-            </button>
-          </form>
-        </div>
-
-        {/* Trending Tags (Dribbble style) */}
-        <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-semibold text-[#6e6d7a]">
-          <span className="font-bold text-[#0d0c22]">Mashhur:</span>
-          {[
-            { label: '⚡ IELTS 8.5', cat: 'ielts' },
-            { label: '📐 SAT Desmos', cat: 'sat' },
-            { label: '🎙️ Speaking Voice AI', cat: 'voice' },
-            { label: '🎮 1v1 Arena', cat: 'arena' },
-            { label: '🎬 Video Darslar', cat: 'lessons' },
-          ].map((item, idx) => (
-            <button
-              key={idx}
-              onClick={() => setSelectedCategory(item.cat)}
-              className="px-3 py-1 rounded-full bg-white hover:bg-black/5 border border-black/10 text-[#0d0c22] transition-colors"
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* 2. DRIBBLE HORIZONTAL CATEGORY FILTER PILLS */}
-      <section className="sticky top-16 z-30 bg-[#f8f7f4]/95 backdrop-blur-md border-y border-black/[0.06] py-3.5 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Scrollable category pills */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-            {[
-              { id: 'all', label: 'Barchasi (All)' },
-              { id: 'ielts', label: 'IELTS Mock' },
-              { id: 'sat', label: 'Digital SAT' },
-              { id: 'voice', label: 'Voice AI 🎙️' },
-              { id: 'lessons', label: 'Video Darslar 🎬' },
-              { id: 'arena', label: '1v1 Arena 🎮' },
-              { id: 'tools', label: 'Asboblar & Reja' },
-            ].map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
-                  selectedCategory === cat.id
-                    ? 'bg-[#0d0c22] text-white shadow-sm'
-                    : 'bg-white hover:bg-black/5 text-[#6e6d7a] hover:text-[#0d0c22] border border-black/10'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-[#6e6d7a]">
-            <span>{filteredShots.length} ta namoyish</span>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. DRIBBLE SIGNATURE "SHOTS" GRID FEED */}
-      <section id="shots-feed" className="max-w-7xl mx-auto px-4 sm:px-6 py-10 w-full scroll-mt-24">
-        {filteredShots.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-black/10 p-8">
-            <Search className="w-12 h-12 text-[#6e6d7a] mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-[#0d0c22] mb-2">Hech qanday bo'lim topilmadi</h3>
-            <p className="text-sm text-[#6e6d7a] mb-6">Boshqa kalit so'z bilan qidirib ko'ring yoki barcha bo'limlarni oching.</p>
-            <button
-              onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-              className="px-5 py-2.5 rounded-full bg-[#0d0c22] text-white text-xs font-bold"
-            >
-              Barcha Shotslarni ko'rsatish
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
-            {filteredShots.map((shot) => {
-              const likeInfo = likesState[shot.id] || { count: shot.initialLikes, isLiked: false };
-
-              return (
-                <div key={shot.id} className="group flex flex-col">
-                  {/* Shot Media Canvas Card */}
-                  <Link
-                    href={shot.link}
-                    className="relative aspect-4/3 rounded-2xl sm:rounded-3xl overflow-hidden bg-white border border-black/10 shadow-sm hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1 block"
-                  >
-                    {/* Visual Graphic Area */}
-                    <div className={`w-full h-full bg-gradient-to-br ${shot.bgGradient} p-6 flex flex-col justify-between relative`}>
-                      {/* Top tags */}
-                      <div className="flex items-center justify-between z-10">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/90 backdrop-blur-xs text-[#0d0c22] border border-black/10 shadow-2xs">
-                          {shot.badgeText}
-                        </span>
-                        <span className="text-[11px] font-bold text-[#6e6d7a] bg-white/60 px-2.5 py-0.5 rounded-full">
-                          {shot.tag}
-                        </span>
-                      </div>
-
-                      {/* Center Decorative Visual Icon / Graphic */}
-                      <div className="my-auto text-center z-10">
-                        <h3 className="text-lg font-black text-[#0d0c22] tracking-tight leading-snug group-hover:text-[#ea4c89] transition-colors">
-                          {shot.title}
-                        </h3>
-                        <div className="flex flex-wrap items-center justify-center gap-1.5 mt-3">
-                          {shot.featurePills.map((pill, pIdx) => (
-                            <span key={pIdx} className="text-[10px] font-bold bg-white/80 px-2 py-0.5 rounded-md text-[#0d0c22] border border-black/5">
-                              {pill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Subtle Bottom Preview */}
-                      <div className="text-[11px] text-[#6e6d7a] font-medium line-clamp-1 z-10">
-                        {shot.description}
-                      </div>
-
-                      {/* Dribbble Hover Overlay (Dark Scrim with Button & Bookmark) */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-between p-5 z-20">
-                        <div className="flex justify-end">
-                          <button 
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                            className="p-2 rounded-full bg-white/90 hover:bg-white text-[#0d0c22] shadow-md transition"
-                            title="Saqlab qo'yish"
-                          >
-                            <Bookmark className="w-4 h-4" />
-                          </button>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <span className="text-white text-xs font-bold line-clamp-1">
-                            {shot.title}
-                          </span>
-                          <span className="px-4 py-2 rounded-full bg-[#ea4c89] hover:bg-[#e03d7b] text-white text-xs font-bold shadow-md transition flex items-center gap-1 shrink-0">
-                            Sinash
-                            <ArrowUpRight className="w-3.5 h-3.5" />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-
-                  {/* Shot Meta Row: Author, Likes & Views (1:1 Dribbble Style) */}
-                  <div className="mt-3 flex items-center justify-between text-xs px-1">
-                    {/* Author Info */}
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={shot.author.avatar}
-                        alt={shot.author.name}
-                        className="w-5 h-5 rounded-full object-cover border border-black/10"
-                      />
-                      <span className="font-bold text-[#0d0c22] hover:underline cursor-pointer">
-                        {shot.author.name}
-                      </span>
-                      {shot.author.isPro && (
-                        <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#0d0c22] text-white leading-none">
-                          PRO
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Likes & Views */}
-                    <div className="flex items-center gap-3 text-[#6e6d7a] font-bold">
-                      <button
-                        onClick={(e) => toggleLike(e, shot.id)}
-                        className={`flex items-center gap-1 transition-colors ${
-                          likeInfo.isLiked ? 'text-[#ea4c89]' : 'hover:text-[#ea4c89]'
-                        }`}
-                        title="Yoqdi"
-                      >
-                        <Heart className={`w-3.5 h-3.5 ${likeInfo.isLiked ? 'fill-[#ea4c89]' : ''}`} />
-                        <span>{likeInfo.count}</span>
-                      </button>
-
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>{shot.views}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* 4. DRIBBLE BENTO SHOWCASE: BAND 5 VS BAND 9 LENS & INTERACTIVE CALCULATOR */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 w-full">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#ea4c89]/10 text-[#ea4c89] uppercase tracking-wide">
-            Interaktiv Tahlil
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-[#0d0c22] mt-3 tracking-tight">
-            IELTS Writing Band 5 vs Band 9 linzasi
-          </h2>
-          <p className="text-sm sm:text-base text-[#6e6d7a] mt-2">
-            AI tekshiruvchimiz qanday qilib inshodagi har bir jumlani tahlil qilishini jonli ko'ring.
-          </p>
-        </div>
-
-        {/* Dual Lens Card */}
-        <div className="bg-white rounded-3xl border border-black/10 p-6 sm:p-10 shadow-sm max-w-4xl mx-auto mb-16">
-          <div className="flex flex-col sm:flex-row items-center justify-between pb-6 border-b border-black/10 gap-4">
-            <div>
-              <div className="text-xs font-bold text-[#6e6d7a]">Mavzu: IELTS Task 2 Essay</div>
-              <h4 className="text-base font-extrabold text-[#0d0c22]">
-                "Should university education be free for all citizens?"
-              </h4>
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+            {/* Pill Announcement */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#E5E7EB] shadow-xs text-xs font-semibold text-[#171A2B] animate-in fade-in slide-in-from-top-4 duration-500">
+              <span className="w-2 h-2 rounded-full bg-[#5146E5] animate-ping" />
+              <span className="text-[#5146E5] font-black uppercase tracking-wider text-[11px]">Yangi</span>
+              <span className="text-[#85899B]">•</span>
+              <span>2026/2027 Yangilangan Cambridge 19 & Digital SAT Formati</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#5146E5]" />
             </div>
 
-            {/* Pill Toggle Button */}
-            <div className="flex items-center p-1 rounded-full bg-[#f8f7f4] border border-black/10">
-              <button
-                onClick={() => setEssayView('BAND_5')}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  essayView === 'BAND_5'
-                    ? 'bg-rose-500 text-white shadow-xs'
-                    : 'text-[#6e6d7a] hover:text-[#0d0c22]'
-                }`}
-              >
-                Band 5.0 (Oddiy)
-              </button>
-              <button
-                onClick={() => setEssayView('BAND_9')}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  essayView === 'BAND_9'
-                    ? 'bg-[#0d0c22] text-white shadow-xs'
-                    : 'text-[#6e6d7a] hover:text-[#0d0c22]'
-                }`}
-              >
-                Band 9.0 (Mukammal)
-              </button>
-            </div>
-          </div>
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-[#171A2B] tracking-tight leading-[1.08] max-w-4xl mx-auto">
+              Your Journey to <br className="hidden sm:inline" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5146E5] via-[#6366F1] to-[#8B7CF6]">
+                Academic Excellence
+              </span> Starts Here.
+            </h1>
 
-          <div className="pt-6">
-            {essayView === 'BAND_5' ? (
-              <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-rose-50/60 border border-rose-200/80 text-sm leading-relaxed text-slate-800">
-                  <p>
-                    I think university should be free because poor students do not have money to study. If government pays, everyone can go to university and get a good job. This is very good for economy. Also teachers will teach many people and country will become rich.
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-[#6e6d7a] block">Task Response:</span>
-                    <strong className="text-rose-600 font-extrabold">5.0 (Cheklangan)</strong>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-[#6e6d7a] block">Cohesion:</span>
-                    <strong className="text-rose-600 font-extrabold">5.0 (Takroriy)</strong>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-[#6e6d7a] block">Vocabulary:</span>
-                    <strong className="text-rose-600 font-extrabold">5.0 (Oddiy)</strong>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-[#6e6d7a] block">Grammar:</span>
-                    <strong className="text-rose-600 font-extrabold">5.5 (Xatolar mavjud)</strong>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 text-sm leading-relaxed text-slate-800">
-                  <p>
-                    Proponents of universal tertiary education argue that waiving tuition fees democratizes socioeconomic mobility. When state subsidies underwrite higher education, meritocratic access supersedes financial pedigree, precipitating exponential gains in human capital and fostering macroeconomic innovation across knowledge-intensive industries.
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-[#6e6d7a] block">Task Response:</span>
-                    <strong className="text-emerald-600 font-extrabold">9.0 (To'liq yoritilgan)</strong>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-[#6e6d7a] block">Cohesion:</span>
-                    <strong className="text-emerald-600 font-extrabold">9.0 (Mukammal bog'lanish)</strong>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-[#6e6d7a] block">Vocabulary:</span>
-                    <strong className="text-emerald-600 font-extrabold">9.0 (Akademik leksika)</strong>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-[#6e6d7a] block">Grammar:</span>
-                    <strong className="text-emerald-600 font-extrabold">9.0 (Murakkab strukturalar)</strong>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 5. INTERACTIVE SCORE CALCULATOR */}
-        <div className="bg-white rounded-3xl border border-black/10 p-6 sm:p-10 shadow-sm max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between pb-6 border-b border-black/10 gap-4">
-            <div>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#0d0c22] text-white">
-                Kalkulyator
-              </span>
-              <h3 className="text-2xl font-black text-[#0d0c22] mt-2">
-                Maqsadingizga erishish uchun qancha vaqt kerak?
-              </h3>
-            </div>
-
-            <div className="flex items-center p-1 rounded-full bg-[#f8f7f4] border border-black/10">
-              <button
-                onClick={() => setCalcExam('IELTS')}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  calcExam === 'IELTS'
-                    ? 'bg-[#0d0c22] text-white'
-                    : 'text-[#6e6d7a] hover:text-[#0d0c22]'
-                }`}
-              >
-                IELTS
-              </button>
-              <button
-                onClick={() => setCalcExam('SAT')}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  calcExam === 'SAT'
-                    ? 'bg-[#0d0c22] text-white'
-                    : 'text-[#6e6d7a] hover:text-[#0d0c22]'
-                }`}
-              >
-                SAT
-              </button>
-            </div>
-          </div>
-
-          <div className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            {calcExam === 'IELTS' ? (
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between text-xs font-bold text-[#0d0c22] mb-2">
-                    <span>Hozirgi IELTS Balingiz:</span>
-                    <span className="text-[#ea4c89] font-black text-sm">{currentScore.toFixed(1)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="4.0"
-                    max="8.5"
-                    step="0.5"
-                    value={currentScore}
-                    onChange={(e) => setCurrentScore(parseFloat(e.target.value))}
-                    className="w-full accent-[#0d0c22] cursor-pointer"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-bold text-[#0d0c22] mb-2">
-                    <span>Maqsad Qilingan Ball:</span>
-                    <span className="text-emerald-600 font-black text-sm">{targetScore.toFixed(1)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="5.0"
-                    max="9.0"
-                    step="0.5"
-                    value={targetScore}
-                    onChange={(e) => setTargetScore(parseFloat(e.target.value))}
-                    className="w-full accent-emerald-600 cursor-pointer"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between text-xs font-bold text-[#0d0c22] mb-2">
-                    <span>Hozirgi SAT Balingiz:</span>
-                    <span className="text-[#ea4c89] font-black text-sm">{currentSat}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="800"
-                    max="1550"
-                    step="50"
-                    value={currentSat}
-                    onChange={(e) => setCurrentSat(parseInt(e.target.value))}
-                    className="w-full accent-[#0d0c22] cursor-pointer"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-bold text-[#0d0c22] mb-2">
-                    <span>Maqsad SAT Bali:</span>
-                    <span className="text-emerald-600 font-black text-sm">{targetSat}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1000"
-                    max="1600"
-                    step="50"
-                    value={targetSat}
-                    onChange={(e) => setTargetSat(parseInt(e.target.value))}
-                    className="w-full accent-emerald-600 cursor-pointer"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Result Box */}
-            <div className="bg-[#f8f7f4] rounded-2xl p-6 border border-black/10 flex flex-col justify-between">
-              <div>
-                <span className="text-[11px] font-black uppercase text-[#6e6d7a] tracking-wider">
-                  Tavsiya Etilgan Tayyorgarlik Rejasi
-                </span>
-                <div className="text-3xl font-black text-[#0d0c22] mt-2">
-                  {calcExam === 'IELTS' ? `${ieltsEstimatedWeeks} Hafta` : `${satEstimatedWeeks} Hafta`}
-                </div>
-                <p className="text-xs text-[#6e6d7a] mt-1">
-                  Har kuni kamida <strong className="text-[#0d0c22]">{calcExam === 'IELTS' ? ieltsDailyMinutes : satDailyMinutes} daqiqa</strong> maqsadli amaliyot bilan.
-                </p>
-              </div>
-
-              <div className="pt-6">
-                <Link
-                  href="/study-plan"
-                  className="w-full py-3 rounded-full bg-[#0d0c22] hover:bg-[#3d3d4e] text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-sm"
-                >
-                  Shaxsiy Rejani Tuzish
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. DRIBBLE LIVE SAMPLE QUESTION SECTION */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-12 w-full">
-        <div className="bg-white rounded-3xl border border-black/10 p-6 sm:p-10 shadow-sm">
-          <div className="flex items-center justify-between pb-6 border-b border-black/10">
-            <div>
-              <span className="text-xs font-bold text-[#ea4c89]">Jonli Savol Sinovi</span>
-              <h3 className="text-xl font-black text-[#0d0c22] mt-1">{sampleQuestion.type}</h3>
-            </div>
-
-            <div className="flex items-center p-1 rounded-full bg-[#f8f7f4] border border-black/10 text-xs font-bold">
-              <button
-                onClick={() => { setActiveTab('IELTS'); setSampleAnswer(null); }}
-                className={`px-3 py-1 rounded-full transition ${activeTab === 'IELTS' ? 'bg-[#0d0c22] text-white' : 'text-[#6e6d7a]'}`}
-              >
-                IELTS
-              </button>
-              <button
-                onClick={() => { setActiveTab('SAT'); setSampleAnswer(null); }}
-                className={`px-3 py-1 rounded-full transition ${activeTab === 'SAT' ? 'bg-[#0d0c22] text-white' : 'text-[#6e6d7a]'}`}
-              >
-                SAT
-              </button>
-            </div>
-          </div>
-
-          <div className="pt-6 space-y-4">
-            <div className="p-4 rounded-2xl bg-[#f8f7f4] border border-black/5 text-sm text-[#0d0c22] leading-relaxed italic">
-              "{sampleQuestion.passage}"
-            </div>
-
-            <p className="font-bold text-sm text-[#0d0c22]">
-              {sampleQuestion.question}
+            {/* Description */}
+            <p className="text-base sm:text-xl text-[#85899B] max-w-2xl mx-auto leading-relaxed font-normal">
+              IELTS va Digital SAT imtihonlariga eng ilg'or AI texnologiyalari, real-time Speaking suhbatdosh, Desmos darsliklari va to'liq mock testlar bilan tayyorlaning.
             </p>
 
-            <div className="space-y-2">
-              {sampleQuestion.options.map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => setSampleAnswer(opt.id)}
-                  className={`w-full text-left p-3.5 rounded-2xl border text-xs sm:text-sm font-medium transition flex items-center gap-3 ${
-                    sampleAnswer === opt.id
-                      ? opt.id === sampleQuestion.correct
-                        ? 'bg-emerald-50 border-emerald-500 text-emerald-900 font-bold'
-                        : 'bg-rose-50 border-rose-500 text-rose-900 font-bold'
-                      : 'bg-white hover:bg-slate-50 border-black/10 text-[#0d0c22]'
-                  }`}
-                >
-                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                    sampleAnswer === opt.id
-                      ? opt.id === sampleQuestion.correct ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
-                      : 'bg-black/5 text-[#0d0c22]'
-                  }`}>
-                    {opt.id}
-                  </span>
-                  <span>{opt.text}</span>
-                </button>
-              ))}
-            </div>
-
-            {sampleAnswer && (
-              <div className={`p-4 rounded-2xl text-xs leading-relaxed border ${
-                sampleAnswer === sampleQuestion.correct ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'
-              }`}>
-                <strong>{sampleAnswer === sampleQuestion.correct ? '✅ Barakalla! To\'g\'ri javob.' : '💡 Tushuntirish:'}</strong> {sampleQuestion.explanation}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* 7. DRIBBLE TESTIMONIAL FEEDBACK CARDS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 w-full">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#ea4c89]/10 text-[#ea4c89] uppercase tracking-wide">
-            O'quvchilarimiz Natijalari
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-[#0d0c22] mt-3 tracking-tight">
-            Minglab talabalar Prepora orqali o'z maqsadiga erishdi
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {studentReviews.map((rev, idx) => (
-            <div key={idx} className="bg-white rounded-3xl border border-black/10 p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-[#0d0c22] text-white">
-                    {rev.score}
-                  </span>
-                  <div className="flex text-amber-400 text-xs">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
-                    ))}
-                  </div>
-                </div>
-
-                <p className="text-xs sm:text-sm text-[#0d0c22] leading-relaxed mb-6 font-normal">
-                  "{rev.text}"
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3 pt-4 border-t border-black/5">
-                <img
-                  src={rev.avatar}
-                  alt={rev.name}
-                  className="w-8 h-8 rounded-full object-cover border border-black/10"
-                />
-                <div>
-                  <h4 className="text-xs font-bold text-[#0d0c22]">{rev.name}</h4>
-                  <span className="text-[10px] text-[#6e6d7a] block">{rev.target}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 8. DRIBBLE COMPARISON MATRIX */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-12 w-full">
-        <div className="bg-white rounded-3xl border border-black/10 p-6 sm:p-10 shadow-sm">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-black text-[#0d0c22]">
-              Nega aynan Prepora?
-            </h3>
-            <p className="text-xs sm:text-sm text-[#6e6d7a] mt-1">
-              Oddiy o'quv markazlari va boshqa ilovalar bilan to'g'ridan-to'g'ri taqqoslang
-            </p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead>
-                <tr className="border-b border-black/10">
-                  <th className="pb-4 font-bold text-[#6e6d7a]">Xususiyat</th>
-                  <th className="pb-4 font-black text-[#ea4c89] text-center">Prepora Platformasi</th>
-                  <th className="pb-4 font-semibold text-[#6e6d7a] text-center hidden sm:table-cell">Oddiy Kurslar</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-black/5">
-                {comparisonFeatures.map((feat, fIdx) => (
-                  <tr key={fIdx} className="hover:bg-slate-50/50">
-                    <td className="py-3.5 font-semibold text-[#0d0c22]">{feat.title}</td>
-                    <td className="py-3.5 text-center">
-                      <span className="inline-flex items-center gap-1 text-emerald-600 font-bold">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Mavjud</span>
-                      </span>
-                    </td>
-                    <td className="py-3.5 text-center text-[#6e6d7a] hidden sm:table-cell">
-                      {feat.offline === false ? '❌ Yo\'q' : feat.offline}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. FAQ ACCORDION (DRIBBLE PILL STYLE) */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 py-16 w-full">
-        <div className="text-center mb-10">
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#ea4c89]/10 text-[#ea4c89] uppercase tracking-wide">
-            FAQ
-          </span>
-          <h2 className="text-3xl font-black text-[#0d0c22] mt-2">
-            Tez-tez beriladigan savollar
-          </h2>
-        </div>
-
-        <div className="space-y-3">
-          {faqs.map((faq, index) => {
-            const isOpen = faqOpen === index;
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-2xl border border-black/10 overflow-hidden shadow-2xs transition"
-              >
-                <button
-                  type="button"
-                  onClick={() => setFaqOpen(isOpen ? null : index)}
-                  className="w-full p-4 sm:p-5 text-left font-bold text-xs sm:text-sm text-[#0d0c22] flex items-center justify-between gap-4"
-                >
-                  <span>{faq.q}</span>
-                  <ChevronRight className={`w-4 h-4 text-[#6e6d7a] transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-90' : ''}`} />
-                </button>
-                {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#6e6d7a] leading-relaxed border-t border-black/5">
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 10. DRIBBLE BOTTOM CTA BANNER */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 w-full">
-        <div className="bg-[#0d0c22] text-white rounded-3xl p-8 sm:p-14 text-center relative overflow-hidden shadow-xl">
-          <div className="max-w-2xl mx-auto relative z-10 space-y-6">
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-              Orzuingizdagi universitet sari bugun qadam qo'ying.
-            </h2>
-            <p className="text-slate-300 text-sm sm:text-base font-normal">
-              Ro'yxatdan o'ting, bepul mock testlarni topshiring va o'z xatolaringiz ustida ishlang.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            {/* Two Prominent Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
               <Link
                 href="/signup"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#ea4c89] hover:bg-[#e03d7b] text-white font-bold text-sm shadow-md transition"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#5146E5] hover:bg-[#4338CA] text-white font-bold text-sm sm:text-base shadow-lg shadow-[#5146E5]/25 hover:shadow-xl hover:shadow-[#5146E5]/35 transition-all flex items-center justify-center gap-2 group"
               >
-                Bepul Boshlash
+                <span>Start Learning Free</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link
-                href="/pricing"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition"
+
+              <a
+                href="#courses"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white hover:bg-slate-50 text-[#171A2B] font-bold text-sm sm:text-base border border-[#E5E7EB] shadow-xs hover:border-[#D1D5DB] transition flex items-center justify-center gap-2"
               >
-                Tariflarni ko'rish
-              </Link>
+                <BookOpen className="w-4 h-4 text-[#5146E5]" />
+                <span>Explore Courses</span>
+              </a>
+            </div>
+
+            {/* Trust Metrics Pill */}
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-[#85899B] font-medium">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>4,800+ Faol Talabalar</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>O'rtacha +1.5 IELTS Band O'sishi</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Digital SAT 1500+ Natijalari</span>
+              </div>
+            </div>
+
+            {/* 3. Educational Dashboard Preview Mockup */}
+            <div className="pt-8 max-w-5xl mx-auto">
+              <div className="p-3 sm:p-5 rounded-3xl bg-white border border-[#E5E7EB] shadow-2xl space-y-4">
+                {/* Mockup Window Controls & Tabs */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-3 border-b border-[#F3F4F6]">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-rose-400" />
+                    <span className="w-3 h-3 rounded-full bg-amber-400" />
+                    <span className="w-3 h-3 rounded-full bg-emerald-400" />
+                    <span className="ml-2 text-xs font-mono font-bold text-[#85899B]">prepora.app/dashboard</span>
+                  </div>
+
+                  {/* Switcher */}
+                  <div className="flex items-center p-1 rounded-xl bg-[#F8F9FC] border border-[#E5E7EB]">
+                    <button
+                      type="button"
+                      onClick={() => setMockPreviewTab('ielts')}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                        mockPreviewTab === 'ielts' ? 'bg-[#5146E5] text-white shadow-xs' : 'text-[#85899B]'
+                      }`}
+                    >
+                      IELTS Module Preview
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMockPreviewTab('sat')}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                        mockPreviewTab === 'sat' ? 'bg-[#5146E5] text-white shadow-xs' : 'text-[#85899B]'
+                      }`}
+                    >
+                      SAT Module Preview
+                    </button>
+                  </div>
+                </div>
+
+                {/* Dashboard Inner Preview */}
+                <div className="p-4 sm:p-6 rounded-2xl bg-[#F8F9FC] border border-[#E5E7EB] text-left grid grid-cols-1 md:grid-cols-12 gap-4">
+                  {/* Left Column stats */}
+                  <div className="md:col-span-4 space-y-3">
+                    <div className="p-4 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#85899B]">Hozirgi Natija</span>
+                      <div className="text-3xl font-black text-[#171A2B] mt-1">
+                        {mockPreviewTab === 'ielts' ? 'Band 8.0' : '1520 Ball'}
+                      </div>
+                      <span className="text-xs text-emerald-600 font-bold flex items-center gap-1 mt-1">
+                        <TrendingUp className="w-3.5 h-3.5" /> +15% o'sish bu oyda
+                      </span>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs space-y-2">
+                      <div className="flex items-center justify-between text-xs font-bold text-[#171A2B]">
+                        <span>Kunlik Reja</span>
+                        <span className="text-[#5146E5]">3/4 Bajarildi</span>
+                      </div>
+                      <div className="w-full bg-[#F3F4F6] rounded-full h-2">
+                        <div className="bg-[#5146E5] h-2 rounded-full w-3/4" />
+                      </div>
+                      <span className="text-[11px] text-[#85899B] block">🔥 7 kunlik ketma-ket o'rganish seriyasi</span>
+                    </div>
+                  </div>
+
+                  {/* Right Column tasks / cards */}
+                  <div className="md:col-span-8 space-y-3">
+                    <div className="p-4 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#5146E5]/10 text-[#5146E5] flex items-center justify-center">
+                          {mockPreviewTab === 'ielts' ? <Mic className="w-5 h-5" /> : <Calculator className="w-5 h-5" />}
+                        </div>
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-[#171A2B]">
+                            {mockPreviewTab === 'ielts' ? 'Voice AI Speaking Practice #4' : 'Desmos Quadratic Systems Mastery'}
+                          </h4>
+                          <span className="text-[11px] text-[#85899B]">
+                            {mockPreviewTab === 'ielts' ? 'Part 2: Describe a memorable journey' : '15 ta murakkab savol yechimi'}
+                          </span>
+                        </div>
+                      </div>
+                      <Link
+                        href={mockPreviewTab === 'ielts' ? '/ielts-gg' : '/sat/math'}
+                        className="px-3.5 py-1.5 rounded-xl bg-[#171A2B] text-white text-xs font-bold hover:bg-[#252A40] transition shrink-0"
+                      >
+                        Boshlash
+                      </Link>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3.5 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs">
+                        <span className="text-[10px] text-[#85899B] uppercase font-bold">
+                          {mockPreviewTab === 'ielts' ? 'Writing Task 2' : 'EBRW Grammar'}
+                        </span>
+                        <div className="text-sm font-bold text-[#171A2B] mt-0.5">
+                          {mockPreviewTab === 'ielts' ? 'AI Insho Tahlili' : 'Tinish belgilari'}
+                        </div>
+                        <span className="text-[10px] text-indigo-600 font-bold block mt-1">✓ 100% Tayyor</span>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs">
+                        <span className="text-[10px] text-[#85899B] uppercase font-bold">
+                          {mockPreviewTab === 'ielts' ? 'Listening Cambridge 19' : 'Math Hard Module'}
+                        </span>
+                        <div className="text-sm font-bold text-[#171A2B] mt-0.5">
+                          {mockPreviewTab === 'ielts' ? 'Audio Test 40 savol' : '22 ta test'}
+                        </div>
+                        <span className="text-[10px] text-emerald-600 font-bold block mt-1">40/40 To'g'ri</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 11. DRIBBLE-STYLE FOOTER */}
-      <footer className="border-t border-black/[0.08] bg-[#f8f7f4] py-14 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-xs text-[#6e6d7a]">
-          {/* Logo & Bio Column */}
-          <div className="col-span-2 space-y-3">
-            <Link href="/" className="inline-block">
-              <span className="text-xl font-black tracking-tight text-[#0d0c22]">
-                Prepora<span className="text-[#ea4c89]">.</span>
+        {/* 4. IELTS and SAT Course Cards (#courses) */}
+        <section id="courses" className="py-16 md:py-24 bg-white border-y border-[#E5E7EB]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <span className="px-3 py-1 rounded-full bg-[#5146E5]/10 text-[#5146E5] text-xs font-bold uppercase tracking-wider">
+                Imtihon Yo'nalishlari
               </span>
-            </Link>
-            <p className="text-xs text-[#6e6d7a] max-w-sm leading-relaxed">
-              O'zbekistonda IELTS va Digital SAT topshiruvchilar uchun yaratilgan eng zamonaviy AI platformasi.
-            </p>
-            <div className="pt-2 text-[11px] text-[#6e6d7a]">
-              © {new Date().getFullYear()} Prepora Inc. Barcha huquqlar himoyalangan.
+              <h2 className="text-3xl sm:text-4xl font-black text-[#171A2B] tracking-tight">
+                Ixtisoslashgan IELTS & SAT Kurslari
+              </h2>
+              <p className="text-sm text-[#85899B]">
+                Har bir imtihonning o'ziga xos talablari, mezonlari va texnikalariga to'liq moslashtirilgan dasturlar.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+              {/* CARD 1: IELTS */}
+              <div className="p-8 sm:p-10 rounded-3xl bg-[#F8F9FC] border border-[#E5E7EB] hover:border-[#5146E5] transition-all flex flex-col justify-between shadow-sm hover:shadow-xl group space-y-8">
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <span className="px-3 py-1 rounded-full bg-[#5146E5] text-white text-xs font-bold uppercase tracking-wider">
+                      Band 7.5 - 9.0
+                    </span>
+                    <span className="text-xs font-bold text-[#85899B]">Cambridge Format</span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-2xl sm:text-3xl font-black text-[#171A2B]">
+                      IELTS Complete Mastery
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#85899B] mt-2 leading-relaxed">
+                      Academic va General Training modullari: Listening audio pleer, Reading matnlari, sun'iy intellektli Writing insho baholash va jonli Voice AI Speaking imtihonchisi.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#171A2B]">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Cambridge 15-19 formatidagi 40 ta Listening & 3 ta Reading matnlari</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#171A2B]">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Real-time Voice AI Speaking suhbati va talaffuz tahlili</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#171A2B]">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Writing Task 1 va 2 bo'yicha tezkor mezonlar tahlili</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#171A2B]">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>10 ta eng sara video darsliklar va lug'at kartochkalari</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <Link
+                    href="/ielts"
+                    className="w-full py-4 rounded-2xl bg-[#5146E5] hover:bg-[#4338CA] text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <span>Start IELTS Preparation</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* CARD 2: DIGITAL SAT */}
+              <div className="p-8 sm:p-10 rounded-3xl bg-[#F8F9FC] border border-[#E5E7EB] hover:border-[#171A2B] transition-all flex flex-col justify-between shadow-sm hover:shadow-xl group space-y-8">
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <span className="px-3 py-1 rounded-full bg-[#171A2B] text-white text-xs font-bold uppercase tracking-wider">
+                      Target 1500 - 1600
+                    </span>
+                    <span className="text-xs font-bold text-[#85899B]">College Board Style</span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-2xl sm:text-3xl font-black text-[#171A2B]">
+                      Digital SAT 1600 Elite
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#85899B] mt-2 leading-relaxed">
+                      Yangi Bluebook moslashuvchan test formati: Desmos kalkulyatorini 100% o'rganish, Reading & Writing grammatika va lug'at qoidalari, qiyin darajadagi modullar.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5 pt-2 border-t border-[#E5E7EB]">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#171A2B]">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Desmos kalkulyatori yordamida har qanday tenglamani 5 soniyada yechish</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#171A2B]">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Reading & Writing modulida tinish belgilari va rhetorical synthesis</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#171A2B]">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Moslashuvchan Hard Module savollarini yechish bo'yicha tahlil</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#171A2B]">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>10 ta professional SAT video masterclass va test savollari</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <Link
+                    href="/sat"
+                    className="w-full py-4 rounded-2xl bg-[#171A2B] hover:bg-[#252A40] text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <span>Start SAT Preparation</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Links Column 1 */}
-          <div className="space-y-2.5">
-            <h5 className="font-bold text-[#0d0c22] uppercase tracking-wider text-[11px]">Imtihonlar</h5>
-            <ul className="space-y-2">
-              <li><Link href="/ielts" className="hover:text-[#0d0c22]">IELTS Mock Test</Link></li>
-              <li><Link href="/sat" className="hover:text-[#0d0c22]">Digital SAT Bluebook</Link></li>
-              <li><Link href="/ielts-gg" className="hover:text-[#0d0c22]">Voice AI Speaking</Link></li>
-              <li><Link href="/lessons" className="hover:text-[#0d0c22]">Video Darsliklar</Link></li>
-            </ul>
+        {/* 5. Features Section */}
+        <section className="py-16 md:py-24 bg-[#F8F9FC]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <span className="px-3 py-1 rounded-full bg-[#5146E5]/10 text-[#5146E5] text-xs font-bold uppercase tracking-wider">
+                Imkoniyatlar
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#171A2B] tracking-tight">
+                Nima Uchun Prepora Boshqalardan Ustun?
+              </h2>
+              <p className="text-sm text-[#85899B]">
+                Faqat kitob o'qish emas, balki sun'iy intellekt va faol o'yin elementlari bilan natijaga kafolat.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Feature 1 */}
+              <div className="p-6 rounded-3xl bg-white border border-[#E5E7EB] shadow-xs hover:shadow-md transition space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-[#5146E5]/10 text-[#5146E5] flex items-center justify-center">
+                  <Mic className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-black text-[#171A2B]">Voice AI Speaking Suhbatdoshi</h3>
+                <p className="text-xs text-[#85899B] leading-relaxed">
+                  Haqiqiy inson kabi talaffuzingiz va ravonligingizni tinglaydi, darhol band bahosini beradi.
+                </p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="p-6 rounded-3xl bg-white border border-[#E5E7EB] shadow-xs hover:shadow-md transition space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Calculator className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-black text-[#171A2B]">Desmos SAT Kalkulyator Integratsiyasi</h3>
+                <p className="text-xs text-[#85899B] leading-relaxed">
+                  Rasmiy Digital SAT interfeysi bilan 1:1 o'xshash kalkulyator va uning barcha sirlari.
+                </p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="p-6 rounded-3xl bg-white border border-[#E5E7EB] shadow-xs hover:shadow-md transition space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <PenTool className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-black text-[#171A2B]">Tezkor Insho (Essay) Baholash</h3>
+                <p className="text-xs text-[#85899B] leading-relaxed">
+                  Task 1 va Task 2 insholarini yuboring, AI gramatika, leksika va tuzilish xatolarini tuzatib beradi.
+                </p>
+              </div>
+
+              {/* Feature 4 */}
+              <div className="p-6 rounded-3xl bg-white border border-[#E5E7EB] shadow-xs hover:shadow-md transition space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-black text-[#171A2B]">24/7 AI Shaxsiy Repetitor</h3>
+                <p className="text-xs text-[#85899B] leading-relaxed">
+                  Har qanday tushunarsiz qoida yoki matematik tenglamani so'rang, batafsil qadamma-qadam tushuntirib beradi.
+                </p>
+              </div>
+
+              {/* Feature 5 */}
+              <div className="p-6 rounded-3xl bg-white border border-[#E5E7EB] shadow-xs hover:shadow-md transition space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <Video className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-black text-[#171A2B]">20 Ta Eksklyuziv Video Darslik</h3>
+                <p className="text-xs text-[#85899B] leading-relaxed">
+                  IELTS va SAT bo'yicha 10 tadan eng sara video masterclasslar to'g'ridan-to'g'ri platformada.
+                </p>
+              </div>
+
+              {/* Feature 6 */}
+              <div className="p-6 rounded-3xl bg-white border border-[#E5E7EB] shadow-xs hover:shadow-md transition space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                  <Crown className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-black text-[#171A2B]">3D Avatar & Gamifikatsiya</h3>
+                <p className="text-xs text-[#85899B] leading-relaxed">
+                  XP to'plang, o'g'il yoki qiz bola 3D qahramoningizni shohona kiyimlar va aksessuarlar bilan kiyintiring.
+                </p>
+              </div>
+            </div>
           </div>
+        </section>
 
-          {/* Links Column 2 */}
-          <div className="space-y-2.5">
-            <h5 className="font-bold text-[#0d0c22] uppercase tracking-wider text-[11px]">Asboblar</h5>
-            <ul className="space-y-2">
-              <li><Link href="/arena" className="hover:text-[#0d0c22]">1v1 PvP Arena</Link></li>
-              <li><Link href="/vocabulary" className="hover:text-[#0d0c22]">Academic Vocab</Link></li>
-              <li><Link href="/study-plan" className="hover:text-[#0d0c22]">O'quv Rejasi</Link></li>
-              <li><Link href="/mistakes" className="hover:text-[#0d0c22]">Xatolar Daftari</Link></li>
-            </ul>
+        {/* 6. Learning Statistics */}
+        <section className="py-16 md:py-20 bg-[#171A2B] text-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-[#5146E5] font-mono">98.4%</div>
+                <div className="text-xs sm:text-sm font-semibold text-slate-300">Maqsadiga Erishganlar</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-white font-mono">120K+</div>
+                <div className="text-xs sm:text-sm font-semibold text-slate-300">Yechilgan Test Savollari</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-[#8B7CF6] font-mono">14,500+</div>
+                <div className="text-xs sm:text-sm font-semibold text-slate-300">AI Tekshirgan Insholar</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-amber-400 font-mono">4.9 / 5</div>
+                <div className="text-xs sm:text-sm font-semibold text-slate-300">O'quvchilar Bahosi</div>
+              </div>
+            </div>
           </div>
+        </section>
 
-          {/* Links Column 3 */}
-          <div className="space-y-2.5">
-            <h5 className="font-bold text-[#0d0c22] uppercase tracking-wider text-[11px]">Kompaniya</h5>
-            <ul className="space-y-2">
-              <li><Link href="/pricing" className="hover:text-[#0d0c22]">Tariflar</Link></li>
-              <li><Link href="/referral" className="hover:text-[#0d0c22]">Bepul Pro Taklif</Link></li>
-              <li><Link href="/settings" className="hover:text-[#0d0c22]">Mening Profilim</Link></li>
-            </ul>
+        {/* 7. Student Testimonials */}
+        <section className="py-16 md:py-24 bg-white border-b border-[#E5E7EB]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <span className="px-3 py-1 rounded-full bg-[#5146E5]/10 text-[#5146E5] text-xs font-bold uppercase tracking-wider">
+                Fikrlar
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#171A2B] tracking-tight">
+                Muvaffaqiyatli Talabalar Fikrlari
+              </h2>
+              <p className="text-sm text-[#85899B]">
+                Prepora orqali o'z maqsadiga erishgan o'zbekistonlik talabalar haqiqiy natijalari.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {TESTIMONIALS.map((t, idx) => (
+                <div key={idx} className="p-6 rounded-3xl bg-[#F8F9FC] border border-[#E5E7EB] flex flex-col justify-between space-y-4 shadow-xs">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-1 text-amber-400">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-current" />
+                      ))}
+                    </div>
+                    <p className="text-xs sm:text-sm text-[#171A2B] leading-relaxed italic">
+                      "{t.comment}"
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-4 border-t border-[#E5E7EB]">
+                    <img
+                      src={t.avatar}
+                      alt={t.name}
+                      className="w-11 h-11 rounded-full object-cover border border-[#E5E7EB]"
+                    />
+                    <div>
+                      <h4 className="text-xs font-bold text-[#171A2B]">{t.name}</h4>
+                      <span className="text-[10px] text-[#5146E5] font-bold block">{t.exam} • {t.score}</span>
+                      <span className="text-[9px] text-[#85899B] font-medium block">{t.university}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 8. FAQ Section */}
+        <section className="py-16 md:py-24 bg-[#F8F9FC]">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div className="text-center space-y-3">
+              <span className="px-3 py-1 rounded-full bg-[#5146E5]/10 text-[#5146E5] text-xs font-bold uppercase tracking-wider">
+                Ko'p Beriladigan Savollar
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#171A2B] tracking-tight">
+                Tez-tez So'raladigan Savollar
+              </h2>
+            </div>
+
+            <div className="space-y-3">
+              {FAQS.map((faq, idx) => {
+                const isOpen = activeFaq === idx;
+                return (
+                  <div
+                    key={idx}
+                    className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden transition-all shadow-xs"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => toggleFaq(idx)}
+                      className="w-full p-5 text-left font-bold text-xs sm:text-sm text-[#171A2B] flex items-center justify-between gap-3 hover:bg-slate-50 transition"
+                    >
+                      <span>{faq.q}</span>
+                      <ChevronDown className={`w-4 h-4 text-[#85899B] transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180 text-[#5146E5]' : ''}`} />
+                    </button>
+                    {isOpen && (
+                      <div className="px-5 pb-5 pt-1 text-xs text-[#85899B] leading-relaxed border-t border-[#F3F4F6]">
+                        {faq.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Call to action card */}
+        <section className="py-12 md:py-16 bg-white border-t border-[#E5E7EB]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-[#171A2B] to-[#252A40] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+              <div className="space-y-2 text-center md:text-left">
+                <h3 className="text-2xl sm:text-3xl font-black">
+                  Tayyorgarlikni Bugunoq Boshlang!
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-lg">
+                  Ro'yxatdan o'ting, 3D qahramoningizni tanlang va IELTS hamda Digital SAT'dan yuqori ball oling.
+                </p>
+              </div>
+
+              <Link
+                href="/signup"
+                className="px-8 py-4 rounded-2xl bg-[#5146E5] hover:bg-[#4338CA] text-white font-bold text-sm transition shadow-lg shrink-0 flex items-center gap-2"
+              >
+                <span>Bepul Ro'yxatdan O'tish</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* 9. Professional Footer */}
+      <footer className="bg-white border-t border-[#E5E7EB] py-12 text-xs text-[#85899B]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+            <div className="col-span-2 space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#5146E5] text-white flex items-center justify-center font-black text-sm">
+                  P
+                </div>
+                <span className="text-base font-black text-[#171A2B]">Prepora.</span>
+              </div>
+              <p className="text-xs text-[#85899B] max-w-sm leading-relaxed">
+                IELTS va Digital SAT imtihonlariga xalqaro standartda tayyorlovchi zamonaviy sun'iy intellekt ta'lim platformasi.
+              </p>
+              <div className="text-[11px] text-[#85899B]">
+                © {new Date().getFullYear()} Prepora Academy. Barcha huquqlar himoyalangan.
+              </div>
+            </div>
+
+            <div className="space-y-2.5">
+              <h4 className="font-bold text-[#171A2B] uppercase tracking-wider text-[11px]">IELTS</h4>
+              <ul className="space-y-1.5">
+                <li><Link href="/ielts/listening" className="hover:text-[#5146E5]">Listening Mock</Link></li>
+                <li><Link href="/ielts/reading" className="hover:text-[#5146E5]">Reading Mock</Link></li>
+                <li><Link href="/ielts/writing" className="hover:text-[#5146E5]">Writing AI Grader</Link></li>
+                <li><Link href="/ielts-gg" className="hover:text-[#5146E5]">Voice AI Speaking</Link></li>
+              </ul>
+            </div>
+
+            <div className="space-y-2.5">
+              <h4 className="font-bold text-[#171A2B] uppercase tracking-wider text-[11px]">Digital SAT</h4>
+              <ul className="space-y-1.5">
+                <li><Link href="/sat/math" className="hover:text-[#5146E5]">SAT Math & Desmos</Link></li>
+                <li><Link href="/sat/reading-writing" className="hover:text-[#5146E5]">Reading & Writing</Link></li>
+                <li><Link href="/sat/mock-exam" className="hover:text-[#5146E5]">Full SAT Mock</Link></li>
+                <li><Link href="/lessons" className="hover:text-[#5146E5]">SAT Video Darslar</Link></li>
+              </ul>
+            </div>
+
+            <div className="space-y-2.5">
+              <h4 className="font-bold text-[#171A2B] uppercase tracking-wider text-[11px]">Platforma</h4>
+              <ul className="space-y-1.5">
+                <li><Link href="/dashboard" className="hover:text-[#5146E5]">Student Dashboard</Link></li>
+                <li><Link href="/arena" className="hover:text-[#5146E5]">Arena PvP</Link></li>
+                <li><Link href="/referral" className="hover:text-[#5146E5]">Do'stlar & Bepul Pro</Link></li>
+                <li><Link href="/pricing" className="hover:text-[#5146E5]">Tariflar (Pricing)</Link></li>
+                <li><Link href="/settings" className="hover:text-[#5146E5]">3D Avatar Studiyasi</Link></li>
+              </ul>
+            </div>
           </div>
         </div>
       </footer>

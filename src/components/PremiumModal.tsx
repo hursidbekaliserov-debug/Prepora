@@ -26,13 +26,12 @@ import { StorageManager } from '@/lib/storage';
 interface PremiumModalProps {
   isOpen: boolean;
   onClose: () => void;
-  reason?: 'chat_limit' | 'test_limit' | 'general';
+  reason?: 'chat_limit' | 'test_limit' | 'video_limit' | 'general';
 }
 
 export default function PremiumModal({ isOpen, onClose, reason = 'general' }: PremiumModalProps) {
   // Qabul qiluvchi karta raqami
   const RECIPIENT_CARD = process.env.NEXT_PUBLIC_RECIPIENT_CARD || '9987 1000 3057 1273';
-  const TELEGRAM_BOT_URL = 'https://t.me/prepora_support_bot';
 
   const [activeTab, setActiveTab] = useState<'pay_and_submit' | 'manual_code' | 'telegram_bot'>('pay_and_submit');
   const [copied, setCopied] = useState(false);
@@ -286,6 +285,7 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
           <p className="text-xs text-slate-300 mt-1">
             {reason === 'chat_limit' && "Bugungi 5 ta bepul AI muloqot limitingiz tugadi."}
             {reason === 'test_limit' && "Bugungi 2 ta bepul test limitingiz tugadi."}
+            {reason === 'video_limit' && "Bugungi 2 ta bepul video darslik limitingiz tugadi."}
             {reason === 'general' && "Prepora platformasida to'liq cheksiz tayyorgarlik ko'ring."}
             {" "}Pul to'g'ridan-to'g'ri rasmiy kartaga o'tkaziladi.
           </p>
@@ -316,16 +316,6 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
             >
               2. Kodni Kiritish
             </button>
-            <a
-              href={TELEGRAM_BOT_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold transition flex items-center justify-center gap-1 text-[11px]"
-              title="Telegram Bot orqali yozish"
-            >
-              <Bot className="w-3.5 h-3.5" />
-              <span>Bot</span>
-            </a>
           </div>
         </div>
 
@@ -365,9 +355,9 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                 <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-900 text-[11px] font-mono font-bold border border-blue-300 inline-block mb-2">
                   So'rov ID: {activeRequestId}
                 </span>
-                <h3 className="text-lg font-black text-blue-950">Admin Skrinshotni Tekshirmoqda...</h3>
+                <h3 className="text-lg font-black text-blue-950">To'lov Skrinshoti Tekshirilmoqda...</h3>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed max-w-sm mx-auto">
-                  Chek skrinshotingiz <strong>@prepora_support_bot</strong> orqali barcha adminlarga yuborildi. Admin kartaga 50 000 so'm tushganini tasdiqlashi bilan, ushbu oyna <strong>avtomatik Pro</strong> ga aylanadi!
+                  Chek skrinshotingiz tekshiruvga yuborildi. Kartaga 50 000 so'm tushgani tasdiqlanishi bilan, ushbu oyna <strong>avtomatik Pro</strong> ga aylanadi!
                 </p>
               </div>
 
@@ -377,20 +367,17 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
               </div>
 
               <div className="flex gap-2 justify-center pt-1">
-                <a
-                  href={TELEGRAM_BOT_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-1.5"
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition"
                 >
-                  <Bot className="w-4 h-4" />
-                  <span>Telegram Botni Ochish</span>
-                </a>
-
+                  Darchani Yopish
+                </button>
                 <button
                   type="button"
                   onClick={() => setRequestStatus('IDLE')}
-                  className="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition"
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition"
                 >
                   Qaytadan Yuborish
                 </button>
@@ -592,23 +579,6 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
                   )}
                 </button>
               </form>
-
-              {/* Bot info card */}
-              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-amber-950 font-medium">
-                  <Bot className="w-4 h-4 text-amber-700 shrink-0" />
-                  <span>Rasmiy Admin Bot: <strong>@prepora_support_bot</strong></span>
-                </div>
-                <a
-                  href={TELEGRAM_BOT_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-700 hover:underline font-bold flex items-center gap-1 text-[11px]"
-                >
-                  <span>Ochish</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
             </div>
           ) : (
             /* TAB 2: TASDIQLASH KODINI KIRITISH */
