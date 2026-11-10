@@ -473,8 +473,8 @@ export class StorageManager {
         dailyTestMax: 2,
         dailyTestRemaining: isPrem ? 9999 : Math.max(0, 2 - (data.dailyTestCount || 0)),
         dailyVideoCount: data.dailyVideoCount || 0,
-        dailyVideoMax: 2,
-        dailyVideoRemaining: isPrem ? 9999 : Math.max(0, 2 - (data.dailyVideoCount || 0)),
+        dailyVideoMax: 1,
+        dailyVideoRemaining: isPrem ? 9999 : Math.max(0, 1 - (data.dailyVideoCount || 0)),
         activatedAt: data.activatedAt,
         paymentMethod: data.paymentMethod,
       };
@@ -535,9 +535,9 @@ export class StorageManager {
     }
   }
 
-  // --- Video darsliklar: Oddiysida kuniga 2 ta, Pro da cheksiz ---
+  // --- Video darsliklar: Oddiysida kuniga 1 ta, Pro da cheksiz ---
   static useVideoQuota(): { allowed: boolean; remaining: number; isPremium: boolean } {
-    if (!this.isClient()) return { allowed: true, remaining: 2, isPremium: false };
+    if (!this.isClient()) return { allowed: true, remaining: 1, isPremium: false };
     const status = this.getSubscriptionStatus();
 
     if (status.isPremium) {
@@ -554,7 +554,7 @@ export class StorageManager {
       data.dailyVideoCount = (data.dailyVideoCount || 0) + 1;
       localStorage.setItem('prepora_subscription', JSON.stringify(data));
       window.dispatchEvent(new Event('prepora_subscription_updated'));
-      return { allowed: true, remaining: Math.max(0, 2 - data.dailyVideoCount), isPremium: false };
+      return { allowed: true, remaining: Math.max(0, 1 - data.dailyVideoCount), isPremium: false };
     } catch (e) {
       return { allowed: true, remaining: 0, isPremium: false };
     }

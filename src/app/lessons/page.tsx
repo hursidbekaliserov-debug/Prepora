@@ -383,7 +383,7 @@ export default function LessonsPage() {
             ) : (
               <div className="flex items-center gap-2">
                 <span className="px-3.5 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-bold text-[#171A2B] shadow-2xs">
-                  Kunlik Limit: <strong className="text-[#5146E5]">{subStatus?.dailyVideoRemaining ?? 2} / 2</strong> video qoldi
+                  Kunlik Limit: <strong className="text-[#5146E5]">{subStatus?.dailyVideoRemaining ?? 1} / 1</strong> video qoldi
                 </span>
                 <button
                   type="button"
@@ -442,9 +442,9 @@ export default function LessonsPage() {
                   <div className="w-14 h-14 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center mb-1">
                     <Lock className="w-7 h-7" />
                   </div>
-                  <h3 className="text-xl font-black">Bugungi Bepul Video Limitingiz Tugadi (2/2)</h3>
+                  <h3 className="text-xl font-black">Bugungi Bepul Video Limitingiz Tugadi (1/1)</h3>
                   <p className="text-xs text-slate-300 max-w-md leading-relaxed">
-                    Siz bugun 2 ta bepul video darslikni tomosha qildingiz. Barcha 20 ta IELTS va SAT darslarini cheklovlarsiz tomosha qilish uchun Pro obunani faollashtiring yoki do'stlaringizni taklif qilib bepul oling!
+                    Siz bugun 1 ta bepul video darslikni tomosha qildingiz. Barcha 20 ta IELTS va SAT darslarini cheklovlarsiz tomosha qilish uchun Pro obunani faollashtiring yoki do'stlaringizni taklif qilib bepul oling!
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                     <button

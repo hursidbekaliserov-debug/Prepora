@@ -285,7 +285,7 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
           <p className="text-xs text-slate-300 mt-1">
             {reason === 'chat_limit' && "Bugungi 5 ta bepul AI muloqot limitingiz tugadi."}
             {reason === 'test_limit' && "Bugungi 2 ta bepul test limitingiz tugadi."}
-            {reason === 'video_limit' && "Bugungi 2 ta bepul video darslik limitingiz tugadi."}
+            {reason === 'video_limit' && "Bugungi 1 ta bepul video darslik limitingiz tugadi."}
             {reason === 'general' && "Prepora platformasida to'liq cheksiz tayyorgarlik ko'ring."}
             {" "}Pul to'g'ridan-to'g'ri rasmiy kartaga o'tkaziladi.
           </p>
