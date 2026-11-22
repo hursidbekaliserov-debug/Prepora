@@ -240,6 +240,12 @@ export class StorageManager {
         if (parsed.totalEarnedXp === undefined) {
           parsed.totalEarnedXp = (parsed.xp || 950) + (parsed.spentXp || 250);
         }
+        // Auto-assign VIP Premium sticker if user has active Premium
+        const subRaw = localStorage.getItem('prepora_subscription');
+        const isPrem = subRaw ? !!JSON.parse(subRaw).isPremium : false;
+        if (isPrem && !parsed.premiumBadge) {
+          parsed.premiumBadge = '👑';
+        }
         return parsed;
       }
     } catch (e) {
@@ -634,7 +640,19 @@ export class StorageManager {
 
     if (this.isClient()) {
       localStorage.setItem('prepora_subscription', JSON.stringify(subData));
+      
+      // Auto-unlock VIP Crown and Premium sticker
+      const prof = this.getProfile();
+      prof.premiumBadge = prof.premiumBadge || '👑';
+      if (!prof.unlockedWardrobe.includes('crown_3d')) prof.unlockedWardrobe.push('crown_3d');
+      if (!prof.unlockedWardrobe.includes('crown')) prof.unlockedWardrobe.push('crown');
+      if (prof.avatarConfig && (prof.avatarConfig.headwear === 'none' || !prof.avatarConfig.headwear)) {
+        prof.avatarConfig.headwear = 'crown';
+      }
+      this.saveProfile(prof);
+
       window.dispatchEvent(new Event('prepora_subscription_updated'));
+      window.dispatchEvent(new Event('prepora_profile_updated'));
     }
 
     return {
@@ -710,7 +728,19 @@ export class StorageManager {
 
     if (this.isClient()) {
       localStorage.setItem('prepora_subscription', JSON.stringify(subData));
+      
+      // Auto-unlock VIP Crown and Premium sticker
+      const prof = this.getProfile();
+      prof.premiumBadge = prof.premiumBadge || '👑';
+      if (!prof.unlockedWardrobe.includes('crown_3d')) prof.unlockedWardrobe.push('crown_3d');
+      if (!prof.unlockedWardrobe.includes('crown')) prof.unlockedWardrobe.push('crown');
+      if (prof.avatarConfig && (prof.avatarConfig.headwear === 'none' || !prof.avatarConfig.headwear)) {
+        prof.avatarConfig.headwear = 'crown';
+      }
+      this.saveProfile(prof);
+
       window.dispatchEvent(new Event('prepora_subscription_updated'));
+      window.dispatchEvent(new Event('prepora_profile_updated'));
     }
 
     return {
@@ -736,7 +766,19 @@ export class StorageManager {
     };
     if (this.isClient()) {
       localStorage.setItem('prepora_subscription', JSON.stringify(subData));
+      
+      // Auto-unlock VIP Crown and Premium sticker
+      const prof = this.getProfile();
+      prof.premiumBadge = prof.premiumBadge || '👑';
+      if (!prof.unlockedWardrobe.includes('crown_3d')) prof.unlockedWardrobe.push('crown_3d');
+      if (!prof.unlockedWardrobe.includes('crown')) prof.unlockedWardrobe.push('crown');
+      if (prof.avatarConfig && (prof.avatarConfig.headwear === 'none' || !prof.avatarConfig.headwear)) {
+        prof.avatarConfig.headwear = 'crown';
+      }
+      this.saveProfile(prof);
+
       window.dispatchEvent(new Event('prepora_subscription_updated'));
+      window.dispatchEvent(new Event('prepora_profile_updated'));
     }
     return this.getSubscriptionStatus();
   }

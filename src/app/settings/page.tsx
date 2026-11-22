@@ -123,7 +123,12 @@ export default function SettingsPage() {
     setName(p.fullName);
     setEmail(p.email);
     setAvatarUrl(p.avatarUrl || '');
-    setPremiumBadge(p.premiumBadge || '');
+    const currentBadge = p.premiumBadge || (sub.isPremium ? '👑' : '');
+    setPremiumBadge(currentBadge);
+    if (sub.isPremium && !p.premiumBadge) {
+      p.premiumBadge = '👑';
+      StorageManager.saveProfile(p);
+    }
     setTargetExam(p.targetExam);
     setIeltsType(p.ieltsType || 'ACADEMIC');
     setTargetIelts(p.targetIeltsBand || 8.0);
@@ -132,7 +137,16 @@ export default function SettingsPage() {
     setDailyMinutes(p.dailyStudyMinutes || 45);
 
     const updateSub = () => {
-      setSubStatus(StorageManager.getSubscriptionStatus());
+      const s = StorageManager.getSubscriptionStatus();
+      setSubStatus(s);
+      if (s.isPremium) {
+        const prof = StorageManager.getProfile();
+        if (!prof.premiumBadge) {
+          prof.premiumBadge = '👑';
+          StorageManager.saveProfile(prof);
+          setPremiumBadge('👑');
+        }
+      }
     };
     window.addEventListener('prepora_subscription_updated', updateSub);
     return () => window.removeEventListener('prepora_subscription_updated', updateSub);
@@ -162,10 +176,14 @@ export default function SettingsPage() {
       return;
     }
 
-    if (premiumBadge === sticker) {
-      setPremiumBadge('');
-    } else {
-      setPremiumBadge(sticker);
+    const nextBadge = premiumBadge === sticker ? '' : sticker;
+    setPremiumBadge(nextBadge);
+
+    // Auto-save immediately to profile so it appears instantly across the site
+    if (profile) {
+      const updated = { ...profile, premiumBadge: nextBadge };
+      StorageManager.saveProfile(updated);
+      setProfile(updated);
     }
   };
 

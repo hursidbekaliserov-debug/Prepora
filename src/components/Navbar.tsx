@@ -338,25 +338,15 @@ export default function Navbar() {
                 <span className="hidden sm:inline text-xs">
                   {profile?.fullName || 'Student'}
                 </span>
-                {profile?.avatarConfig?.headwear === 'crown' ? (
-                  <span className="text-xs" title="Shohona Toj">👑</span>
-                ) : profile?.avatarConfig?.aura === 'fire_wings' ? (
-                  <span className="text-xs" title="Olovli Qanotlar">🪽</span>
-                ) : profile?.avatarConfig?.glasses === 'vr_visor' ? (
-                  <span className="text-xs" title="VR Vizor">🥽</span>
-                ) : profile?.equippedItem ? (
-                  <span className="text-xs" title="Taqilgan 3D aksessuar">
-                    {profile.equippedItem === 'crown_3d' ? '👑' :
-                     profile.equippedItem === 'aura_3d' ? '⚡' :
-                     profile.equippedItem === 'visors_3d' ? '🕶️' :
-                     profile.equippedItem === 'wings_3d' ? '🪽' :
-                     profile.equippedItem === 'diamond_frame' ? '💎' :
-                     profile.equippedItem === 'shield_band9' ? '🛡️' : ''}
+                {/* VIP Premium Sticker */}
+                {(profile?.premiumBadge || subStatus?.isPremium) && (
+                  <span className="text-sm select-none" title="VIP Premium Stiker">
+                    {profile?.premiumBadge || '👑'}
                   </span>
-                ) : null}
+                )}
                 {subStatus?.isPremium && (
-                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#5146E5] text-white">
-                    PRO
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-xs flex items-center gap-0.5">
+                    ⭐ PRO
                   </span>
                 )}
               </Link>
@@ -413,7 +403,15 @@ export default function Navbar() {
                     </div>
                   )}
                   <div>
-                    <h4 className="text-xs font-bold text-[#171A2B] dark:text-white">{profile?.fullName || 'Student'}</h4>
+                    <h4 className="text-xs font-bold text-[#171A2B] dark:text-white flex items-center gap-1.5">
+                      <span>{profile?.fullName || 'Student'}</span>
+                      {(profile?.premiumBadge || subStatus?.isPremium) && (
+                        <span className="text-xs" title="VIP Premium Stiker">{profile?.premiumBadge || '👑'}</span>
+                      )}
+                      {subStatus?.isPremium && (
+                        <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase bg-amber-400 text-slate-950">PRO</span>
+                      )}
+                    </h4>
                     <span className="text-[10px] text-[#85899B] font-normal">{profile?.email || 'student@prepora.uz'}</span>
                   </div>
                 </div>

@@ -119,8 +119,12 @@ export default function StudentDashboard() {
                 <span>Maqsad: {profile?.examDate || '15-Dekabr, 2026'}</span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#171A2B] tracking-tight">
-                Xush kelibsiz, {profile?.fullName || 'Talaba'}! 👋
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#171A2B] tracking-tight flex items-center gap-2">
+                <span>Xush kelibsiz, {profile?.fullName || 'Talaba'}!</span>
+                {profile?.premiumBadge && (
+                  <span className="text-2xl select-none" title="VIP Premium Stiker">{profile.premiumBadge}</span>
+                )}
+                <span>👋</span>
               </h1>
               <p className="text-sm sm:text-base text-[#85899B] mt-1.5 max-w-2xl leading-relaxed">
                 Bugungi o'quv rejangiz 3 ta dars va 1 ta mini-testdan iborat. Davomiyligingizni saqlab qoling va ballaringizni oshiring!
