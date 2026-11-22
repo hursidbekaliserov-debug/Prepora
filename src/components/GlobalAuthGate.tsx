@@ -19,6 +19,15 @@ export default function GlobalAuthGate() {
   const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
+    // Admin route protection: only super admin can access
+    if (pathname.startsWith('/admin')) {
+      if (!StorageManager.isAdminLoggedIn()) {
+        router.push('/login');
+      }
+      setShowAuth(false);
+      return;
+    }
+
     const isPublic = PUBLIC_ROUTES.includes(pathname);
     if (isPublic) {
       setShowAuth(false);

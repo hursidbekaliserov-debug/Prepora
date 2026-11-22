@@ -9,7 +9,74 @@ export interface UserAccount {
   email: string;
   password?: string;
   createdAt: string;
+  targetExam?: 'IELTS' | 'SAT' | 'BOTH';
+  isPro?: boolean;
+  xp?: number;
+  lastActive?: string;
 }
+
+const INITIAL_USERS: UserAccount[] = [
+  {
+    id: 'usr_1',
+    fullName: 'Javohir Toshmatov',
+    email: 'javohir.t@gmail.com',
+    createdAt: '2026-11-04T10:20:00.000Z',
+    targetExam: 'IELTS',
+    isPro: true,
+    xp: 1450,
+    lastActive: 'Bugun, 15:40'
+  },
+  {
+    id: 'usr_2',
+    fullName: 'Madina Karimova',
+    email: 'karimova.m@mail.ru',
+    createdAt: '2026-11-06T14:15:00.000Z',
+    targetExam: 'SAT',
+    isPro: true,
+    xp: 1820,
+    lastActive: 'Bugun, 12:10'
+  },
+  {
+    id: 'usr_3',
+    fullName: 'Bekzod Rahmonov',
+    email: 'bekzod.rahmonov@gmail.com',
+    createdAt: '2026-11-08T09:00:00.000Z',
+    targetExam: 'IELTS',
+    isPro: false,
+    xp: 620,
+    lastActive: 'Kecha, 19:25'
+  },
+  {
+    id: 'usr_4',
+    fullName: 'Dilnoza Yusupova',
+    email: 'dilnoza_yu@yahoo.com',
+    createdAt: '2026-11-10T16:30:00.000Z',
+    targetExam: 'BOTH',
+    isPro: true,
+    xp: 2100,
+    lastActive: 'Bugun, 14:05'
+  },
+  {
+    id: 'usr_5',
+    fullName: 'Shahzod Olimov',
+    email: 'shahzod.olimov99@gmail.com',
+    createdAt: '2026-11-14T11:45:00.000Z',
+    targetExam: 'SAT',
+    isPro: false,
+    xp: 890,
+    lastActive: '3 kun oldin'
+  },
+  {
+    id: 'usr_6',
+    fullName: 'Sevara Azimova',
+    email: 'sevara.azimova@gmail.com',
+    createdAt: '2026-11-18T08:20:00.000Z',
+    targetExam: 'IELTS',
+    isPro: false,
+    xp: 430,
+    lastActive: 'Bugun, 09:15'
+  }
+];
 
 export interface SubscriptionStatus {
   isPremium: boolean;
@@ -112,16 +179,97 @@ export class StorageManager {
     return typeof window !== 'undefined';
   }
 
+  // --- Admin Session Management ---
+  static setAdminSession(isAdmin: boolean): void {
+    if (!this.isClient()) return;
+    if (isAdmin) {
+      localStorage.setItem('prepora_admin_session', JSON.stringify({
+        email: 'Xurshid_admin@gmail.com',
+        role: 'SUPER_ADMIN',
+        loginTime: new Date().toISOString()
+      }));
+      localStorage.setItem('prepora_active_session', JSON.stringify({
+        id: 'admin_xurshid',
+        fullName: 'Xurshid Admin',
+        email: 'Xurshid_admin@gmail.com',
+        isAdmin: true
+      }));
+    } else {
+      localStorage.removeItem('prepora_admin_session');
+    }
+  }
+
+  static isAdminLoggedIn(): boolean {
+    if (!this.isClient()) return false;
+    try {
+      const raw = localStorage.getItem('prepora_admin_session');
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      return data && data.role === 'SUPER_ADMIN';
+    } catch {
+      return false;
+    }
+  }
+
+  static logoutAdmin(): void {
+    if (!this.isClient()) return;
+    localStorage.removeItem('prepora_admin_session');
+    localStorage.removeItem('prepora_active_session');
+  }
+
   // --- Real User Accounts Management ---
   static getUsers(): UserAccount[] {
-    if (!this.isClient()) return [];
+    if (!this.isClient()) return INITIAL_USERS;
     try {
       const data = localStorage.getItem('prepora_registered_users');
-      if (data) return JSON.parse(data);
+      if (data) {
+        const parsed: UserAccount[] = JSON.parse(data);
+        if (parsed.length > 0) return parsed;
+      }
+      localStorage.setItem('prepora_registered_users', JSON.stringify(INITIAL_USERS));
+      return INITIAL_USERS;
     } catch (e) {
       console.warn('Failed reading users:', e);
+      return INITIAL_USERS;
     }
-    return [];
+  }
+
+  static saveUsers(users: UserAccount[]): void {
+    if (this.isClient()) {
+      localStorage.setItem('prepora_registered_users', JSON.stringify(users));
+      window.dispatchEvent(new Event('prepora_users_updated'));
+    }
+  }
+
+  static deleteUser(userId: string): UserAccount[] {
+    const users = this.getUsers().filter(u => u.id !== userId);
+    this.saveUsers(users);
+    return users;
+  }
+
+  static toggleUserPro(userId: string): UserAccount[] {
+    const users = this.getUsers().map(u => {
+      if (u.id === userId) {
+        return { ...u, isPro: !u.isPro };
+      }
+      return u;
+    });
+    this.saveUsers(users);
+    return users;
+  }
+
+  static addUser(user: Omit<UserAccount, 'id' | 'createdAt'>): UserAccount[] {
+    const users = this.getUsers();
+    const newUser: UserAccount = {
+      ...user,
+      id: `usr_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      xp: user.xp || 500,
+      lastActive: 'Hozirgina'
+    };
+    users.unshift(newUser);
+    this.saveUsers(users);
+    return users;
   }
 
   static registerUser(fullName: string, email: string, password?: string): UserProfile {
