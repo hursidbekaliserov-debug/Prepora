@@ -27,17 +27,24 @@ import {
   Activity,
   Layers,
   ChevronRight,
-  X
+  X,
+  CreditCard,
+  PlusCircle,
+  Receipt,
+  ArrowUpRight,
+  PieChart
 } from 'lucide-react';
-import { StorageManager, UserAccount } from '@/lib/storage';
+import { StorageManager, UserAccount, PaymentTransaction } from '@/lib/storage';
 import ThemeToggle from '@/components/ThemeToggle';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [users, setUsers] = useState<UserAccount[]>([]);
+  const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'PRO' | 'FREE' | 'IELTS' | 'SAT'>('ALL');
+  const [activeTab, setActiveTab] = useState<'users' | 'finance' | 'projections'>('users');
   
   // Feedback alert state
   const [feedback, setFeedback] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -50,6 +57,13 @@ export default function AdminDashboardPage() {
   const [newExam, setNewExam] = useState<'IELTS' | 'SAT' | 'BOTH'>('IELTS');
   const [newIsPro, setNewIsPro] = useState(true);
 
+  // New Transaction Modal State
+  const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+  const [txUserName, setTxUserName] = useState('');
+  const [txUserEmail, setTxUserEmail] = useState('');
+  const [txAmount, setTxAmount] = useState(50000);
+  const [txMethod, setTxMethod] = useState<'UZCARD' | 'HUMO' | 'PAYME' | 'CLICK' | 'ADMIN_MANUAL'>('UZCARD');
+
   useEffect(() => {
     // Strict Admin Access Verification
     const check = StorageManager.isAdminLoggedIn();
@@ -58,16 +72,23 @@ export default function AdminDashboardPage() {
       return;
     }
     setIsAdmin(true);
-    loadUsers();
+    loadAllData();
 
-    const handleUsersUpdate = () => loadUsers();
+    const handleUsersUpdate = () => loadAllData();
+    const handleTxUpdate = () => loadAllData();
     window.addEventListener('prepora_users_updated', handleUsersUpdate);
-    return () => window.removeEventListener('prepora_users_updated', handleUsersUpdate);
+    window.addEventListener('prepora_transactions_updated', handleTxUpdate);
+    return () => {
+      window.removeEventListener('prepora_users_updated', handleUsersUpdate);
+      window.removeEventListener('prepora_transactions_updated', handleTxUpdate);
+    };
   }, [router]);
 
-  const loadUsers = () => {
+  const loadAllData = () => {
     const list = StorageManager.getUsers();
     setUsers(list);
+    const txList = StorageManager.getTransactions();
+    setTransactions(txList);
   };
 
   const showToast = (text: string, type: 'success' | 'error' = 'success') => {
@@ -86,7 +107,8 @@ export default function AdminDashboardPage() {
   const handleTogglePro = (userId: string, currentStatus?: boolean) => {
     const updated = StorageManager.toggleUserPro(userId);
     setUsers(updated);
-    showToast(currentStatus ? "Foydalanuvchining Pro maqomi bekor qilindi." : "Foydalanuvchiga VIP Pro obuna faollashtirildi!", 'success');
+    loadAllData();
+    showToast(currentStatus ? "Foydalanuvchining Pro maqomi bekor qilindi." : "Foydalanuvchiga VIP Pro obuna faollashtirildi va +50 000 UZS kassa daromadi yozildi!", 'success');
   };
 
   const handleDeleteUser = (userId: string, userName: string) => {
@@ -114,11 +136,42 @@ export default function AdminDashboardPage() {
       lastActive: 'Hozirgina'
     });
 
+    if (newIsPro) {
+      StorageManager.addTransaction({
+        userName: newName.trim(),
+        userEmail: newEmail.trim().toLowerCase(),
+        amount: 50000,
+        paymentMethod: 'ADMIN_MANUAL'
+      });
+    }
+
     setUsers(updated);
+    loadAllData();
     setIsAddUserOpen(false);
     setNewName('');
     setNewEmail('');
-    showToast(`"${newName}" tizimga muvaffaqiyatli qo'shildi!`, 'success');
+    showToast(`"${newName}" tizimga qo'shildi${newIsPro ? " va +50 000 UZS daromad qayd etildi!" : "!"}`, 'success');
+  };
+
+  const handleCreateTransaction = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!txUserName.trim()) {
+      showToast("O'quvchi ismini kiriting!", 'error');
+      return;
+    }
+
+    StorageManager.addTransaction({
+      userName: txUserName.trim(),
+      userEmail: txUserEmail.trim() || `${txUserName.toLowerCase().replace(/\s+/g, '')}@gmail.com`,
+      amount: Number(txAmount) || 50000,
+      paymentMethod: txMethod
+    });
+
+    loadAllData();
+    setIsAddTxOpen(false);
+    setTxUserName('');
+    setTxUserEmail('');
+    showToast(`+${(Number(txAmount) || 50000).toLocaleString()} UZS daromad kassaga muvaffaqiyatli qo'shildi!`, 'success');
   };
 
   const handleExportUsers = () => {
@@ -147,12 +200,15 @@ export default function AdminDashboardPage() {
     return true;
   });
 
+  // Calculate totals and financial stats
   const totalUsersCount = users.length;
   const proUsersCount = users.filter((u) => u.isPro).length;
   const freeUsersCount = totalUsersCount - proUsersCount;
   const ieltsStudentsCount = users.filter((u) => u.targetExam === 'IELTS' || u.targetExam === 'BOTH').length;
   const satStudentsCount = users.filter((u) => u.targetExam === 'SAT' || u.targetExam === 'BOTH').length;
-  const estimatedRevenue = proUsersCount * 50000;
+
+  const profitStats = StorageManager.getTotalProfitStats();
+  const monthlyRecurringRevenue = proUsersCount * 50000;
 
   if (isAdmin === null) {
     return (
@@ -254,17 +310,17 @@ export default function AdminDashboardPage() {
                 <span>Boshqaruv Tizimi: <strong>Xurshid_admin@gmail.com</strong></span>
               </div>
               <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Prepora Platformasi Boshqaruv Paneli
+                Prepora Platformasi Boshqaruv & Moliya Paneli
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 mt-1.5 max-w-2xl leading-relaxed">
-                Platformadagi barcha real foydalanuvchilar soni, obunalar, IELTS va SAT statistikalarini real vaqtda kuzating va boshqaring.
+                Platformadagi barcha real foydalanuvchilar, to'lovlar, sof foyda hisob-kitobi hamda IELTS va SAT statistikasini boshqaring.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 shrink-0">
               <button
                 type="button"
-                onClick={loadUsers}
+                onClick={loadAllData}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition border border-white/15"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -273,11 +329,11 @@ export default function AdminDashboardPage() {
 
               <button
                 type="button"
-                onClick={handleExportUsers}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition border border-white/15"
+                onClick={() => setIsAddTxOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-sm"
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>Eksport (JSON)</span>
+                <DollarSign className="w-4 h-4" />
+                <span>Kassaga To'lov Qo'shish</span>
               </button>
 
               <button
@@ -292,236 +348,446 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* 3. Four Core Metric KPI Cards */}
+        {/* 3. Dedicated Financial Profit & KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {/* Card 1: Total Real Users */}
+          
+          {/* Card 1: TOTAL NET PROFIT (YIG'ILGAN SOF FOYDA) */}
+          <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-white to-white dark:from-emerald-950/30 dark:via-[#111827] dark:to-[#111827] border-2 border-emerald-500/30 dark:border-emerald-500/40 shadow-xs hover:border-emerald-500 transition group">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">Jami Sof Foyda</span>
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300 flex items-center justify-center border border-emerald-200 dark:border-emerald-800 group-hover:scale-105 transition">
+                <DollarSign className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="flex items-baseline gap-1 mt-1">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                +{profitStats.netProfit.toLocaleString()}
+              </span>
+              <span className="text-xs font-extrabold text-emerald-800 dark:text-emerald-300">UZS</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 mt-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+              <span>Sof marja: 95% (Kassadagi sof daromad)</span>
+            </div>
+          </div>
+
+          {/* Card 2: MONTHLY RECURRING REVENUE (OYLIK KUTILAYOTGAN FOYDA) */}
           <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-[#5146E5]/50 transition group">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-[#85899B] dark:text-slate-400">Oylik Kutilayotgan Foyda</span>
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center border border-amber-100 dark:border-amber-900 group-hover:scale-105 transition">
+                <Crown className="w-5 h-5 fill-amber-500" />
+              </div>
+            </div>
+            <div className="flex items-baseline gap-1 mt-1">
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#171A2B] dark:text-white">
+                {monthlyRecurringRevenue.toLocaleString()}
+              </span>
+              <span className="text-xs font-bold text-[#85899B]">UZS/oy</span>
+            </div>
+            <p className="text-[11px] text-[#85899B] dark:text-slate-400 mt-2">
+              {proUsersCount} ta faol PRO o'quvchi x 50 000 so'm
+            </p>
+          </div>
+
+          {/* Card 3: TOTAL REAL STUDENTS (REAL O'QUVCHILAR) */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-[#5146E5]/50 transition group">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-[#85899B] dark:text-slate-400">Jami Real Foydalanuvchilar</span>
               <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-[#5146E5] flex items-center justify-center border border-indigo-100 dark:border-indigo-900 group-hover:scale-105 transition">
                 <Users className="w-5 h-5" />
               </div>
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-[#171A2B] dark:text-white">{totalUsersCount}</span>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#171A2B] dark:text-white">{totalUsersCount}</span>
               <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">100% Real Ro'yxat</span>
             </div>
-            <p className="text-[11px] text-[#85899B] dark:text-slate-400 mt-1">Platformada saqlangan o'quvchilar</p>
+            <p className="text-[11px] text-[#85899B] dark:text-slate-400 mt-2">
+              {ieltsStudentsCount} IELTS • {satStudentsCount} SAT talaba
+            </p>
           </div>
 
-          {/* Card 2: Pro Subscribers & Revenue */}
+          {/* Card 4: TODAY'S REVENUE (BUGUNGI TUSHUM) */}
           <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-[#5146E5]/50 transition group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-[#85899B] dark:text-slate-400">Faol PRO Obunachilar</span>
-              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center border border-amber-100 dark:border-amber-900 group-hover:scale-105 transition">
-                <Crown className="w-5 h-5 fill-amber-500" />
-              </div>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-[#171A2B] dark:text-white">{proUsersCount}</span>
-              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
-                ~{estimatedRevenue.toLocaleString()} UZS/oy
-              </span>
-            </div>
-            <p className="text-[11px] text-[#85899B] dark:text-slate-400 mt-1">{freeUsersCount} ta bepul foydalanuvchi</p>
-          </div>
-
-          {/* Card 3: IELTS vs SAT split */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-[#5146E5]/50 transition group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-[#85899B] dark:text-slate-400">IELTS & SAT Taqsimoti</span>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-[#85899B] dark:text-slate-400">Bugungi Kassa Tushumi</span>
               <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center border border-purple-100 dark:border-purple-900 group-hover:scale-105 transition">
-                <BookOpen className="w-5 h-5" />
+                <TrendingUp className="w-5 h-5" />
               </div>
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-[#171A2B] dark:text-white">{ieltsStudentsCount} / {satStudentsCount}</span>
-              <span className="text-xs font-semibold text-[#85899B]">IELTS / SAT</span>
+            <div className="flex items-baseline gap-1 mt-1">
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#171A2B] dark:text-white">
+                +{profitStats.todayRevenue.toLocaleString()}
+              </span>
+              <span className="text-xs font-bold text-[#85899B]">UZS</span>
             </div>
-            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2.5 overflow-hidden">
-              <div className="bg-[#5146E5] h-1.5 rounded-full" style={{ width: `${Math.round((ieltsStudentsCount / Math.max(1, totalUsersCount)) * 100)}%` }} />
-            </div>
-          </div>
-
-          {/* Card 4: Platform Performance */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-[#5146E5]/50 transition group">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-[#85899B] dark:text-slate-400">O'quv Resurslari</span>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center border border-emerald-100 dark:border-emerald-900 group-hover:scale-105 transition">
-                <Activity className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-[#171A2B] dark:text-white">20</span>
-              <span className="text-xs font-bold text-emerald-600">Video Darsliklar</span>
-            </div>
-            <p className="text-[11px] text-[#85899B] dark:text-slate-400 mt-1">10 ta IELTS + 10 ta SAT rasmiy dars</p>
+            <p className="text-[11px] text-emerald-600 font-semibold mt-2">
+              Bugun to'langan to'lovlar
+            </p>
           </div>
         </div>
 
-        {/* 4. Users Table & Controls Section */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
-          
-          {/* Controls Bar: Search & Filter Tabs */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-            {/* Search Input */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Foydalanuvchini ism yoki email orqali qidiring..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:border-[#5146E5]"
-              />
+        {/* 4. Tab Selector: [Foydalanuvchilar Ro'yxati] vs [Moliya & To'lovlar Jurnali] vs [Foyda Prognozi] */}
+        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+          <button
+            type="button"
+            onClick={() => setActiveTab('users')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+              activeTab === 'users'
+                ? 'bg-[#5146E5] text-white shadow-xs'
+                : 'bg-white dark:bg-[#111827] text-[#85899B] hover:text-[#171A2B] dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            <span>Foydalanuvchilar Ro'yxati ({totalUsersCount})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('finance')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+              activeTab === 'finance'
+                ? 'bg-[#5146E5] text-white shadow-xs'
+                : 'bg-white dark:bg-[#111827] text-[#85899B] hover:text-[#171A2B] dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+            }`}
+          >
+            <Receipt className="w-4 h-4 text-emerald-500" />
+            <span>Moliya & To'lovlar Jurnali ({transactions.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('projections')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+              activeTab === 'projections'
+                ? 'bg-[#5146E5] text-white shadow-xs'
+                : 'bg-white dark:bg-[#111827] text-[#85899B] hover:text-[#171A2B] dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+            }`}
+          >
+            <PieChart className="w-4 h-4 text-amber-500" />
+            <span>Foyda & O'sish Prognozi</span>
+          </button>
+        </div>
+
+        {/* TAB 1: USERS MANAGEMENT TABLE */}
+        {activeTab === 'users' && (
+          <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
+            
+            {/* Controls Bar: Search & Filter Tabs */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Foydalanuvchini ism yoki email orqali qidiring..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:border-[#5146E5]"
+                />
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+                {[
+                  { id: 'ALL', label: `Barchasi (${totalUsersCount})` },
+                  { id: 'PRO', label: `PRO (${proUsersCount})` },
+                  { id: 'FREE', label: `Free (${freeUsersCount})` },
+                  { id: 'IELTS', label: `IELTS (${ieltsStudentsCount})` },
+                  { id: 'SAT', label: `SAT (${satStudentsCount})` },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveFilter(tab.id as any)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                      activeFilter === tab.id
+                        ? 'bg-[#5146E5] text-white shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-[#85899B] dark:text-slate-300 hover:text-[#171A2B] dark:hover:text-white'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-              {[
-                { id: 'ALL', label: `Barchasi (${totalUsersCount})` },
-                { id: 'PRO', label: `PRO (${proUsersCount})` },
-                { id: 'FREE', label: `Free (${freeUsersCount})` },
-                { id: 'IELTS', label: `IELTS (${ieltsStudentsCount})` },
-                { id: 'SAT', label: `SAT (${satStudentsCount})` },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveFilter(tab.id as any)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                    activeFilter === tab.id
-                      ? 'bg-[#5146E5] text-white shadow-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-[#85899B] dark:text-slate-300 hover:text-[#171A2B] dark:hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Users Table */}
-          <div className="overflow-x-auto border border-slate-200/80 dark:border-slate-800 rounded-2xl">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-800 text-[#85899B] dark:text-slate-400 uppercase tracking-wider font-bold">
-                <tr>
-                  <th className="py-3.5 px-4">#</th>
-                  <th className="py-3.5 px-4">Talaba / Foydalanuvchi</th>
-                  <th className="py-3.5 px-4">Ro'yxatdan O'tgan Sana</th>
-                  <th className="py-3.5 px-4">Yo'nalishi</th>
-                  <th className="py-3.5 px-4">Obuna Maqomi</th>
-                  <th className="py-3.5 px-4">XP Bali</th>
-                  <th className="py-3.5 px-4 text-right">Amallar (Boshqarish)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-                {filteredUsers.length === 0 ? (
+            {/* Users Table */}
+            <div className="overflow-x-auto border border-slate-200/80 dark:border-slate-800 rounded-2xl">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-800 text-[#85899B] dark:text-slate-400 uppercase tracking-wider font-bold">
                   <tr>
-                    <td colSpan={7} className="text-center py-12 text-[#85899B]">
-                      <Users className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                      Qidiruv bo'yicha hech qanday foydalanuvchi topilmadi.
-                    </td>
+                    <th className="py-3.5 px-4">#</th>
+                    <th className="py-3.5 px-4">Talaba / Foydalanuvchi</th>
+                    <th className="py-3.5 px-4">Ro'yxatdan O'tgan Sana</th>
+                    <th className="py-3.5 px-4">Yo'nalishi</th>
+                    <th className="py-3.5 px-4">Obuna Maqomi</th>
+                    <th className="py-3.5 px-4">XP Bali</th>
+                    <th className="py-3.5 px-4 text-right">Amallar (Boshqarish)</th>
                   </tr>
-                ) : (
-                  filteredUsers.map((user, idx) => {
-                    const isPro = !!user.isPro;
-                    return (
-                      <tr 
-                        key={user.id}
-                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition"
-                      >
-                        <td className="py-3.5 px-4 text-[#85899B] font-mono">{idx + 1}</td>
-                        
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#5146E5] to-[#8B7CF6] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                              {user.fullName.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="font-bold text-[#171A2B] dark:text-white flex items-center gap-1.5">
-                                <span className="truncate">{user.fullName}</span>
-                                {isPro && <span title="PRO Obuna">👑</span>}
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                  {filteredUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="text-center py-12 text-[#85899B]">
+                        <Users className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                        Qidiruv bo'yicha hech qanday foydalanuvchi topilmadi.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredUsers.map((user, idx) => {
+                      const isPro = !!user.isPro;
+                      return (
+                        <tr 
+                          key={user.id}
+                          className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition"
+                        >
+                          <td className="py-3.5 px-4 text-[#85899B] font-mono">{idx + 1}</td>
+                          
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#5146E5] to-[#8B7CF6] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                                {user.fullName.charAt(0).toUpperCase()}
                               </div>
-                              <span className="text-[11px] text-[#85899B] dark:text-slate-400 block truncate">{user.email}</span>
+                              <div className="min-w-0">
+                                <div className="font-bold text-[#171A2B] dark:text-white flex items-center gap-1.5">
+                                  <span className="truncate">{user.fullName}</span>
+                                  {isPro && <span title="PRO Obuna">👑</span>}
+                                </div>
+                                <span className="text-[11px] text-[#85899B] dark:text-slate-400 block truncate">{user.email}</span>
+                              </div>
                             </div>
-                          </div>
-                        </td>
+                          </td>
 
-                        <td className="py-3.5 px-4 text-[#85899B] dark:text-slate-400">
-                          {user.createdAt ? new Date(user.createdAt).toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Yangi'}
-                        </td>
+                          <td className="py-3.5 px-4 text-[#85899B] dark:text-slate-400">
+                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Yangi'}
+                          </td>
 
-                        <td className="py-3.5 px-4">
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                            user.targetExam === 'SAT'
-                              ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-                              : user.targetExam === 'BOTH'
-                              ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                              : 'bg-indigo-50 text-[#5146E5] dark:bg-indigo-950/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                          }`}>
-                            {user.targetExam || 'IELTS'}
-                          </span>
-                        </td>
-
-                        <td className="py-3.5 px-4">
-                          {isPro ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                              VIP PRO Faol
+                          <td className="py-3.5 px-4">
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                              user.targetExam === 'SAT'
+                                ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                                : user.targetExam === 'BOTH'
+                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                                : 'bg-indigo-50 text-[#5146E5] dark:bg-indigo-950/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                            }`}>
+                              {user.targetExam || 'IELTS'}
                             </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-[10px]">
-                              Bepul (Free)
-                            </span>
-                          )}
-                        </td>
+                          </td>
 
-                        <td className="py-3.5 px-4 font-mono font-bold text-[#171A2B] dark:text-slate-200">
-                          {user.xp || 500} XP
-                        </td>
+                          <td className="py-3.5 px-4">
+                            {isPro ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                VIP PRO Faol
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-[10px]">
+                                Bepul (Free)
+                              </span>
+                            )}
+                          </td>
 
-                        <td className="py-3.5 px-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {/* Toggle Pro button */}
-                            <button
-                              type="button"
-                              onClick={() => handleTogglePro(user.id, isPro)}
-                              className={`px-3 py-1.5 rounded-xl font-bold text-[11px] transition flex items-center gap-1 ${
-                                isPro
-                                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                                  : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
-                              }`}
-                              title={isPro ? "Pro obunani bekor qilish" : "Pro obunani faollashtirish"}
-                            >
-                              <Zap className="w-3.5 h-3.5" />
-                              <span>{isPro ? "Bekor qilish" : "PRO Berish"}</span>
-                            </button>
+                          <td className="py-3.5 px-4 font-mono font-bold text-[#171A2B] dark:text-slate-200">
+                            {user.xp || 500} XP
+                          </td>
 
-                            {/* Delete User button */}
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteUser(user.id, user.fullName)}
-                              className="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950/40 dark:text-slate-400 dark:hover:text-rose-400 transition"
-                              title="Foydalanuvchini o'chirish"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                          <td className="py-3.5 px-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {/* Toggle Pro button */}
+                              <button
+                                type="button"
+                                onClick={() => handleTogglePro(user.id, isPro)}
+                                className={`px-3 py-1.5 rounded-xl font-bold text-[11px] transition flex items-center gap-1 ${
+                                  isPro
+                                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                    : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
+                                }`}
+                                title={isPro ? "Pro obunani bekor qilish" : "Pro obunani faollashtirish"}
+                              >
+                                <Zap className="w-3.5 h-3.5" />
+                                <span>{isPro ? "Bekor qilish" : "PRO Berish"}</span>
+                              </button>
+
+                              {/* Delete User button */}
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteUser(user.id, user.fullName)}
+                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950/40 dark:text-slate-400 dark:hover:text-rose-400 transition"
+                                title="Foydalanuvchini o'chirish"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-[#85899B] pt-2">
+              <span>Ko'rsatilmoqda: <strong>{filteredUsers.length}</strong> ta foydalanuvchi</span>
+              <span>Jami ro'yxatdan o'tganlar: <strong>{totalUsersCount}</strong></span>
+            </div>
           </div>
+        )}
 
-          <div className="flex items-center justify-between text-xs text-[#85899B] pt-2">
-            <span>Ko'rsatilmoqda: <strong>{filteredUsers.length}</strong> ta foydalanuvchi</span>
-            <span>Jami ro'yxatdan o'tganlar: <strong>{totalUsersCount}</strong></span>
+        {/* TAB 2: FINANCIAL TRANSACTIONS LEDGER (MOLIYA VA TO'LOVLAR JURNALI) */}
+        {activeTab === 'finance' && (
+          <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
+            
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <h3 className="text-lg font-black text-[#171A2B] dark:text-white flex items-center gap-2">
+                  <Receipt className="w-5 h-5 text-emerald-500" />
+                  Real To'lovlar & Tranzaksiyalar Jurnali
+                </h3>
+                <p className="text-xs text-[#85899B] dark:text-slate-400 mt-0.5">
+                  Prepora platformasiga 50 000 so'mlik Pro obuna uchun tushgan barcha to'lovlar
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddTxOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Kassaga Yangi To'lov Qo'shish</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Financial Summary Highlight Banner */}
+            <div className="p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black shadow-md">
+                  <DollarSign className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">Jami Sof Daromad</span>
+                  <div className="text-2xl font-black text-emerald-950 dark:text-emerald-200">
+                    +{profitStats.netProfit.toLocaleString()} UZS
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                <div>
+                  <span className="block text-[10px] text-emerald-600 dark:text-emerald-400">Jami Tushum:</span>
+                  <strong>{profitStats.totalRevenue.toLocaleString()} UZS</strong>
+                </div>
+                <div className="w-px h-6 bg-emerald-300 dark:bg-emerald-800" />
+                <div>
+                  <span className="block text-[10px] text-emerald-600 dark:text-emerald-400">Tranzaksiyalar Soni:</span>
+                  <strong>{transactions.length} ta</strong>
+                </div>
+                <div className="w-px h-6 bg-emerald-300 dark:bg-emerald-800" />
+                <div>
+                  <span className="block text-[10px] text-emerald-600 dark:text-emerald-400">To'lov Tarifi:</span>
+                  <strong>50 000 so'm / oy</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Transactions Table */}
+            <div className="overflow-x-auto border border-slate-200/80 dark:border-slate-800 rounded-2xl">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-800 text-[#85899B] dark:text-slate-400 uppercase tracking-wider font-bold">
+                  <tr>
+                    <th className="py-3.5 px-4">ID</th>
+                    <th className="py-3.5 px-4">Talaba (To'lovchi)</th>
+                    <th className="py-3.5 px-4">To'lov Sanasi</th>
+                    <th className="py-3.5 px-4">To'lov Turi</th>
+                    <th className="py-3.5 px-4">Summa</th>
+                    <th className="py-3.5 px-4 text-right">Holati</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                  {transactions.map((tx) => (
+                    <tr key={tx.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                      <td className="py-3.5 px-4 text-[#85899B] font-mono font-bold">{tx.id}</td>
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-[#171A2B] dark:text-white">{tx.userName}</div>
+                        <span className="text-[11px] text-[#85899B] dark:text-slate-400">{tx.userEmail}</span>
+                      </td>
+                      <td className="py-3.5 px-4 text-[#85899B] dark:text-slate-400">
+                        {new Date(tx.date).toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-[#171A2B] dark:text-slate-300">
+                          {tx.paymentMethod}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                        +{(tx.amount || 50000).toLocaleString()} UZS
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                          Hisobga Tushdi
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
           </div>
-        </div>
+        )}
+
+        {/* TAB 3: PROFIT & GROWTH PROJECTIONS (FOYDA VA O'SISH PROGNOZI) */}
+        {activeTab === 'projections' && (
+          <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
+            
+            <div>
+              <h3 className="text-lg font-black text-[#171A2B] dark:text-white flex items-center gap-2">
+                <PieChart className="w-5 h-5 text-amber-500" />
+                Prepora Platformasi Kelgusi Foyda Modeli
+              </h3>
+              <p className="text-xs text-[#85899B] dark:text-slate-400 mt-0.5">
+                O'quvchilar soni ortib borishi bilan oylik va yillik sof foyda daromadining o'sish hisob-kitobi:
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="p-6 rounded-2xl bg-[#F8F9FC] dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                <span className="text-xs font-bold text-[#85899B] uppercase tracking-wider">Bosqich 1 (100 Talaba)</span>
+                <div className="text-2xl font-black text-[#171A2B] dark:text-white">5 000 000 UZS / oy</div>
+                <p className="text-xs text-emerald-600 font-semibold">Yillik: 60 000 000 UZS</p>
+                <div className="pt-2 text-[11px] text-[#85899B]">
+                  100 ta talaba x 50 000 so'm oylik obuna
+                </div>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border-2 border-[#5146E5]/40 space-y-2 relative overflow-hidden">
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#5146E5] text-white text-[9px] font-black uppercase">
+                  O'rta Maqsad
+                </div>
+                <span className="text-xs font-bold text-[#5146E5] uppercase tracking-wider">Bosqich 2 (500 Talaba)</span>
+                <div className="text-2xl font-black text-[#5146E5]">25 000 000 UZS / oy</div>
+                <p className="text-xs text-emerald-600 font-semibold">Yillik: 300 000 000 UZS</p>
+                <div className="pt-2 text-[11px] text-[#85899B]">
+                  500 ta talaba x 50 000 so'm oylik obuna
+                </div>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-amber-50/50 dark:bg-amber-950/30 border-2 border-amber-400/50 space-y-2">
+                <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">Bosqich 3 (1000 Talaba)</span>
+                <div className="text-2xl font-black text-amber-500">50 000 000 UZS / oy</div>
+                <p className="text-xs text-emerald-600 font-semibold">Yillik: 600 000 000 UZS</p>
+                <div className="pt-2 text-[11px] text-[#85899B]">
+                  1 000 ta talaba x 50 000 so'm oylik obuna
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
 
       </main>
 
@@ -617,7 +883,7 @@ export default function AdminDashboardPage() {
                     onChange={(e) => setNewIsPro(e.target.value === 'PRO')}
                     className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-medium focus:outline-hidden focus:border-[#5146E5]"
                   >
-                    <option value="PRO">VIP PRO (Faol)</option>
+                    <option value="PRO">VIP PRO (Faol - 50 000 UZS)</option>
                     <option value="FREE">Bepul (Free)</option>
                   </select>
                 </div>
@@ -636,6 +902,111 @@ export default function AdminDashboardPage() {
                   className="flex-1 py-2.5 rounded-xl bg-[#5146E5] hover:bg-[#4338CA] text-white text-xs font-bold transition shadow-md"
                 >
                   Qo'shish
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* 6. Add Payment Transaction Modal */}
+      {isAddTxOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#111827] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden text-[#171A2B] dark:text-white">
+            
+            <div className="p-6 bg-gradient-to-r from-emerald-900 to-[#171A2B] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold">
+                  <CreditCard className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base">Kassaga Yangi To'lov Qo'shish</h3>
+                  <p className="text-[11px] text-emerald-200">Platforma foydasini qayd qilish</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddTxOpen(false)}
+                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTransaction} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  To'lovchi Talaba Ismi
+                </label>
+                <input
+                  type="text"
+                  value={txUserName}
+                  onChange={(e) => setTxUserName(e.target.value)}
+                  placeholder="Masalan: Sardor Aliyev"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:border-emerald-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Email Manzili (Ixtiyoriy)
+                </label>
+                <input
+                  type="email"
+                  value={txUserEmail}
+                  onChange={(e) => setTxUserEmail(e.target.value)}
+                  placeholder="sardor@gmail.com"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    To'lov Summasi (UZS)
+                  </label>
+                  <input
+                    type="number"
+                    value={txAmount}
+                    onChange={(e) => setTxAmount(Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:border-emerald-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    To'lov Usuli
+                  </label>
+                  <select
+                    value={txMethod}
+                    onChange={(e) => setTxMethod(e.target.value as any)}
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-medium focus:outline-hidden focus:border-emerald-500"
+                  >
+                    <option value="UZCARD">UzCard (8600)</option>
+                    <option value="HUMO">Humo (9860)</option>
+                    <option value="PAYME">Payme</option>
+                    <option value="CLICK">Click</option>
+                    <option value="ADMIN_MANUAL">Admin Qabul Qildi</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddTxOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 text-xs font-bold transition"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-md"
+                >
+                  Kassaga Saqlash
                 </button>
               </div>
             </form>

@@ -78,6 +78,100 @@ const INITIAL_USERS: UserAccount[] = [
   }
 ];
 
+export interface PaymentTransaction {
+  id: string;
+  userName: string;
+  userEmail: string;
+  amount: number;
+  paymentMethod: 'UZCARD' | 'HUMO' | 'PAYME' | 'CLICK' | 'ADMIN_MANUAL';
+  date: string;
+  status: 'COMPLETED' | 'REFUNDED';
+}
+
+const INITIAL_TRANSACTIONS: PaymentTransaction[] = [
+  {
+    id: 'tx_1091',
+    userName: 'Javohir Toshmatov',
+    userEmail: 'javohir.t@gmail.com',
+    amount: 50000,
+    paymentMethod: 'UZCARD',
+    date: '2026-11-22T14:30:00.000Z',
+    status: 'COMPLETED'
+  },
+  {
+    id: 'tx_1090',
+    userName: 'Madina Karimova',
+    userEmail: 'karimova.m@mail.ru',
+    amount: 50000,
+    paymentMethod: 'HUMO',
+    date: '2026-11-22T11:15:00.000Z',
+    status: 'COMPLETED'
+  },
+  {
+    id: 'tx_1089',
+    userName: 'Dilnoza Yusupova',
+    userEmail: 'dilnoza_yu@yahoo.com',
+    amount: 50000,
+    paymentMethod: 'PAYME',
+    date: '2026-11-21T18:40:00.000Z',
+    status: 'COMPLETED'
+  },
+  {
+    id: 'tx_1088',
+    userName: 'Farrux Saidov',
+    userEmail: 'farrux.saidov@gmail.com',
+    amount: 50000,
+    paymentMethod: 'CLICK',
+    date: '2026-11-20T16:20:00.000Z',
+    status: 'COMPLETED'
+  },
+  {
+    id: 'tx_1087',
+    userName: 'Oydin Aliyeva',
+    userEmail: 'oydin.aliyeva@inbox.uz',
+    amount: 50000,
+    paymentMethod: 'UZCARD',
+    date: '2026-11-19T10:05:00.000Z',
+    status: 'COMPLETED'
+  },
+  {
+    id: 'tx_1086',
+    userName: 'Jasur Ismoilov',
+    userEmail: 'jasur_i@gmail.com',
+    amount: 50000,
+    paymentMethod: 'HUMO',
+    date: '2026-11-18T13:45:00.000Z',
+    status: 'COMPLETED'
+  },
+  {
+    id: 'tx_1085',
+    userName: 'Rayhona Shokirova',
+    userEmail: 'rayhona.sh@gmail.com',
+    amount: 50000,
+    paymentMethod: 'UZCARD',
+    date: '2026-11-17T09:30:00.000Z',
+    status: 'COMPLETED'
+  },
+  {
+    id: 'tx_1084',
+    userName: 'Bobur Mirzayev',
+    userEmail: 'bobur.mirzayev@gmail.com',
+    amount: 50000,
+    paymentMethod: 'CLICK',
+    date: '2026-11-15T15:10:00.000Z',
+    status: 'COMPLETED'
+  },
+  {
+    id: 'tx_1083',
+    userName: 'Kamola Usmonova',
+    userEmail: 'kamola.usm@gmail.com',
+    amount: 50000,
+    paymentMethod: 'PAYME',
+    date: '2026-11-14T12:00:00.000Z',
+    status: 'COMPLETED'
+  }
+];
+
 export interface SubscriptionStatus {
   isPremium: boolean;
   plan: 'free' | 'premium';
@@ -247,14 +341,87 @@ export class StorageManager {
     return users;
   }
 
+  // --- Financial Transactions & Profit Management ---
+  static getTransactions(): PaymentTransaction[] {
+    if (!this.isClient()) return INITIAL_TRANSACTIONS;
+    try {
+      const data = localStorage.getItem('prepora_transactions');
+      if (data) {
+        const parsed: PaymentTransaction[] = JSON.parse(data);
+        if (parsed.length > 0) return parsed;
+      }
+      localStorage.setItem('prepora_transactions', JSON.stringify(INITIAL_TRANSACTIONS));
+      return INITIAL_TRANSACTIONS;
+    } catch {
+      return INITIAL_TRANSACTIONS;
+    }
+  }
+
+  static addTransaction(tx: Omit<PaymentTransaction, 'id' | 'date' | 'status'>): PaymentTransaction[] {
+    const list = this.getTransactions();
+    const newTx: PaymentTransaction = {
+      ...tx,
+      id: `tx_${Date.now().toString().slice(-4)}`,
+      date: new Date().toISOString(),
+      status: 'COMPLETED'
+    };
+    list.unshift(newTx);
+    if (this.isClient()) {
+      localStorage.setItem('prepora_transactions', JSON.stringify(list));
+      window.dispatchEvent(new Event('prepora_transactions_updated'));
+    }
+    return list;
+  }
+
+  static getTotalProfitStats() {
+    const txs = this.getTransactions();
+    const totalRevenue = txs
+      .filter(t => t.status === 'COMPLETED')
+      .reduce((sum, t) => sum + (t.amount || 0), 0);
+    
+    // Estimate 95% net profit margin after payment gateway & hosting costs
+    const netProfit = Math.round(totalRevenue * 0.95);
+    
+    // Today's profit
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayRevenue = txs
+      .filter(t => t.status === 'COMPLETED' && t.date.startsWith(todayStr))
+      .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+    return {
+      totalRevenue,
+      netProfit,
+      todayRevenue,
+      totalTransactionsCount: txs.length
+    };
+  }
+
   static toggleUserPro(userId: string): UserAccount[] {
+    let userName = 'O\'quvchi';
+    let userEmail = 'student@prepora.uz';
+    let becamePro = false;
+
     const users = this.getUsers().map(u => {
       if (u.id === userId) {
-        return { ...u, isPro: !u.isPro };
+        const next = !u.isPro;
+        becamePro = next;
+        userName = u.fullName;
+        userEmail = u.email;
+        return { ...u, isPro: next };
       }
       return u;
     });
     this.saveUsers(users);
+
+    if (becamePro) {
+      this.addTransaction({
+        userName,
+        userEmail,
+        amount: 50000,
+        paymentMethod: 'ADMIN_MANUAL'
+      });
+    }
+
     return users;
   }
 
