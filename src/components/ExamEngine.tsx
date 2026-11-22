@@ -408,7 +408,7 @@ export default function ExamEngine({
       <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 sm:px-6 h-16 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-4">
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-wider text-blue-950 font-bold">Prepora • {exam}</span>
+            <span className="text-xs uppercase tracking-wider text-blue-950 font-bold">Nine16 • {exam}</span>
             <span className="text-sm font-black text-slate-900 truncate max-w-[200px] sm:max-w-md">{title}</span>
           </div>
           <span className="hidden sm:inline px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">

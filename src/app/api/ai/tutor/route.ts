@@ -25,7 +25,7 @@ export async function POST(req: Request) {
                   role: 'user',
                   parts: [
                     {
-                      text: `You are an elite, encouraging AI tutor for Prepora specializing in IELTS (Academic & General Training) and the SAT.
+                      text: `You are an elite, encouraging AI tutor for Nine16 specializing in IELTS (Academic & General Training) and the SAT.
 The student is preparing for: "${examContext || 'IELTS & SAT'}".
 Student Question: "${trimmed}"
 
@@ -68,7 +68,7 @@ Instructions:
       lower.includes('qandaysiz') || lower === 'hi' || lower === 'hello' || lower === 'hey' ||
       lower.includes('privet') || lower.includes('zdravstvuyte')
     ) {
-      reply = `**Assalomu alaykum! Prepora AI shaxsiy repetitoriga xush kelibsiz.**\n\nMen sizga quyidagi yo'nalishlarda 24/7 yordam bera olaman:\n- **IELTS Speaking**: Jonli suhbat, Part 1, 2, 3 strategiyalari va C1/C2 so'zlar.\n- **IELTS Writing**: Task 1 (grafik tahlili) va Task 2 (insho) 4 paragrafli strukturasi va Band 8+ iboralar.\n- **IELTS Reading & Listening**: True/False/Not Given, Headings va tezkor audio belgilash usullari.\n- **SAT Math**: Desmos formulalari, kvadrat tenglamalar, parabola cho'qqisi va geometriya sirlari.\n- **SAT Reading & Writing**: Kontekstdagi so'zlar (Words in Context), tinish belgilari va transition so'zlar.\n\nSiz hozir qaysi mavzu yoki qaysi bo'lim bo'yicha mashq qilmoqchisiz?`;
+      reply = `**Assalomu alaykum! Nine16 AI shaxsiy repetitoriga xush kelibsiz.**\n\nMen sizga quyidagi yo'nalishlarda 24/7 yordam bera olaman:\n- **IELTS Speaking**: Jonli suhbat, Part 1, 2, 3 strategiyalari va C1/C2 so'zlar.\n- **IELTS Writing**: Task 1 (grafik tahlili) va Task 2 (insho) 4 paragrafli strukturasi va Band 8+ iboralar.\n- **IELTS Reading & Listening**: True/False/Not Given, Headings va tezkor audio belgilash usullari.\n- **SAT Math**: Desmos formulalari, kvadrat tenglamalar, parabola cho'qqisi va geometriya sirlari.\n- **SAT Reading & Writing**: Kontekstdagi so'zlar (Words in Context), tinish belgilari va transition so'zlar.\n\nSiz hozir qaysi mavzu yoki qaysi bo'lim bo'yicha mashq qilmoqchisiz?`;
     }
     // Score Target questions (e.g. "7 olish", "8 band", "1500 ball", "qanday boshlash kerak")
     else if (
@@ -100,7 +100,7 @@ Instructions:
     }
     // Contextual intelligent breakdown of user query
     else {
-      reply = `Siz so'ragan mavzu bo'yicha tahlil: **"${trimmed}"**\n\nUshbu yo'nalishda eng yuqori natijaga erishish uchun quyidagilarga e'tibor qaratish lozim:\n\n1. **Konseptual tushunish**: Nazariyani yodlamasdan, uning imtihon savollarida qanday formatda uchrashini (Reading/Writing konteksti yoki Math formulalari) amaliyotda ko'ring.\n2. **Kunlik 45 daqiqalik odat**: Haftada 1 marta ko'p dars qilgandan ko'ra, har kuni 45 daqiqa Prepora trenajyorlarida aniq modullarni ishlash miyada neyron bog'lanishlarini 3 barobar mustahkamlaydi.\n3. **Xatolar ustida ishlash**: Noto'g'ri chiqqan har bir savol uchun tushuntirishni sinchiklab o'qib chiqing.\n\nIstalgan paytda aniq bitta savol, insho mavzusi yoki matematika masalasini shu yerga yuborishingiz mumkin — birgalikda yechimini ko'ramiz!`;
+      reply = `Siz so'ragan mavzu bo'yicha tahlil: **"${trimmed}"**\n\nUshbu yo'nalishda eng yuqori natijaga erishish uchun quyidagilarga e'tibor qaratish lozim:\n\n1. **Konseptual tushunish**: Nazariyani yodlamasdan, uning imtihon savollarida qanday formatda uchrashini (Reading/Writing konteksti yoki Math formulalari) amaliyotda ko'ring.\n2. **Kunlik 45 daqiqalik odat**: Haftada 1 marta ko'p dars qilgandan ko'ra, har kuni 45 daqiqa Nine16 trenajyorlarida aniq modullarni ishlash miyada neyron bog'lanishlarini 3 barobar mustahkamlaydi.\n3. **Xatolar ustida ishlash**: Noto'g'ri chiqqan har bir savol uchun tushuntirishni sinchiklab o'qib chiqing.\n\nIstalgan paytda aniq bitta savol, insho mavzusi yoki matematika masalasini shu yerga yuborishingiz mumkin — birgalikda yechimini ko'ramiz!`;
     }
 
     return NextResponse.json({

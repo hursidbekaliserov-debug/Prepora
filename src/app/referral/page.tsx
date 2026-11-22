@@ -70,7 +70,7 @@ export default function ReferralPage() {
 
   const handleTelegramShare = () => {
     const text = encodeURIComponent(
-      `👋 Salom do'stim! IELTS va SAT ga professional tayyorlanish uchun Prepora platformasiga taklif qilaman.\n\n` +
+      `👋 Salom do'stim! IELTS va SAT ga professional tayyorlanish uchun Nine16 platformasiga taklif qilaman.\n\n` +
       `Bu yerda Band 9 AI Tutor, Real-time Speaking suhbatdoshi, Cambridge Mock testlari va Desmos darsliklari bor ekan!\n\n` +
       `Havola orqali ro'yxatdan o't: ${referralUrl}`
     );
@@ -115,7 +115,7 @@ export default function ReferralPage() {
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5146E5]/10 border border-[#5146E5]/20 text-[#5146E5] text-xs font-bold uppercase tracking-wider">
             <Gift className="w-4 h-4 text-[#5146E5]" />
-            <span>Prepora Virallik Dasturi • 10 Ta Do'st = Bepul Pro</span>
+            <span>Nine16 Virallik Dasturi • 10 Ta Do'st = Bepul Pro</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-[#171A2B] tracking-tight leading-tight">
@@ -124,7 +124,7 @@ export default function ReferralPage() {
           </h1>
 
           <p className="text-xs sm:text-sm text-[#85899B] max-w-xl mx-auto leading-relaxed">
-            Do'stlaringiz sizning taklif havolangiz orqali ro'yxatdan o'tishlari kerak. <strong>10 ta do'stingiz ro'yxatdan o'tgach</strong>, 50 000 so'mlik <strong>Prepora Pro</strong> obunasi 1 oyga to'liq bepul ochiladi!
+            Do'stlaringiz sizning taklif havolangiz orqali ro'yxatdan o'tishlari kerak. <strong>10 ta do'stingiz ro'yxatdan o'tgach</strong>, 50 000 so'mlik <strong>Nine16 Pro</strong> obunasi 1 oyga to'liq bepul ochiladi!
           </p>
         </div>
 
@@ -155,7 +155,7 @@ export default function ReferralPage() {
                 <span className="px-2.5 py-0.5 rounded-full bg-[#5146E5] text-white text-[10px] font-black uppercase tracking-wider inline-block mb-1">
                   Muvaffaqiyat!
                 </span>
-                <h3 className="text-xl font-black">Prepora Pro Faollashtirildi!</h3>
+                <h3 className="text-xl font-black">Nine16 Pro Faollashtirildi!</h3>
                 <p className="text-xs text-slate-300">
                   10 ta do'stingiz ro'yxatdan o'tdi va to'liq tasdiqlandi. Barcha testlar va video darsliklar 1 oy bepul ochildi!
                 </p>

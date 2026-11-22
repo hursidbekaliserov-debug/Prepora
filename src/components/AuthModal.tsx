@@ -121,11 +121,11 @@ export default function AuthModal({
 
           {/* 3D Brand Logo */}
           <div className="w-14 h-14 mx-auto mb-2.5 flex items-center justify-center">
-            <img src="/logo.png" alt="Prepora Logo" className="w-14 h-14 object-contain drop-shadow-md" />
+            <img src="/logo.png" alt="Nine16 Logo" className="w-14 h-14 object-contain drop-shadow-md rounded-2xl" />
           </div>
 
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">
-            {title || (mode === 'register' ? "Prepora'da Ro'yxatdan O'tish" : "Tizimga Kirish")}
+            {title || (mode === 'register' ? "Nine16'da Ro'yxatdan O'tish" : "Tizimga Kirish")}
           </h2>
           <p className="text-xs text-slate-300 mt-1 max-w-xs mx-auto leading-relaxed">
             {subtitle || "IELTS va Digital SAT darsliklari, testlar va AI ustozidan foydalanish uchun hisobingizga kiring."}

@@ -261,7 +261,7 @@ export default function ArenaPage() {
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-900 text-xs font-black uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            <span>Prepora Arena • O'yinlar & Mukofotlar</span>
+            <span>Nine16 Arena • O'yinlar & Mukofotlar</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-blue-950 tracking-tight">

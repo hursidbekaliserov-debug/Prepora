@@ -162,7 +162,7 @@ export default function Avatar3DRenderer({
             />
             {/* Collar Accent */}
             <path d="M 88 132 Q 100 144 112 132 Z" fill="#ea4c89" />
-            <text x="100" y="165" textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="900">PREPORA</text>
+            <text x="100" y="165" textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="900">NINE16</text>
           </g>
         )}
 

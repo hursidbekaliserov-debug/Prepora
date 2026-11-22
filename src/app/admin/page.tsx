@@ -92,7 +92,14 @@ export default function AdminDashboardPage() {
 
   const loadAllData = async () => {
     try {
-      const res = await fetch('/api/admin/users').then(r => r.json()).catch(() => null);
+      const res = await fetch(`/api/admin/users?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      }).then(r => r.json()).catch(() => null);
+
       if (res && res.success) {
         if (Array.isArray(res.users)) {
           setUsers(res.users);
@@ -302,12 +309,12 @@ export default function AdminDashboardPage() {
             <Link href="/" className="flex items-center gap-2.5 group" title="Bosh sahifaga o'tish">
               <img
                 src="/logo.png"
-                alt="Prepora"
+                alt="Nine16"
                 className="w-9 h-9 object-contain rounded-xl shrink-0 group-hover:scale-105 transition-transform"
               />
               <div className="flex items-baseline">
                 <span className="text-xl font-black tracking-tight text-[#171A2B] dark:text-white leading-none">
-                  Prepora<span className="text-[#5146E5]">.</span>
+                  Nine16<span className="text-[#5146E5]">.</span>
                 </span>
               </div>
             </Link>
@@ -383,7 +390,7 @@ export default function AdminDashboardPage() {
                 <span>Boshqaruv Tizimi: <strong>Xurshid_admin@gmail.com</strong></span>
               </div>
               <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Prepora Platformasi Boshqaruv & Moliya Paneli
+                Nine16 Platformasi Boshqaruv & Moliya Paneli
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 mt-1.5 max-w-2xl leading-relaxed">
                 Platformadagi barcha real foydalanuvchilar, to'lovlar, sof foyda hisob-kitobi hamda IELTS va SAT statistikasini boshqaring.
@@ -721,7 +728,7 @@ export default function AdminDashboardPage() {
                   Real To'lovlar & Tranzaksiyalar Jurnali
                 </h3>
                 <p className="text-xs text-[#85899B] dark:text-slate-400 mt-0.5">
-                  Prepora platformasiga 50 000 so'mlik Pro obuna uchun tushgan barcha to'lovlar
+                  Nine16 platformasiga 50 000 so'mlik Pro obuna uchun tushgan barcha to'lovlar
                 </p>
               </div>
 
@@ -845,7 +852,7 @@ export default function AdminDashboardPage() {
             <div>
               <h3 className="text-lg font-black text-[#171A2B] dark:text-white flex items-center gap-2">
                 <PieChart className="w-5 h-5 text-amber-500" />
-                Prepora Platformasi Kelgusi Foyda Modeli
+                Nine16 Platformasi Kelgusi Foyda Modeli
               </h3>
               <p className="text-xs text-[#85899B] dark:text-slate-400 mt-0.5">
                 O'quvchilar soni ortib borishi bilan oylik va yillik sof foyda daromadining o'sish hisob-kitobi:

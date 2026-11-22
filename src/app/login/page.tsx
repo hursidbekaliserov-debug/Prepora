@@ -66,10 +66,10 @@ export default function LoginPage() {
           <Link href="/" className="inline-flex items-center gap-2.5 mb-3 group">
             <img 
               src="/logo.png" 
-              alt="Prepora" 
+              alt="Nine16" 
               className="w-11 h-11 object-contain rounded-2xl group-hover:scale-105 transition-transform" 
             />
-            <span className="text-2xl font-black text-[#171A2B] dark:text-white tracking-tight">Prepora<span className="text-[#5146E5]">.</span></span>
+            <span className="text-2xl font-black text-[#171A2B] dark:text-white tracking-tight">Nine16<span className="text-[#5146E5]">.</span></span>
           </Link>
           <h1 className="text-xl font-extrabold text-[#171A2B] dark:text-white">Kirish / Sign In</h1>
           <p className="text-xs text-[#85899B] mt-1">

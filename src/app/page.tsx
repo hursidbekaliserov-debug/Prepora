@@ -56,8 +56,8 @@ export default function LandingPage() {
 
   const FAQS = [
     {
-      q: "Prepora platformasi nima va u qanday imtihonlarga tayyorlaydi?",
-      a: "Prepora — xalqaro IELTS va Digital SAT imtihonlariga eng yuqori darajada tayyorlanish uchun mo'ljallangan zamonaviy intellektual platforma. Bizda Cambridge formatidagi to'liq mock imtihonlar, Desmos kalkulyatorli SAT darslari, sun'iy intellekt asosidagi Voice Speaking va insho tekshiruvchi modullar jamlangan."
+      q: "Nine16 platformasi nima va u qanday imtihonlarga tayyorlaydi?",
+      a: "Nine16 — xalqaro IELTS va Digital SAT imtihonlariga eng yuqori darajada tayyorlanish uchun mo'ljallangan zamonaviy intellektual platforma. Bizda Cambridge formatidagi to'liq mock imtihonlar, Desmos kalkulyatorli SAT darslari, sun'iy intellekt asosidagi Voice Speaking va insho tekshiruvchi modullar jamlangan."
     },
     {
       q: "Voice AI Speaking qanday ishlaydi?",
@@ -65,15 +65,15 @@ export default function LandingPage() {
     },
     {
       q: "Bepul foydalanish imkoniyati bormi?",
-      a: "Ha! Har bir yangi o'quvchi uchun mock testlar, kundalik bepul video darsliklar, lug'at va so'z kartochkalari ochiq. Shuningdek, 10 ta do'stingizni taklif qilib, 1 oylik to'liq Prepora Pro obunasini mutlaqo bepul qo'lga kiritishingiz mumkin."
+      a: "Ha! Har bir yangi o'quvchi uchun mock testlar, kundalik bepul video darsliklar, lug'at va so'z kartochkalari ochiq. Shuningdek, 10 ta do'stingizni taklif qilib, 1 oylik to'liq Nine16 Pro obunasini mutlaqo bepul qo'lga kiritishingiz mumkin."
     },
     {
-      q: "Prepora Pro obunasi qancha va unga nimalar kiradi?",
-      a: "Prepora Pro obunasi oyiga atigi 50 000 so'm. Unga cheksiz barcha 20 ta video masterclasslar, cheksiz AI Tutor savollari, to'liq Cambridge va Digital SAT mock testlari hamda VIP status kiradi."
+      q: "Nine16 Pro obunasi qancha va unga nimalar kiradi?",
+      a: "Nine16 Pro obunasi oyiga atigi 50 000 so'm. Unga cheksiz barcha 20 ta video masterclasslar, cheksiz AI Tutor savollari, to'liq Cambridge va Digital SAT mock testlari hamda VIP status kiradi."
     },
     {
       q: "Platformadan telefonda yoki planshetda foydalanish mumkinmi?",
-      a: "Albatta! Prepora to'liq responsiv bo'lib, mobil telefon, planshet, noutbuk va kompyuterlarda yuqori tezlikda hamda qulay ishlaydi."
+      a: "Albatta! Nine16 to'liq responsiv bo'lib, mobil telefon, planshet, noutbuk va kompyuterlarda yuqori tezlikda hamda qulay ishlaydi."
     }
   ];
 
@@ -84,7 +84,7 @@ export default function LandingPage() {
       score: "Band 8.5",
       university: "Admitted to University of Oxford",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
-      comment: "Prepora'ning Voice AI Speaking moduli meni imtihon oldidagi barcha hayajonimni yo'qotdi. Imtihondan roppa-rosa 8.5 oldim!"
+      comment: "Nine16'ning Voice AI Speaking moduli meni imtihon oldidagi barcha hayajonimni yo'qotdi. Imtihondan roppa-rosa 8.5 oldim!"
     },
     {
       name: "Madina Karimova",
@@ -173,7 +173,7 @@ export default function LandingPage() {
                     <span className="w-3 h-3 rounded-full bg-rose-400" />
                     <span className="w-3 h-3 rounded-full bg-amber-400" />
                     <span className="w-3 h-3 rounded-full bg-emerald-400" />
-                    <span className="ml-2 text-xs font-mono font-bold text-[#85899B]">prepora.app/dashboard</span>
+                    <span className="ml-2 text-xs font-mono font-bold text-[#85899B]">nine16.uz/dashboard</span>
                   </div>
 
                   {/* Switcher */}
@@ -404,7 +404,7 @@ export default function LandingPage() {
                 Imkoniyatlar
               </span>
               <h2 className="text-3xl sm:text-4xl font-black text-[#171A2B] tracking-tight">
-                Nima Uchun Prepora Boshqalardan Ustun?
+                Nima Uchun Nine16 Boshqalardan Ustun?
               </h2>
               <p className="text-sm text-[#85899B]">
                 Faqat kitob o'qish emas, balki sun'iy intellekt va faol o'yin elementlari bilan natijaga kafolat.
@@ -516,7 +516,7 @@ export default function LandingPage() {
                 Muvaffaqiyatli Talabalar Fikrlari
               </h2>
               <p className="text-sm text-[#85899B]">
-                Prepora orqali o'z maqsadiga erishgan o'zbekistonlik talabalar haqiqiy natijalari.
+                Nine16 orqali o'z maqsadiga erishgan o'zbekistonlik talabalar haqiqiy natijalari.
               </p>
             </div>
 
@@ -623,14 +623,14 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
             <div className="col-span-2 space-y-3">
               <div className="flex items-center gap-2.5">
-                <img src="/logo.png" alt="Prepora" className="w-8 h-8 object-contain rounded-lg" />
-                <span className="text-base font-black text-[#171A2B]">Prepora<span className="text-[#5146E5]">.</span></span>
+                <img src="/logo.png" alt="Nine16" className="w-8 h-8 object-contain rounded-lg" />
+                <span className="text-base font-black text-[#171A2B]">Nine16<span className="text-[#5146E5]">.</span></span>
               </div>
               <p className="text-xs text-[#85899B] max-w-sm leading-relaxed">
                 IELTS va Digital SAT imtihonlariga xalqaro standartda tayyorlovchi zamonaviy sun'iy intellekt ta'lim platformasi.
               </p>
               <div className="text-[11px] text-[#85899B]">
-                © {new Date().getFullYear()} Prepora Academy. Barcha huquqlar himoyalangan.
+                © {new Date().getFullYear()} Nine16 Academy. Barcha huquqlar himoyalangan.
               </div>
             </div>
 

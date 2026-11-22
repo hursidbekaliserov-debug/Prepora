@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import GlobalAuthGate from "@/components/GlobalAuthGate";
 import TelegramWebAppInit from "@/components/TelegramWebAppInit";
 
 export const metadata: Metadata = {
-  title: "Prepora — Complete IELTS & SAT Preparation Platform",
-  description: "Prepora is an AI-powered education platform for IELTS Academic, General Training, and the SAT with interactive testing, AI evaluation, and full mock exams.",
+  title: "Nine16 — Complete IELTS & SAT Preparation Platform",
+  description: "Nine16 is an AI-powered education platform for IELTS Academic, General Training, and the SAT with interactive testing, AI evaluation, and full mock exams.",
 };
 
 export default function RootLayout({
@@ -41,6 +42,7 @@ export default function RootLayout({
         <GlobalAuthGate />
         <TelegramWebAppInit />
         {children}
+        <Analytics />
       </body>
     </html>
   );

@@ -135,7 +135,7 @@ export default function IeltsHubPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#5146E5]/10 border border-[#5146E5]/20 text-[#5146E5] text-xs font-bold mb-3">
               <Award className="w-4 h-4 text-[#5146E5]" />
-              Rasmiy Prepora Band 9.0 Dasturi
+              Rasmiy Nine16 Band 9.0 Dasturi
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#171A2B] tracking-tight">
               IELTS Tayyorgarlik Markazi
@@ -205,7 +205,7 @@ export default function IeltsHubPage() {
             </div>
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Prepora IELTS Voice AI Examiner
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Nine16 IELTS Voice AI Examiner
               </div>
               <h3 className="text-lg sm:text-xl font-extrabold text-[#171A2B]">
                 Britaniya yoki Amerika Ovozli AI Imtihon Oluvchisi Bilan Suhbatlashing!

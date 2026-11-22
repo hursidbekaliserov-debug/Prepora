@@ -92,7 +92,7 @@ export default function OnboardingPage() {
       },
       {
         id: 'task-init-3',
-        title: 'Prepora AI Tutor Diagnostic Consultation',
+        title: 'Nine16 AI Tutor Diagnostic Consultation',
         exam: targetExam === 'SAT' ? 'SAT' : 'IELTS',
         skill: 'Tutoring',
         estimatedMinutes: 15,
@@ -134,7 +134,7 @@ export default function OnboardingPage() {
           <div>
             <h1 className="text-2xl font-black text-blue-950 mb-2">Qaysi Imtihonga Tayyorlanyapsiz?</h1>
             <p className="text-xs text-slate-500 mb-6">
-              Prepora sizning tanlovingizga qarab shaxsiy topshiriqlar va AI tavsiyalarini tayyorlaydi.
+              Nine16 sizning tanlovingizga qarab shaxsiy topshiriqlar va AI tavsiyalarini tayyorlaydi.
             </p>
 
             <div className="space-y-3 mb-6">
@@ -333,7 +333,7 @@ export default function OnboardingPage() {
           <div>
             <h1 className="text-2xl font-black text-blue-950 mb-2">Qaysi Mavzularda Yordam Kerak?</h1>
             <p className="text-xs text-slate-500 mb-6">
-              O'zingizga qiyin bo'lgan mavzularni tanlang; Prepora ularga ustuvorlik beradi.
+              O'zingizga qiyin bo'lgan mavzularni tanlang; Nine16 ularga ustuvorlik beradi.
             </p>
 
             <div className="flex flex-wrap gap-2.5 mb-8">

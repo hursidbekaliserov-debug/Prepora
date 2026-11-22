@@ -274,7 +274,7 @@ export default function SettingsPage() {
                 Profil Rasmi (Sayt Nomi Oldida Ko'rinadi)
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                O'zingiz xohlagan rasmni yuklang. Ushbu rasm darhol sayt logotipi (Prepora) oldida va profilingizda aks etadi!
+                O'zingiz xohlagan rasmni yuklang. Ushbu rasm darhol sayt logotipi (Nine16) oldida va profilingizda aks etadi!
               </p>
             </div>
           </div>
@@ -368,7 +368,7 @@ export default function SettingsPage() {
                     </div>
                   )}
                   <div>
-                    <span className="text-sm font-black text-blue-950 leading-none block">Prepora</span>
+                    <span className="text-sm font-black text-blue-950 leading-none block">Nine16</span>
                     <span className="text-[8px] uppercase tracking-widest text-slate-400 font-bold">IELTS & SAT</span>
                   </div>
                 </div>
@@ -430,7 +430,7 @@ export default function SettingsPage() {
                 </div>
                 <h4 className="text-sm font-black text-blue-950">Faqat Premium Foydalanuvchilar Uchun</h4>
                 <p className="text-xs text-slate-600 max-w-md mt-1">
-                  VIP maxsus stikerlarni faqat <strong>Prepora Premium</strong> obunachilari ismining yoniga qo'ya oladi.
+                  VIP maxsus stikerlarni faqat <strong>Nine16 Premium</strong> obunachilari ismining yoniga qo'ya oladi.
                 </p>
                 <div className="mt-3 flex items-center gap-2">
                   <Link
@@ -629,7 +629,7 @@ export default function SettingsPage() {
                     🎩 {profile?.avatarConfig?.headwear === 'crown' ? 'Shohona Toj' : profile?.avatarConfig?.headwear === 'grad_cap' ? 'Garvard Shapkasi' : profile?.avatarConfig?.headwear === 'headphones' ? 'Kiber Quloqchin' : profile?.avatarConfig?.headwear === 'cap' ? 'Kepka' : 'Bosh kiyimsiz'}
                   </span>
                   <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white text-[10px] font-bold border border-white/15">
-                    👕 {profile?.avatarConfig?.outfit === 'suit' ? 'Oxford Kostyum' : profile?.avatarConfig?.outfit === 'hoodie' ? 'Cambridge Xudi' : profile?.avatarConfig?.outfit === 'cyber_jacket' ? 'Cyberpunk Bomber' : 'Prepora T-Shirt'}
+                    👕 {profile?.avatarConfig?.outfit === 'suit' ? 'Oxford Kostyum' : profile?.avatarConfig?.outfit === 'hoodie' ? 'Cambridge Xudi' : profile?.avatarConfig?.outfit === 'cyber_jacket' ? 'Cyberpunk Bomber' : 'Nine16 T-Shirt'}
                   </span>
                   <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white text-[10px] font-bold border border-white/15">
                     👓 {profile?.avatarConfig?.glasses === 'vr_visor' ? 'VR Vizor' : profile?.avatarConfig?.glasses === 'smart_glasses' ? 'Garvard Ko\'zoynak' : profile?.avatarConfig?.glasses === 'sunglasses' ? 'VIP Ko\'zoynak' : 'Ko\'zoynaksiz'}

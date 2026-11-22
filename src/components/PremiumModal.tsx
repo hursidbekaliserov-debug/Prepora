@@ -271,7 +271,7 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
           <div className="flex items-center gap-2 mb-1.5">
             <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border border-amber-400/30">
               <Crown className="w-3 h-3 text-amber-400 fill-amber-400" />
-              Prepora Pro Obunasi
+              Nine16 Pro Obunasi
             </span>
             <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
               50 000 So'm / Oy
@@ -286,7 +286,7 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
             {reason === 'chat_limit' && "Bugungi 5 ta bepul AI muloqot limitingiz tugadi."}
             {reason === 'test_limit' && "Bugungi 2 ta bepul test limitingiz tugadi."}
             {reason === 'video_limit' && "Bugungi 1 ta bepul video darslik limitingiz tugadi."}
-            {reason === 'general' && "Prepora platformasida to'liq cheksiz tayyorgarlik ko'ring."}
+            {reason === 'general' && "Nine16 platformasida to'liq cheksiz tayyorgarlik ko'ring."}
             {" "}Pul to'g'ridan-to'g'ri rasmiy kartaga o'tkaziladi.
           </p>
 
@@ -336,7 +336,7 @@ export default function PremiumModal({ isOpen, onClose, reason = 'general' }: Pr
               </div>
               <h3 className="text-xl font-black text-emerald-950">To'lov Muvaffaqiyatli Tasdiqlandi!</h3>
               <p className="text-xs text-emerald-800">
-                Tabriklaymiz! Telegram admin to'lov cheki skrinshotini tekshirib tasdiqladi. Prepora Pro obunasi hisobingizga muvaffaqiyatli yoqildi.
+                Tabriklaymiz! Telegram admin to'lov cheki skrinshotini tekshirib tasdiqladi. Nine16 Pro obunasi hisobingizga muvaffaqiyatli yoqildi.
               </p>
               {successCode && (
                 <div className="p-2.5 bg-white rounded-xl border border-emerald-200 font-mono text-xs text-emerald-950 font-bold inline-block">

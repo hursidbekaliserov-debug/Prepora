@@ -540,7 +540,7 @@ export default function StudentDashboard() {
               <div className="w-10 h-10 rounded-xl bg-[#5146E5] text-white flex items-center justify-center mb-4 shadow-sm">
                 <Sparkles className="w-5 h-5 text-amber-300" />
               </div>
-              <h4 className="text-base font-extrabold text-white mb-1.5">Prepora AI Ustoz</h4>
+              <h4 className="text-base font-extrabold text-white mb-1.5">Nine16 AI Ustoz</h4>
               <p className="text-xs text-slate-300 mb-5 leading-relaxed">
                 Tushunarsiz formulalar, IELTS insho xatolari yoki SAT masalalarini 24/7 AI orqali so'rang.
               </p>

@@ -35,7 +35,7 @@ export default function PricingPage() {
   const faqs = [
     {
       q: "50 000 so'mlik Premium obunaga nimalar kiradi?",
-      a: "Prepora Premium bilan siz platformadagi barcha imkoniyatlardan mutlaqo bezlimit (cheksiz) foydalanasiz: Voice AI bilan cheksiz ovozli suhbat, 24/7 AI repetitor, to'liq 98 savollik SAT va 4 ko'nikmali IELTS mock testlari hamda insholarni Cambridge mezonlari bo'yicha tekshirish."
+      a: "Nine16 Premium bilan siz platformadagi barcha imkoniyatlardan mutlaqo bezlimit (cheksiz) foydalanasiz: Voice AI bilan cheksiz ovozli suhbat, 24/7 AI repetitor, to'liq 98 savollik SAT va 4 ko'nikmali IELTS mock testlari hamda insholarni Cambridge mezonlari bo'yicha tekshirish."
     },
     {
       q: "Bepul tarifda qanday cheklovlar bor?",
@@ -61,7 +61,7 @@ export default function PricingPage() {
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-950 text-xs font-extrabold shadow-xs">
             <Crown className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span>Prepora Obuna & Tarif Rejalari</span>
+            <span>Nine16 Obuna & Tarif Rejalari</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-blue-950 tracking-tight">
@@ -86,7 +86,7 @@ export default function PricingPage() {
               </div>
               <div>
                 <span className="text-xs font-black text-amber-900 uppercase tracking-wider block">Faol Obuna</span>
-                <h3 className="text-lg font-black text-blue-950">Sizda Prepora Premium (Bezlimit) Faol!</h3>
+                <h3 className="text-lg font-black text-blue-950">Sizda Nine16 Premium (Bezlimit) Faol!</h3>
                 <p className="text-xs text-slate-600">Barcha IELTS & SAT modullari va AI suhbatlari cheksiz ishlamoqda.</p>
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function PricingPage() {
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-950 text-xs font-black uppercase tracking-wider flex items-center gap-1">
                   <Crown className="w-3.5 h-3.5 fill-amber-700 text-amber-700" />
-                  Prepora Premium
+                  Nine16 Premium
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
                   100% Bezlimit

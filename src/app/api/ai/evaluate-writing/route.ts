@@ -141,7 +141,7 @@ Return ONLY valid JSON matching this exact structure:
     return NextResponse.json({
       feedback,
       isRealAi: false,
-      note: 'Evaluated using Prepora certified rubric engine. Configure GEMINI_API_KEY for dynamic generative analysis.',
+      note: 'Evaluated using Nine16 certified rubric engine. Configure GEMINI_API_KEY for dynamic generative analysis.',
       wordCount,
     });
   } catch (error) {

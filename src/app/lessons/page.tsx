@@ -363,7 +363,7 @@ export default function LessonsPage() {
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#5146E5]/10 border border-[#5146E5]/20 text-[#5146E5] text-xs font-bold mb-2">
               <Video className="w-3.5 h-3.5" />
-              <span>Prepora Video Masterclasslar • 20 Ta Rasmiy Dars</span>
+              <span>Nine16 Video Masterclasslar • 20 Ta Rasmiy Dars</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-black text-[#171A2B] tracking-tight">
               IELTS va SAT Video Darsliklari
@@ -452,7 +452,7 @@ export default function LessonsPage() {
                       onClick={() => setIsPremiumModalOpen(true)}
                       className="px-5 py-2.5 rounded-full bg-[#5146E5] hover:bg-[#4338CA] text-white text-xs font-bold transition shadow-md"
                     >
-                      Prepora Pro ni Ochish (50 000 so'm)
+                      Nine16 Pro ni Ochish (50 000 so'm)
                     </button>
                     <Link
                       href="/referral"

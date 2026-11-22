@@ -79,15 +79,44 @@ async function fetchFromTelegramCloud(): Promise<ServerStoreData | null> {
 async function syncToTelegramCloud(data: ServerStoreData): Promise<void> {
   try {
     const payload = JSON.stringify(data);
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
+    const chatRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${ADMIN_CHAT_ID}`, {
+      cache: 'no-store'
+    });
+    const chatData = await chatRes.json();
+    const msgId = chatData.ok && chatData.result?.pinned_message?.message_id ? chatData.result.pinned_message.message_id : PINNED_MSG_ID;
+
+    const editRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: ADMIN_CHAT_ID,
-        message_id: PINNED_MSG_ID,
+        message_id: msgId,
         text: payload
       })
     });
+    const editData = await editRes.json();
+    if (!editData.ok && editData.description && !editData.description.includes('not modified')) {
+      // If editing failed, send a new message and pin it automatically
+      const sendRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: ADMIN_CHAT_ID,
+          text: payload
+        })
+      });
+      const sendData = await sendRes.json();
+      if (sendData.ok && sendData.result?.message_id) {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/pinChatMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: ADMIN_CHAT_ID,
+            message_id: sendData.result.message_id
+          })
+        });
+      }
+    }
   } catch (err) {
     console.warn('Telegram Cloud DB save error:', err);
   }
@@ -110,8 +139,8 @@ export async function sendTelegramAdminAlert(message: string): Promise<void> {
 
 export async function loadServerStoreAsync(): Promise<ServerStoreData> {
   const now = Date.now();
-  // Cache in-memory for 4 seconds before re-fetching from cloud
-  if (global.__prepora_master_store && global.__prepora_last_cloud_fetch && now - global.__prepora_last_cloud_fetch < 4000) {
+  // Cache in-memory for 1.5 seconds before re-fetching from cloud
+  if (global.__prepora_master_store && global.__prepora_last_cloud_fetch && now - global.__prepora_last_cloud_fetch < 1500) {
     return global.__prepora_master_store;
   }
 
@@ -211,7 +240,7 @@ export async function addOrUpdateServerUser(user: Partial<UserAccount> & { fullN
 
     // Send instant alert to admin Telegram
     sendTelegramAdminAlert(
-      `🔔 <b>YANGI TALABA RO'YXATDAN O'TDI!</b>\n\n` +
+      `🔔 <b>YANGI NINE16 TALABASI RO'YXATDAN O'TDI!</b>\n\n` +
       `👤 <b>Ism:</b> ${updatedUser.fullName}\n` +
       `📧 <b>Email:</b> <code>${updatedUser.email}</code>\n` +
       `🎯 <b>Yo'nalish:</b> ${updatedUser.targetExam}\n` +

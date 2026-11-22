@@ -32,7 +32,7 @@ export default function AiTutorPage() {
     {
       id: 'init-msg',
       sender: 'assistant',
-      text: `Salom! Men **Prepora AI** shaxsiy o'quv murabbiyingizman.
+      text: `Salom! Men **Nine16 AI** shaxsiy o'quv murabbiyingizman.
 
 Men quyidagi yo'nalishlarda yordam bera olaman:
 - **IELTS Writing**: Task 1 diagramma va Task 2 insho tuzilishi, Band 8+ jumlalar.
@@ -142,7 +142,7 @@ Bugun qaysi mavzuni birgalikda o'rganamiz?`,
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-base font-black text-blue-950">Prepora AI Tutor</h1>
+              <h1 className="text-base font-black text-blue-950">Nine16 AI Tutor</h1>
               <p className="text-xs text-slate-500 font-medium">IELTS & Digital SAT Aqlli Yordamchisi</p>
             </div>
           </div>

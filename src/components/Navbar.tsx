@@ -99,17 +99,17 @@ export default function Navbar() {
       <header className="sticky top-0 z-40 w-full border-b border-[#E5E7EB] dark:border-slate-800 bg-[#F8F9FC]/90 dark:bg-[#0B0F19]/90 backdrop-blur-md transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           
-          {/* Brand: Prepora with 3D Graduation Ribbon Cap Logo */}
+          {/* Brand: Nine16 with Gold Medal Arrow Logo */}
           <div className="flex items-center gap-7">
             <Link href="/" className="flex items-center gap-2.5 group">
               <img
                 src="/logo.png"
-                alt="Prepora Logo"
+                alt="Nine16 Logo"
                 className="w-9 h-9 object-contain rounded-xl shrink-0 group-hover:scale-105 transition-transform"
               />
               <div className="flex items-baseline">
                 <span className="text-xl font-black tracking-tight text-[#171A2B] dark:text-white leading-none font-sans">
-                  Prepora<span className="text-[#5146E5] font-black">.</span>
+                  Nine16<span className="text-[#5146E5] font-black">.</span>
                 </span>
               </div>
             </Link>
