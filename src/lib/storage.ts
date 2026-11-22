@@ -15,68 +15,7 @@ export interface UserAccount {
   lastActive?: string;
 }
 
-const INITIAL_USERS: UserAccount[] = [
-  {
-    id: 'usr_1',
-    fullName: 'Javohir Toshmatov',
-    email: 'javohir.t@gmail.com',
-    createdAt: '2026-11-04T10:20:00.000Z',
-    targetExam: 'IELTS',
-    isPro: true,
-    xp: 1450,
-    lastActive: 'Bugun, 15:40'
-  },
-  {
-    id: 'usr_2',
-    fullName: 'Madina Karimova',
-    email: 'karimova.m@mail.ru',
-    createdAt: '2026-11-06T14:15:00.000Z',
-    targetExam: 'SAT',
-    isPro: true,
-    xp: 1820,
-    lastActive: 'Bugun, 12:10'
-  },
-  {
-    id: 'usr_3',
-    fullName: 'Bekzod Rahmonov',
-    email: 'bekzod.rahmonov@gmail.com',
-    createdAt: '2026-11-08T09:00:00.000Z',
-    targetExam: 'IELTS',
-    isPro: false,
-    xp: 620,
-    lastActive: 'Kecha, 19:25'
-  },
-  {
-    id: 'usr_4',
-    fullName: 'Dilnoza Yusupova',
-    email: 'dilnoza_yu@yahoo.com',
-    createdAt: '2026-11-10T16:30:00.000Z',
-    targetExam: 'BOTH',
-    isPro: true,
-    xp: 2100,
-    lastActive: 'Bugun, 14:05'
-  },
-  {
-    id: 'usr_5',
-    fullName: 'Shahzod Olimov',
-    email: 'shahzod.olimov99@gmail.com',
-    createdAt: '2026-11-14T11:45:00.000Z',
-    targetExam: 'SAT',
-    isPro: false,
-    xp: 890,
-    lastActive: '3 kun oldin'
-  },
-  {
-    id: 'usr_6',
-    fullName: 'Sevara Azimova',
-    email: 'sevara.azimova@gmail.com',
-    createdAt: '2026-11-18T08:20:00.000Z',
-    targetExam: 'IELTS',
-    isPro: false,
-    xp: 430,
-    lastActive: 'Bugun, 09:15'
-  }
-];
+const INITIAL_USERS: UserAccount[] = [];
 
 export interface PaymentTransaction {
   id: string;
@@ -88,89 +27,7 @@ export interface PaymentTransaction {
   status: 'COMPLETED' | 'REFUNDED';
 }
 
-const INITIAL_TRANSACTIONS: PaymentTransaction[] = [
-  {
-    id: 'tx_1091',
-    userName: 'Javohir Toshmatov',
-    userEmail: 'javohir.t@gmail.com',
-    amount: 50000,
-    paymentMethod: 'UZCARD',
-    date: '2026-11-22T14:30:00.000Z',
-    status: 'COMPLETED'
-  },
-  {
-    id: 'tx_1090',
-    userName: 'Madina Karimova',
-    userEmail: 'karimova.m@mail.ru',
-    amount: 50000,
-    paymentMethod: 'HUMO',
-    date: '2026-11-22T11:15:00.000Z',
-    status: 'COMPLETED'
-  },
-  {
-    id: 'tx_1089',
-    userName: 'Dilnoza Yusupova',
-    userEmail: 'dilnoza_yu@yahoo.com',
-    amount: 50000,
-    paymentMethod: 'PAYME',
-    date: '2026-11-21T18:40:00.000Z',
-    status: 'COMPLETED'
-  },
-  {
-    id: 'tx_1088',
-    userName: 'Farrux Saidov',
-    userEmail: 'farrux.saidov@gmail.com',
-    amount: 50000,
-    paymentMethod: 'CLICK',
-    date: '2026-11-20T16:20:00.000Z',
-    status: 'COMPLETED'
-  },
-  {
-    id: 'tx_1087',
-    userName: 'Oydin Aliyeva',
-    userEmail: 'oydin.aliyeva@inbox.uz',
-    amount: 50000,
-    paymentMethod: 'UZCARD',
-    date: '2026-11-19T10:05:00.000Z',
-    status: 'COMPLETED'
-  },
-  {
-    id: 'tx_1086',
-    userName: 'Jasur Ismoilov',
-    userEmail: 'jasur_i@gmail.com',
-    amount: 50000,
-    paymentMethod: 'HUMO',
-    date: '2026-11-18T13:45:00.000Z',
-    status: 'COMPLETED'
-  },
-  {
-    id: 'tx_1085',
-    userName: 'Rayhona Shokirova',
-    userEmail: 'rayhona.sh@gmail.com',
-    amount: 50000,
-    paymentMethod: 'UZCARD',
-    date: '2026-11-17T09:30:00.000Z',
-    status: 'COMPLETED'
-  },
-  {
-    id: 'tx_1084',
-    userName: 'Bobur Mirzayev',
-    userEmail: 'bobur.mirzayev@gmail.com',
-    amount: 50000,
-    paymentMethod: 'CLICK',
-    date: '2026-11-15T15:10:00.000Z',
-    status: 'COMPLETED'
-  },
-  {
-    id: 'tx_1083',
-    userName: 'Kamola Usmonova',
-    userEmail: 'kamola.usm@gmail.com',
-    amount: 50000,
-    paymentMethod: 'PAYME',
-    date: '2026-11-14T12:00:00.000Z',
-    status: 'COMPLETED'
-  }
-];
+const INITIAL_TRANSACTIONS: PaymentTransaction[] = [];
 
 export interface SubscriptionStatus {
   isPremium: boolean;
@@ -313,18 +170,22 @@ export class StorageManager {
 
   // --- Real User Accounts Management ---
   static getUsers(): UserAccount[] {
-    if (!this.isClient()) return INITIAL_USERS;
+    if (!this.isClient()) return [];
     try {
       const data = localStorage.getItem('prepora_registered_users');
       if (data) {
         const parsed: UserAccount[] = JSON.parse(data);
-        if (parsed.length > 0) return parsed;
+        // Filter out legacy dummy mock users (usr_1, usr_2, etc.)
+        const realUsers = parsed.filter(u => !u.id.match(/^usr_[1-6]$/));
+        if (realUsers.length !== parsed.length) {
+          localStorage.setItem('prepora_registered_users', JSON.stringify(realUsers));
+        }
+        return realUsers;
       }
-      localStorage.setItem('prepora_registered_users', JSON.stringify(INITIAL_USERS));
-      return INITIAL_USERS;
+      return [];
     } catch (e) {
       console.warn('Failed reading users:', e);
-      return INITIAL_USERS;
+      return [];
     }
   }
 
@@ -338,22 +199,35 @@ export class StorageManager {
   static deleteUser(userId: string): UserAccount[] {
     const users = this.getUsers().filter(u => u.id !== userId);
     this.saveUsers(users);
+
+    if (this.isClient()) {
+      fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', userId })
+      }).catch(err => console.warn('Server user delete sync error:', err));
+    }
+
     return users;
   }
 
   // --- Financial Transactions & Profit Management ---
   static getTransactions(): PaymentTransaction[] {
-    if (!this.isClient()) return INITIAL_TRANSACTIONS;
+    if (!this.isClient()) return [];
     try {
       const data = localStorage.getItem('prepora_transactions');
       if (data) {
         const parsed: PaymentTransaction[] = JSON.parse(data);
-        if (parsed.length > 0) return parsed;
+        // Filter out legacy dummy demo transactions
+        const realTx = parsed.filter(t => !t.id.match(/^tx_108[3-9]$/) && !t.id.match(/^tx_109[0-1]$/));
+        if (realTx.length !== parsed.length) {
+          localStorage.setItem('prepora_transactions', JSON.stringify(realTx));
+        }
+        return realTx;
       }
-      localStorage.setItem('prepora_transactions', JSON.stringify(INITIAL_TRANSACTIONS));
-      return INITIAL_TRANSACTIONS;
+      return [];
     } catch {
-      return INITIAL_TRANSACTIONS;
+      return [];
     }
   }
 
@@ -361,7 +235,7 @@ export class StorageManager {
     const list = this.getTransactions();
     const newTx: PaymentTransaction = {
       ...tx,
-      id: `tx_${Date.now().toString().slice(-4)}`,
+      id: `tx_${Date.now().toString().slice(-6)}`,
       date: new Date().toISOString(),
       status: 'COMPLETED'
     };
@@ -369,6 +243,12 @@ export class StorageManager {
     if (this.isClient()) {
       localStorage.setItem('prepora_transactions', JSON.stringify(list));
       window.dispatchEvent(new Event('prepora_transactions_updated'));
+
+      fetch('/api/admin/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tx)
+      }).catch(err => console.warn('Failed sync transaction to server:', err));
     }
     return list;
   }
@@ -379,8 +259,8 @@ export class StorageManager {
       .filter(t => t.status === 'COMPLETED')
       .reduce((sum, t) => sum + (t.amount || 0), 0);
     
-    // Estimate 95% net profit margin after payment gateway & hosting costs
-    const netProfit = Math.round(totalRevenue * 0.95);
+    // 95% net profit margin after costs (or 0 if no revenue)
+    const netProfit = totalRevenue > 0 ? Math.round(totalRevenue * 0.95) : 0;
     
     // Today's profit
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -397,7 +277,7 @@ export class StorageManager {
   }
 
   static toggleUserPro(userId: string): UserAccount[] {
-    let userName = 'O\'quvchi';
+    let userName = "O'quvchi";
     let userEmail = 'student@prepora.uz';
     let becamePro = false;
 
@@ -412,6 +292,14 @@ export class StorageManager {
       return u;
     });
     this.saveUsers(users);
+
+    if (this.isClient()) {
+      fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'togglePro', userId })
+      }).catch(err => console.warn('Server togglePro sync error:', err));
+    }
 
     if (becamePro) {
       this.addTransaction({
@@ -429,31 +317,63 @@ export class StorageManager {
     const users = this.getUsers();
     const newUser: UserAccount = {
       ...user,
-      id: `usr_${Date.now()}`,
+      id: `usr_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       createdAt: new Date().toISOString(),
       xp: user.xp || 500,
       lastActive: 'Hozirgina'
     };
     users.unshift(newUser);
     this.saveUsers(users);
+
+    if (this.isClient()) {
+      fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'add',
+          ...user
+        })
+      }).catch(err => console.warn('Server user add sync error:', err));
+    }
+
     return users;
   }
 
-  static registerUser(fullName: string, email: string, password?: string): UserProfile {
+  static registerUser(fullName: string, email: string, password?: string, targetExam: 'IELTS' | 'SAT' | 'BOTH' = 'IELTS'): UserProfile {
     const users = this.getUsers();
-    const existing = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-    const id = existing ? existing.id : `usr_${Date.now()}`;
+    const cleanEmail = email.trim().toLowerCase();
+    const existing = users.find((u) => u.email.toLowerCase() === cleanEmail);
+    const id = existing ? existing.id : `usr_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 
     if (!existing) {
-      users.push({
+      const newUser: UserAccount = {
         id,
-        fullName,
-        email,
+        fullName: fullName.trim(),
+        email: cleanEmail,
         password,
         createdAt: new Date().toISOString(),
-      });
+        targetExam,
+        isPro: false,
+        xp: 100,
+        lastActive: 'Hozirgina'
+      };
+      users.unshift(newUser);
+      this.saveUsers(users);
+
       if (this.isClient()) {
-        localStorage.setItem('prepora_registered_users', JSON.stringify(users));
+        fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'register',
+            fullName: fullName.trim(),
+            email: cleanEmail,
+            password,
+            targetExam,
+            isPro: false,
+            xp: 100
+          })
+        }).catch(err => console.warn('Server user sync error:', err));
       }
     }
 
