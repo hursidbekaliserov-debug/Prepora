@@ -91,49 +91,28 @@ export default function AdminDashboardPage() {
   }, [router]);
 
   const loadAllData = async () => {
-    // 1. Instant local read
-    const localUsers = StorageManager.getUsers();
-    setUsers(localUsers);
-    const localTx = StorageManager.getTransactions();
-    setTransactions(localTx);
-
-    // 2. Fetch live data from centralized server API (cross-device & persistent)
     try {
-      const [usersRes, txRes] = await Promise.all([
-        fetch('/api/admin/users').then(r => r.json()).catch(() => null),
-        fetch('/api/admin/transactions').then(r => r.json()).catch(() => null)
-      ]);
-
-      if (usersRes && usersRes.success && Array.isArray(usersRes.users)) {
-        const serverUsers: UserAccount[] = usersRes.users;
-        // Merge server and local accounts (avoiding duplicate emails)
-        const emailMap = new Map<string, UserAccount>();
-        serverUsers.forEach(u => emailMap.set(u.email.toLowerCase(), u));
-        localUsers.forEach(u => {
-          if (!emailMap.has(u.email.toLowerCase())) {
-            emailMap.set(u.email.toLowerCase(), u);
-          }
-        });
-        const mergedUsers = Array.from(emailMap.values());
-        setUsers(mergedUsers);
-        StorageManager.saveUsers(mergedUsers);
+      const res = await fetch('/api/admin/users').then(r => r.json()).catch(() => null);
+      if (res && res.success) {
+        if (Array.isArray(res.users)) {
+          setUsers(res.users);
+          StorageManager.saveUsers(res.users);
+        }
+        if (Array.isArray(res.transactions)) {
+          setTransactions(res.transactions);
+          localStorage.setItem('prepora_transactions', JSON.stringify(res.transactions));
+        }
+      } else {
+        const localUsers = StorageManager.getUsers();
+        setUsers(localUsers);
+        const localTx = StorageManager.getTransactions();
+        setTransactions(localTx);
       }
-
-      if (txRes && txRes.success && Array.isArray(txRes.transactions)) {
-        const serverTx: PaymentTransaction[] = txRes.transactions;
-        const txMap = new Map<string, PaymentTransaction>();
-        serverTx.forEach(t => txMap.set(t.id, t));
-        localTx.forEach(t => {
-          if (!txMap.has(t.id)) {
-            txMap.set(t.id, t);
-          }
-        });
-        const mergedTx = Array.from(txMap.values());
-        setTransactions(mergedTx);
-        localStorage.setItem('prepora_transactions', JSON.stringify(mergedTx));
-      }
-    } catch (err) {
-      console.warn('Sync error:', err);
+    } catch {
+      const localUsers = StorageManager.getUsers();
+      setUsers(localUsers);
+      const localTx = StorageManager.getTransactions();
+      setTransactions(localTx);
     }
   };
 
@@ -151,18 +130,66 @@ export default function AdminDashboardPage() {
   };
 
   const handleTogglePro = (userId: string, currentStatus?: boolean) => {
-    const updated = StorageManager.toggleUserPro(userId);
-    setUsers(updated);
-    loadAllData();
-    showToast(currentStatus ? "Foydalanuvchining Pro maqomi bekor qilindi." : "Foydalanuvchiga VIP Pro obuna faollashtirildi va +50 000 UZS kassa daromadi yozildi!", 'success');
+    const nextStatus = !currentStatus;
+
+    // 1. Instant optimistic state update (NO page shaking or freezing!)
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, isPro: nextStatus } : u));
+
+    const targetUser = users.find(u => u.id === userId);
+    if (targetUser) {
+      if (nextStatus) {
+        // Pro berildi: darhol kassaga qo'shish
+        const newTx: PaymentTransaction = {
+          id: `tx_${Date.now().toString().slice(-6)}`,
+          userName: targetUser.fullName,
+          userEmail: targetUser.email,
+          amount: 50000,
+          paymentMethod: 'ADMIN_MANUAL',
+          date: new Date().toISOString(),
+          status: 'COMPLETED'
+        };
+        setTransactions(prev => [newTx, ...prev]);
+      } else {
+        // Pro bekor qilindi: kassadan shu foydalanuvchining to'lovini olib tashlash (minus qilish)
+        setTransactions(prev => prev.filter(t => t.userEmail.toLowerCase() !== targetUser.email.toLowerCase()));
+      }
+    }
+
+    // 2. Background sync to persistent server
+    StorageManager.toggleUserPro(userId);
+    showToast(nextStatus ? "Foydalanuvchiga VIP Pro obuna berildi (+50 000 UZS)!" : "Foydalanuvchining Pro maqomi bekor qilindi va to'lov kassadan olib tashlandi.", 'success');
   };
 
   const handleDeleteUser = (userId: string, userName: string) => {
-    if (confirm(`Haqiqatan ham "${userName}" foydalanuvchisini o'chirmoqchimisiz?`)) {
-      const updated = StorageManager.deleteUser(userId);
-      setUsers(updated);
-      showToast(`"${userName}" foydalanuvchisi bazadan o'chirildi.`, 'success');
+    if (!confirm(`Haqiqatan ham "${userName}" foydalanuvchisini o'chirmoqchimisiz?\n\nDiqqat: Ushbu foydalanuvchi saytdan darhol chiqarib yuboriladi va uning to'lagan pullari kassadan minus qilinadi.`)) {
+      return;
     }
+
+    const target = users.find(u => u.id === userId);
+    const targetEmail = target ? target.email.toLowerCase() : '';
+
+    // 1. Instant optimistic removal from UI (smooth, no delay)
+    setUsers(prev => prev.filter(u => u.id !== userId));
+
+    // 2. Minus / remove any transactions by this user from cash register
+    setTransactions(prev => prev.filter(t => {
+      const match = (targetEmail && t.userEmail.toLowerCase() === targetEmail) ||
+                    t.userName.toLowerCase() === userName.toLowerCase();
+      return !match;
+    }));
+
+    // 3. Background sync to server and storage (evicts user from active sessions)
+    StorageManager.deleteUser(userId, targetEmail);
+    showToast(`"${userName}" o'chirildi, saytdan chiqarib yuborildi va kassadan pullari minus qilindi.`, 'success');
+  };
+
+  const handleResetCash = () => {
+    if (!confirm("Kassani 0 UZS qilib barcha to'lovlar tarixini tozalashni tasdiqlaysizmi?")) {
+      return;
+    }
+    setTransactions([]);
+    StorageManager.resetCashRegister();
+    showToast("Kassa va to'lovlar jurnali muvaffaqiyatli 0 UZS ga tenglashtirildi!", 'success');
   };
 
   const handleCreateUser = (e: React.FormEvent) => {
@@ -698,11 +725,21 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResetCash}
+                  className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  title="Kassani tozalash va 0 UZS qilish"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Kassani 0 Qilish</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setIsAddTxOpen(true)}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Kassaga Yangi To'lov Qo'shish</span>

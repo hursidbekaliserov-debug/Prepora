@@ -34,7 +34,32 @@ export default function GlobalAuthGate() {
       return;
     }
 
-    const checkAuth = () => {
+    const checkAuth = async () => {
+      // 1. Check if user was deleted/banned by admin
+      if (StorageManager.isCurrentUserDeleted()) {
+        StorageManager.logout();
+        alert("Sizning hisobingiz administrator tomonidan o'chirildi.");
+        router.push('/login');
+        return;
+      }
+
+      // Check with server if active session email is banned
+      try {
+        const sessionRaw = typeof window !== 'undefined' ? localStorage.getItem('prepora_active_session') : null;
+        if (sessionRaw) {
+          const session = JSON.parse(sessionRaw);
+          if (session.email) {
+            const res = await fetch(`/api/admin/users?email=${encodeURIComponent(session.email)}`).then(r => r.json()).catch(() => null);
+            if (res && res.evicted) {
+              StorageManager.logout();
+              alert("Sizning hisobingiz administrator tomonidan o'chirildi.");
+              router.push('/login');
+              return;
+            }
+          }
+        }
+      } catch {}
+
       const loggedIn = StorageManager.isUserLoggedIn();
       if (!loggedIn) {
         setShowAuth(true);
@@ -45,8 +70,14 @@ export default function GlobalAuthGate() {
 
     checkAuth();
 
+    // Check account validity every 10 seconds
+    const evictionTimer = setInterval(checkAuth, 10000);
+
     window.addEventListener('prepora_auth_changed', checkAuth);
-    return () => window.removeEventListener('prepora_auth_changed', checkAuth);
+    return () => {
+      clearInterval(evictionTimer);
+      window.removeEventListener('prepora_auth_changed', checkAuth);
+    };
   }, [pathname]);
 
   const handleModalClose = () => {

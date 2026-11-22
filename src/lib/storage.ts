@@ -196,15 +196,39 @@ export class StorageManager {
     }
   }
 
-  static deleteUser(userId: string): UserAccount[] {
-    const users = this.getUsers().filter(u => u.id !== userId);
+  static deleteUser(userId: string, userEmail?: string): UserAccount[] {
+    const targetUser = this.getUsers().find(u => u.id === userId || (userEmail && u.email.toLowerCase() === userEmail.toLowerCase()));
+    const exactEmail = targetUser ? targetUser.email.toLowerCase() : (userEmail || '').toLowerCase();
+    const exactName = targetUser ? targetUser.fullName.toLowerCase() : '';
+
+    const users = this.getUsers().filter(u => u.id !== userId && (!exactEmail || u.email.toLowerCase() !== exactEmail));
     this.saveUsers(users);
 
+    // Subtract/remove transactions belonging to this deleted user from cash register
+    const currentTx = this.getTransactions();
+    const filteredTx = currentTx.filter(tx => {
+      const isMatch = (exactEmail && tx.userEmail.toLowerCase() === exactEmail) ||
+                      (exactName && tx.userName.toLowerCase() === exactName);
+      return !isMatch;
+    });
     if (this.isClient()) {
+      localStorage.setItem('prepora_transactions', JSON.stringify(filteredTx));
+      window.dispatchEvent(new Event('prepora_transactions_updated'));
+
+      // Add to deleted users blacklist in localStorage
+      try {
+        const deletedRaw = localStorage.getItem('prepora_deleted_users');
+        const deletedArr: string[] = deletedRaw ? JSON.parse(deletedRaw) : [];
+        if (userId && !deletedArr.includes(userId)) deletedArr.push(userId);
+        if (exactEmail && !deletedArr.includes(exactEmail)) deletedArr.push(exactEmail);
+        localStorage.setItem('prepora_deleted_users', JSON.stringify(deletedArr));
+      } catch {}
+
+      // Inform server to ban user and subtract transactions from cloud database
       fetch('/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'delete', userId })
+        body: JSON.stringify({ action: 'delete', userId, userEmail: exactEmail })
       }).catch(err => console.warn('Server user delete sync error:', err));
     }
 
@@ -293,6 +317,24 @@ export class StorageManager {
     });
     this.saveUsers(users);
 
+    if (becamePro) {
+      // Pro berilganda +50 000 UZS daromad
+      this.addTransaction({
+        userName,
+        userEmail,
+        amount: 50000,
+        paymentMethod: 'ADMIN_MANUAL'
+      });
+    } else {
+      // Pro bekor qilinganda - shu foydalanuvchining to'lovini kassadan olib tashlash (minus qilish)
+      const currentTx = this.getTransactions();
+      const filteredTx = currentTx.filter(tx => tx.userEmail.toLowerCase() !== userEmail.toLowerCase());
+      if (this.isClient()) {
+        localStorage.setItem('prepora_transactions', JSON.stringify(filteredTx));
+        window.dispatchEvent(new Event('prepora_transactions_updated'));
+      }
+    }
+
     if (this.isClient()) {
       fetch('/api/admin/users', {
         method: 'POST',
@@ -301,16 +343,42 @@ export class StorageManager {
       }).catch(err => console.warn('Server togglePro sync error:', err));
     }
 
-    if (becamePro) {
-      this.addTransaction({
-        userName,
-        userEmail,
-        amount: 50000,
-        paymentMethod: 'ADMIN_MANUAL'
-      });
-    }
-
     return users;
+  }
+
+  static resetCashRegister(): void {
+    if (this.isClient()) {
+      localStorage.setItem('prepora_transactions', JSON.stringify([]));
+      window.dispatchEvent(new Event('prepora_transactions_updated'));
+
+      fetch('/api/admin/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset' })
+      }).catch(() => {});
+    }
+  }
+
+  static isCurrentUserDeleted(): boolean {
+    if (!this.isClient()) return false;
+    try {
+      const sessionRaw = localStorage.getItem('prepora_active_session');
+      if (!sessionRaw) return false;
+      const session = JSON.parse(sessionRaw);
+      const email = session.email ? session.email.toLowerCase() : '';
+      const id = session.id || '';
+
+      const deletedRaw = localStorage.getItem('prepora_deleted_users');
+      if (deletedRaw) {
+        const deletedArr: string[] = JSON.parse(deletedRaw);
+        if (deletedArr.includes(email) || deletedArr.includes(id)) {
+          return true;
+        }
+      }
+      return false;
+    } catch {
+      return false;
+    }
   }
 
   static addUser(user: Omit<UserAccount, 'id' | 'createdAt'>): UserAccount[] {
@@ -364,6 +432,7 @@ export class StorageManager {
         fetch('/api/admin/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
           body: JSON.stringify({
             action: 'register',
             fullName: fullName.trim(),

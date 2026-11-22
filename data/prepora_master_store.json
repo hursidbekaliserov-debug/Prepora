@@ -1,0 +1,104 @@
+{
+  "users": [],
+  "transactions": [
+    {
+      "userName": "d",
+      "userEmail": "s@sdfgyhuiklkjhgf",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "id": "tx_730721",
+      "date": "2026-11-22T12:48:50.721Z",
+      "status": "COMPLETED"
+    },
+    {
+      "userName": "d",
+      "userEmail": "s@sdfgyhuiklkjhgf",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "id": "tx_637384",
+      "date": "2026-11-22T12:47:17.384Z",
+      "status": "COMPLETED"
+    },
+    {
+      "userName": "d",
+      "userEmail": "s@sdfgyhuiklkjhgf",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "id": "tx_636610",
+      "date": "2026-11-22T12:47:16.610Z",
+      "status": "COMPLETED"
+    },
+    {
+      "userName": "d",
+      "userEmail": "s@sdfgyhuiklkjhgf",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "id": "tx_636365",
+      "date": "2026-11-22T12:47:16.365Z",
+      "status": "COMPLETED"
+    },
+    {
+      "userName": "d",
+      "userEmail": "s@sdfgyhuiklkjhgf",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "id": "tx_635964",
+      "date": "2026-11-22T12:47:15.964Z",
+      "status": "COMPLETED"
+    },
+    {
+      "userName": "d",
+      "userEmail": "s@sdfgyhuiklkjhgf",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "id": "tx_621860",
+      "date": "2026-11-22T12:47:01.860Z",
+      "status": "COMPLETED"
+    },
+    {
+      "userName": "Xurshid_admin",
+      "userEmail": "xurshid_admin@gmail.com",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "id": "tx_464592",
+      "date": "2026-11-22T12:44:24.592Z",
+      "status": "COMPLETED"
+    },
+    {
+      "id": "tx_464580",
+      "userName": "Xurshid_admin",
+      "userEmail": "xurshid_admin@gmail.com",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "date": "2026-11-22T12:44:24.580Z",
+      "status": "COMPLETED"
+    },
+    {
+      "userName": "Xurshid_admin",
+      "userEmail": "xurshid_admin@gmail.com",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "id": "tx_453571",
+      "date": "2026-11-22T12:44:13.571Z",
+      "status": "COMPLETED"
+    },
+    {
+      "id": "tx_453553",
+      "userName": "Xurshid_admin",
+      "userEmail": "xurshid_admin@gmail.com",
+      "amount": 50000,
+      "paymentMethod": "ADMIN_MANUAL",
+      "date": "2026-11-22T12:44:13.553Z",
+      "status": "COMPLETED"
+    },
+    {
+      "userName": "Munira",
+      "userEmail": "munira19901809@gmail.com",
+      "amount": 50000,
+      "paymentMethod": "UZCARD",
+      "id": "tx_387450",
+      "date": "2026-11-22T12:43:07.450Z",
+      "status": "COMPLETED"
+    }
+  ]
+}
